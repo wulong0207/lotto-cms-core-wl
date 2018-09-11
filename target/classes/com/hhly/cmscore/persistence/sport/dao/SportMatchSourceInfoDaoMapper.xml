@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.sport.dao.SportMatchSourceInfoDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.sport.po.SportMatchSourceInfoPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="match_id" jdbcType="INTEGER" property="matchId" />
+    <result column="match_name" jdbcType="VARCHAR" property="matchName" />
+    <result column="match_abbr_name" jdbcType="VARCHAR" property="matchAbbrName" />
+    <result column="match_type" jdbcType="TINYINT" property="matchType" />
+    <result column="source_id" jdbcType="INTEGER" property="sourceId" />
+    <result column="source" jdbcType="TINYINT" property="source" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  
+  <resultMap id="BoResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportMatchSourceInfoBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="match_id" jdbcType="INTEGER" property="matchId" />
+    <result column="match_name" jdbcType="VARCHAR" property="matchName" />
+    <result column="match_abbr_name" jdbcType="VARCHAR" property="matchAbbrName" />
+    <result column="match_type" jdbcType="TINYINT" property="matchType" />
+    <result column="source_id" jdbcType="INTEGER" property="sourceId" />
+    <result column="source" jdbcType="TINYINT" property="source" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>  
+  
+  <sql id="Base_Column_List">
+    id, match_id, match_name, match_abbr_name, match_type, source_id, source, create_time, 
+    update_time
+  </sql>
+  
+  <sql id="Base_Where_Clause">
+  	<where>
+      <if test="matchId != null">
+        and match_id = #{matchId,jdbcType=INTEGER}
+      </if>
+      <if test="matchName != null and matchName != ''">
+        and match_name like CONCAT('%',#{matchName},'%') 
+      </if>
+      <if test="matchAbbrName != null and matchAbbrName != ''">
+        and match_abbr_name like CONCAT('%',#{matchAbbrName},'%')  
+      </if>
+      <if test="matchType != null">
+        and match_type = #{matchType,jdbcType=TINYINT}
+      </if>
+      <if test="sourceId != null">
+        and source_id = #{sourceId,jdbcType=INTEGER}
+      </if>
+      <if test="source != null">
+        and source = #{source,jdbcType=TINYINT}
+      </if> 		
+  	</where>
+  </sql>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SportMatchSourceInfoVO"  resultType="java.lang.Integer">
+  	select count(1) from sport_match_source_info
+  	<include refid="Base_Where_Clause"/>
+  </select>
+  
+  <select id="findList" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SportMatchSourceInfoVO" resultMap="BoResultMap">
+  	select <include refid="Base_Column_List"/>
+  	from sport_match_source_info
+  	<include refid="Base_Where_Clause"/>
+  	order by match_id desc
+	<if test="startRow != null and pageSize != null">
+		limit #{startRow} ,#{pageSize}
+	</if>	  	
+  </select>  
+
+  <update id="updateById" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SportMatchSourceInfoVO">
+    update sport_match_source_info
+    <set>
+      <if test="matchId != null">
+        match_id = #{matchId,jdbcType=INTEGER},
+      </if>
+      <if test="matchName != null">
+        match_name = #{matchName,jdbcType=VARCHAR},
+      </if>
+      <if test="matchAbbrName != null">
+        match_abbr_name = #{matchAbbrName,jdbcType=VARCHAR},
+      </if>
+      <if test="matchType != null">
+        match_type = #{matchType,jdbcType=TINYINT},
+      </if>
+      <if test="sourceId != null">
+        source_id = #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="source != null">
+        source = #{source,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <update id="removeBind" parameterType="int">
+  	update sport_match_source_info set match_id = null where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <delete id="deleteBatch">
+	DELETE FROM sport_match_source_info
+	WHERE ID in
+	<foreach collection="list" item="item" open="(" close=")"
+			 separator=",">
+		#{item}
+	</foreach>
+ </delete>
+
+</mapper>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityCdkeyDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityCdkeyBO">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="activity_code" property="activityCode"/>
+        <result column="cdkey" jdbcType="VARCHAR" property="cdkey"/>
+        <result column="status" jdbcType="BIT" property="status"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="accountName" jdbcType="VARCHAR" property="accountName"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
+        <result column="exchange_time" jdbcType="VARCHAR" property="exchangeTime"/>
+    </resultMap>
+    <insert id="addBatchInsert" parameterType="java.util.List">
+        insert into operate_activity_cdkey (
+        activity_code, user_id,
+        cdkey, status, exchange_time,
+        create_time, create_by, modify_time,
+        modify_by, remark)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.activityCode,jdbcType=VARCHAR}, #{item.userId,jdbcType=INTEGER},
+            #{item.cdkey,jdbcType=VARCHAR}, 0, #{item.exchangeTime,jdbcType=TIMESTAMP},
+            NOW(), #{item.createBy,jdbcType=VARCHAR}, NOW(),
+            #{item.modifyBy,jdbcType=VARCHAR}, #{item.remark,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityCdkeyPO">
+        INSERT INTO operate_activity_cdkey (
+            activity_code,
+            user_id,
+            cdkey,
+            STATUS,
+            exchange_time,
+            create_time,
+            create_by,
+            modify_time,
+            modify_by,
+            remark
+        ) VALUES
+        (
+          #{activityCode,jdbcType=VARCHAR},
+          #{userId,jdbcType=INTEGER},
+          #{cdkey,jdbcType=VARCHAR},
+          #{status,jdbcType=BIT},
+          #{exchangeTime,jdbcType=TIMESTAMP},
+          #{createTime,jdbcType=TIMESTAMP},
+          #{createBy,jdbcType=VARCHAR},
+          #{modifyTime,jdbcType=TIMESTAMP},
+          #{modifyBy,jdbcType=VARCHAR},
+          #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <sql id="Base_Column_List">
+        id,
+        activity_code,
+        user_id,
+        cdkey,
+        status,
+        exchange_time,
+        create_time,
+        create_by,
+        modify_time,
+        modify_by,
+        remark
+    </sql>
+    <sql id="connditon">
+        <where>
+            <if test="activityCode != null">
+                and activity_code = #{activityCode}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+
+    </sql>
+
+    <select id="findValidCdkcount" resultType="java.lang.Integer">
+        SELECT count(0)
+        FROM operate_activity_cdkey
+        <include refid="connditon"/>
+    </select>
+
+    <select id="findMemberInfo" resultType="com.hhly.skeleton.user.bo.UserInfoBO">
+        SELECT
+          account_name account,
+          cus_mobile mobile
+        FROM m_user_info WHERE id = #{userId}
+    </select>
+
+    <select id="findCdkeyList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from operate_activity_cdkey
+        <include refid="connditon"/>
+        <if test="startRow != null and pageSize != null">
+            limit #{startRow}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="findTotal" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM operate_activity_cdkey
+        <include refid="connditon"/>
+
+    </select>
+
+    <delete id="deleteCdkey" parameterType="String">
+        DELETE FROM operate_activity_cdkey
+        WHERE id IN (
+            SELECT *
+            FROM (
+                     SELECT id
+                     FROM operate_activity_cdkey
+                     WHERE status = 0
+                     ORDER BY id DESC
+                     LIMIT 0, #{num}
+                 ) aa
+        )
+    </delete>
+    
+    <select id="findCountByCdkey" resultType="int">
+    	select count(*) from operate_activity_cdkey oac where
+    	oac.cdkey =#{cdkey, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="findExistCdkeys" resultType="java.lang.String">
+    	select distinct oac.cdkey from operate_activity_cdkey oac where
+    	oac.cdkey in
+    	<foreach collection="cdkeys" item="cdkey" open="(" separator="," close=")">
+    		#{cdkey}
+    	</foreach>
+    </select>
+</mapper>

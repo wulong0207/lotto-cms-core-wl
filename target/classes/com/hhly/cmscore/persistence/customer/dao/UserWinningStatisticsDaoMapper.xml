@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.hhly.cmscore.persistence.customer.dao.UserWinningStatisticsDaoMapper">
+	<resultMap id="BaseResultMap"
+		type="com.hhly.cmscore.persistence.customer.po.UserWinningStatisticsPO">
+		<id column="ID" jdbcType="DECIMAL" property="id" />
+		<result column="USER_ID" jdbcType="DECIMAL" property="userId" />
+		<result column="LOTTERY_CODE" jdbcType="DECIMAL" property="lotteryCode" />
+		<result column="SCORE" jdbcType="DECIMAL" property="score" />
+		<result column="AGENT_BUY_MONEY" jdbcType="DECIMAL" property="agentBuyMoney" />
+		<result column="AGENT_BUY_TIMES" jdbcType="DECIMAL" property="agentBuyTimes" />
+		<result column="AGENT_WINNING_MONEY" jdbcType="DECIMAL"
+			property="agentWinningMoney" />
+		<result column="AGENT_WINNING_TIMES" jdbcType="DECIMAL"
+			property="agentWinningTimes" />
+		<result column="JOIN_CREATE_MONEY" jdbcType="DECIMAL" property="joinCreateMoney" />
+		<result column="JOIN_CREATE_TIMES" jdbcType="DECIMAL" property="joinCreateTimes" />
+		<result column="JOIN_SUCCESS_TIMES" jdbcType="DECIMAL"
+			property="joinSuccessTimes" />
+		<result column="JOIN_WINNING_MONEY" jdbcType="DECIMAL"
+			property="joinWinningMoney" />
+		<result column="JOIN_WINNING_TIMES" jdbcType="DECIMAL"
+			property="joinWinningTimes" />
+		<result column="JOIN_BUY_MONEY" jdbcType="DECIMAL" property="joinBuyMoney" />
+		<result column="JOIN_INCOME_MONEY" jdbcType="DECIMAL" property="joinIncomeMoney" />
+		<result column="JOIN_SUCCESS_WINNING_TIMES" jdbcType="DECIMAL"
+			property="joinSuccessWinningTimes" />
+		<result column="FOLLOW_BUY_MONEY" jdbcType="DECIMAL" property="followBuyMoney" />
+		<result column="FOLLOW_BUY_TIMES" jdbcType="DECIMAL" property="followBuyTimes" />
+		<result column="FOLLOW_SUCCESS_TIMES" jdbcType="DECIMAL"
+			property="followSuccessTimes" />
+		<result column="FOLLOW_WINNING_MONEY" jdbcType="DECIMAL"
+			property="followWinningMoney" />
+		<result column="FOLLOW_WINNING_TIMES" jdbcType="DECIMAL"
+			property="followWinningTimes" />
+		<result column="FOLLOW_INCOME_MONEY" jdbcType="DECIMAL"
+			property="followIncomeMoney" />
+		<result column="FOLLOW_SUCCESS_WINNING_TIMES" jdbcType="DECIMAL"
+			property="followSuccessWinningTimes" />
+		<result column="ADD_BUY_MONEY" jdbcType="DECIMAL" property="addBuyMoney" />
+		<result column="ADD_BUY_TIMES" jdbcType="DECIMAL" property="addBuyTimes" />
+		<result column="ADD_WINNING_MONEY" jdbcType="DECIMAL" property="addWinningMoney" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, USER_ID, LOTTERY_CODE, SCORE, AGENT_BUY_MONEY, AGENT_BUY_TIMES,
+		AGENT_WINNING_MONEY,
+		AGENT_WINNING_TIMES, JOIN_CREATE_MONEY, JOIN_CREATE_TIMES, JOIN_SUCCESS_TIMES,
+		JOIN_WINNING_MONEY,
+		JOIN_WINNING_TIMES, JOIN_BUY_MONEY, JOIN_INCOME_MONEY, JOIN_SUCCESS_WINNING_TIMES,
+		FOLLOW_BUY_MONEY, FOLLOW_BUY_TIMES, FOLLOW_SUCCESS_TIMES,
+		FOLLOW_WINNING_MONEY, FOLLOW_WINNING_TIMES,
+		FOLLOW_INCOME_MONEY, FOLLOW_SUCCESS_WINNING_TIMES, ADD_BUY_MONEY, ADD_BUY_TIMES,
+		ADD_WINNING_MONEY
+	</sql>
+	<sql id="sql_condition_userWinningStatisticsVO">
+		<where>
+			<if test="nickName!=null and nickName!=''">
+				and ui.NICK_NAME = #{nickName}
+			</if>
+			<if test="accountName!=null and accountName!=''">
+				and ui.ACCOUNT_NAME = #{accountName}
+			</if>
+			<if test="cusMobile!=null and cusMobile!=''">
+				and ui.CUS_MOBILE = #{cusMobile}
+			</if>
+			<if test="actualName !=null and actualName !=''">
+				and ui.ACTUAL_NAME = #{actualName}
+			</if>
+			<if test="idNum != null and idNum != ''">
+				and ui.ID_NUM = #{idNum}
+			</if>
+			<if test="type !=null and type !=''">
+				and ui.${type} in
+				<foreach collection="values" open="(" close=")" separator=","
+					item="item">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</sql>
+	<select id="find"
+		parameterType="com.hhly.skeleton.cms.customermgr.vo.UserWinningStatisticsVO"
+		resultType="com.hhly.skeleton.cms.customermgr.bo.UserWinningStatisticsBO">
+			select
+			ui.account_name accountName,
+			ui.nick_name nickName,
+			lt.lottery_name lotteryname,
+			uws.SCORE SCORE,
+			uws.AGENT_BUY_MONEY AGENTBUYMONEY,
+			uws.AGENT_BUY_TIMES AGENTBUYTIMES,
+			uws.AGENT_WINNING_MONEY AGENTWINNINGMONEY,
+			uws.AGENT_WINNING_TIMES AGENTWINNINGTIMES,
+			uws.JOIN_CREATE_MONEY JOINCREATEMONEY,
+			uws.JOIN_CREATE_TIMES JOINCREATETIMES,
+			uws.JOIN_SUCCESS_TIMES JOINSUCCESSTIMES,
+			uws.JOIN_WINNING_MONEY JOINWINNINGMONEY,
+			uws.JOIN_WINNING_TIMES JOINWINNINGTIMES,
+			uws.JOIN_BUY_MONEY JOINBUYMONEY,
+			uws.JOIN_INCOME_MONEY JOININCOMEMONEY,
+			uws.JOIN_SUCCESS_WINNING_TIMES JOINSUCCESSWINNINGTIMES,
+			uws.FOLLOW_BUY_MONEY FOLLOWBUYMONEY,
+			uws.FOLLOW_BUY_TIMES FOLLOWBUYTIMES,
+			uws.FOLLOW_SUCCESS_TIMES FOLLOWSUCCESSTIMES,
+			uws.FOLLOW_WINNING_MONEY FOLLOWWINNINGMONEY,
+			uws.FOLLOW_WINNING_TIMES FOLLOWWINNINGTIMES,
+			uws.FOLLOW_INCOME_MONEY FOLLOWINCOMEMONEY,
+			uws.FOLLOW_SUCCESS_WINNING_TIMES FOLLOWSUCCESSWINNINGTIMES,
+			uws.ADD_BUY_MONEY ADDBUYMONEY,
+			uws.ADD_BUY_TIMES ADDBUYTIMES,
+			uws.ADD_WINNING_MONEY ADDWINNINGMONEY
+		from M_USER_WINNING_STATISTICS uws
+		left join M_USER_INFO ui on ui.id = uws.user_id
+		left join lottery_type lt on lt.lottery_code = uws.lottery_code
+		<include refid="sql_condition_userWinningStatisticsVO" />
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="findTotal"
+		parameterType="com.hhly.skeleton.cms.customermgr.vo.UserWinningStatisticsVO"
+		resultType="int">
+		select count(1)
+		from M_USER_WINNING_STATISTICS uws
+		left join M_USER_INFO ui on ui.id = uws.user_id
+		<include refid="sql_condition_userWinningStatisticsVO" />
+	</select>
+
+	<select id="findUserWinningStatisticsExcel"
+		parameterType="com.hhly.skeleton.cms.customermgr.vo.UserWinningStatisticsVO"
+		resultType="com.hhly.skeleton.cms.customermgr.bo.UserWinningStatisticsExcelBO">
+		select
+			uws.id,
+			ui.account_name accountName,
+			ui.nick_name nickName,
+			lt.lottery_name lotteryname,
+			uws.SCORE SCORE,
+			uws.AGENT_BUY_MONEY AGENTBUYMONEY,
+			uws.AGENT_BUY_TIMES AGENTBUYTIMES,
+			uws.AGENT_WINNING_MONEY AGENTWINNINGMONEY,
+			uws.AGENT_WINNING_TIMES AGENTWINNINGTIMES,
+			uws.JOIN_CREATE_MONEY JOINCREATEMONEY,
+			uws.JOIN_CREATE_TIMES JOINCREATETIMES,
+			uws.JOIN_SUCCESS_TIMES JOINSUCCESSTIMES,
+			uws.JOIN_WINNING_MONEY JOINWINNINGMONEY,
+			uws.JOIN_WINNING_TIMES JOINWINNINGTIMES,
+			uws.JOIN_BUY_MONEY JOINBUYMONEY,
+			uws.JOIN_INCOME_MONEY JOININCOMEMONEY,
+			uws.JOIN_SUCCESS_WINNING_TIMES JOINSUCCESSWINNINGTIMES,
+			uws.FOLLOW_BUY_MONEY FOLLOWBUYMONEY,
+			uws.FOLLOW_BUY_TIMES FOLLOWBUYTIMES,
+			uws.FOLLOW_SUCCESS_TIMES FOLLOWSUCCESSTIMES,
+			uws.FOLLOW_WINNING_MONEY FOLLOWWINNINGMONEY,
+			uws.FOLLOW_WINNING_TIMES FOLLOWWINNINGTIMES,
+			uws.FOLLOW_INCOME_MONEY FOLLOWINCOMEMONEY,
+			uws.FOLLOW_SUCCESS_WINNING_TIMES FOLLOWSUCCESSWINNINGTIMES,
+			uws.ADD_BUY_MONEY ADDBUYMONEY,
+			uws.ADD_BUY_TIMES ADDBUYTIMES,
+			uws.ADD_WINNING_MONEY ADDWINNINGMONEY
+		from M_USER_WINNING_STATISTICS uws
+		left join M_USER_INFO ui on ui.id = uws.user_id
+		left join lottery_type lt on lt.lottery_code = uws.lottery_code
+		<include refid="sql_condition_userWinningStatisticsVO" />
+		order by uws.id 
+	</select>
+		
+</mapper>

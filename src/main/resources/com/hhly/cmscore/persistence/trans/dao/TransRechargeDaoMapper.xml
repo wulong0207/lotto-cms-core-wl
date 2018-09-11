@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.trans.dao.TransRechargeDaoMapper">
+  <resultMap type="com.hhly.skeleton.cms.transmgr.bo.TransRechargeBO" id="BaseResultMap">
+  	<result column="id" property="id" jdbcType="DECIMAL"/>
+  	<result column="NICK_NAME" property="nickName" jdbcType="VARCHAR"/>
+  	<result column="TRANS_RECHARGE_CODE" property="transRechargeCode" jdbcType="VARCHAR"/>
+  	<result column="trans_status" property="transStatus" jdbcType="INTEGER"/>
+  	<result column="recharge_amount" property="rechargeAmount" jdbcType="DECIMAL"/>
+  	<result column="service_charge" property="serviceCharge" jdbcType="DECIMAL"/>
+  	<result column="red_amount" property="redAmount" jdbcType="DECIMAL"/>
+  	<result column="arrival_amount" property="arrivalAmount" jdbcType="DECIMAL"/>
+  	<result column="recharge_channel" property="rechargeChannel" jdbcType="INTEGER"/>
+  	<result column="bank_card_type" property="bankCardType" jdbcType="INTEGER"/>
+  	<result column="recharge_bank" property="rechargeBank" jdbcType="VARCHAR"/>
+  	<result column="pay_type" property="payType" jdbcType="INTEGER"/>
+  	<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+  	<result column="trans_time" property="transTime" jdbcType="TIMESTAMP"/>
+  	<result column="trans_end_time" property="transEndTime" jdbcType="TIMESTAMP"/>
+  	<result column="third_trans_num" property="thirdTransNum" jdbcType="VARCHAR"/>
+  	<result column="recharge_platform" property="rechargePlatform" jdbcType="INTEGER"/>
+  	<result column="supplement_by" property="supplementBy" jdbcType="VARCHAR"/>
+  	<result column="remark" property="remark" jdbcType="VARCHAR"/>
+  	<result column="account_name" property="accountName" jdbcType="VARCHAR"/>
+  	<result column="cus_mobile" property="cusMobile" jdbcType="VARCHAR"/>
+  	<result column="channel_name" property="channelName" jdbcType="VARCHAR"/>
+  	<result column="order_code" property="orderCode" jdbcType="VARCHAR"/>
+  	<result column="third_trans_time" property="thirdTransTime" jdbcType="TIMESTAMP"/>
+  	<result column="response_time" property="responseTime" jdbcType="TIMESTAMP"/>
+  	<result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP"/>
+  	<result column="recharge_remark" property="rechargeRemark" jdbcType="VARCHAR"/>
+  	<result column="CREATE_BY" property="createBy" jdbcType="VARCHAR"/>
+  	<result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR"/>
+  	<result column="BANK_CARD_NUM" property="bankCardNum" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+  	tr.id,TRANS_RECHARGE_CODE,trans_status,recharge_amount,service_charge,red_amount,arrival_amount,recharge_channel,bank_card_type,tr.CREATE_BY,tr.MODIFY_BY,
+  	recharge_bank,pay_type,tr.trans_time,tr.create_time,trans_end_time,third_trans_num,recharge_platform,supplement_by,tr.remark,third_trans_time,response_time,tr.MODIFY_TIME,recharge_remark,
+  	order_code,
+  	NICK_NAME,account_name,cus_mobile,
+  	channel_name,BANK_CARD_NUM
+  </sql>
+
+  <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+  	 	limit #{startRow},#{pageSize}
+ 	 </if>
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+			<if test="transRechargeCode != null and transRechargeCode !=''">
+				and trans_recharge_code = #{transRechargeCode}
+			</if>
+			<if test="thirdTransNum != null and thirdTransNum !=''">
+				and third_trans_num = #{thirdTransNum}
+			</if>
+			<if test="rechargeChannel != null">
+				and recharge_channel = #{rechargeChannel}
+			</if>
+			<if test="bankCardType != null">
+				and bank_card_type = #{bankCardType}
+			</if>
+			<if test="channelName != null and channelName !=''">
+				and channel_name like CONCAT('%',#{channelName},'%')
+			</if>
+			<if test="channelId != null">
+				and tr.channel_id = #{channelId}
+			</if>
+			<if test="rechargeBank != null">
+				and recharge_bank = #{rechargeBank}
+			</if>
+			<if test="searchUserType != null and searchUserValue != null and searchUserValue != ''">
+				<choose>
+					<when test="searchUserType == 1">
+						and NICK_NAME like CONCAT('%',#{searchUserValue},'%')
+					</when>
+					<when test="searchUserType == 2">
+						and ACCOUNT_NAME like CONCAT('%',#{searchUserValue},'%')
+					</when>
+					<when test="searchUserType == 3">
+						and CUS_MOBILE = #{searchUserValue}
+					</when>
+					<when test="searchUserType == 4">
+						and ACTUAL_NAME like CONCAT('%',#{searchUserValue},'%')
+					</when>
+					<when test="searchUserType == 5">
+						and ID_NUM like CONCAT('%',#{searchUserValue},'%')
+					</when>
+				</choose>
+			</if>
+			<if test="searchTimeType != null and startTime != null and endTime != null">
+				<choose>
+					<when test="searchTimeType == 1">
+						<![CDATA[ and tr.create_time >= #{startTime} and tr.create_time <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 2">
+						<![CDATA[ and trans_time >= #{startTime} and trans_time <= #{endTime}]]>
+					</when>
+				</choose>
+			</if>
+			<if test="transStatus != null">
+				and tr.trans_status = #{transStatus}
+			</if>
+			<if test="payType != null">
+				and pay_type = #{payType}
+			</if>
+		</where>
+  </sql>
+  
+  <sql id="Table">
+  	trans_recharge tr 
+  	left outer join operate_market_channel omc on tr.channel_id=omc.channel_id
+		left outer join M_USER_INFO lc on tr.user_id=lc.id
+  </sql>
+  
+  <select id="findTrans" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransRechargeVO" resultMap="BaseResultMap">
+	     select <include refid="Base_Column_List"/>
+				from <include refid="Table"/>
+				<include refid="Query_Condition"/>
+		  		order by 
+		     <choose>  
+		       <when test="sortField !=null and sortField!=''">  
+		           ${sortField} ${sortOrder}
+		       </when>   
+		       <otherwise>  
+		            tr.id desc
+		       </otherwise>  
+		     </choose> 				
+  <include refid="Page_Condition"/>
+  </select>
+  
+  <select id="findStatis" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransRechargeVO" resultType="Map">
+	    select count(*) total,
+	    	sum(recharge_amount) queryRechargeAmount,
+	    	sum(arrival_amount) queryArrivalAmount
+	    from <include refid="Table"/>
+				<include refid="Query_Condition"/>
+	</select>
+
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransRechargeVO" resultType="int">
+    select count(*) total
+    from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+	</select>
+  
+  <select id="findExcel" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransRechargeVO" resultType="com.hhly.skeleton.cms.transmgr.bo.TransRechargeExcelBO">
+    select
+	  @rownum:=@rownum+1 AS id,
+      NICK_NAME nickName,
+      TRANS_RECHARGE_CODE transRechargeCode,
+      tr.TRANS_STATUS transStatus,
+      RECHARGE_AMOUNT rechargeAmount,
+      SERVICE_CHARGE serviceCharge,
+      RED_AMOUNT redAmount,
+      ARRIVAL_AMOUNT arrivalAmount,
+      RECHARGE_CHANNEL rechargeChannel,
+      BANK_CARD_TYPE bankCardType,
+      RECHARGE_BANK rechargeBank,
+      PAY_TYPE payType,
+      date_format(tr.CREATE_TIME, '%Y-%m-%d %H:%i:%s') createTime,
+      date_format(TRANS_TIME, '%Y-%m-%d %H:%i:%s') transTime,
+      date_format(TRANS_END_TIME, '%Y-%m-%d %H:%i:%s') transEndTime,
+      THIRD_TRANS_NUM thirdTransNum,
+      RECHARGE_PLATFORM rechargePlatform,
+      SUPPLEMENT_BY supplementBy,
+      tr.REMARK remark,
+	  channel_name channelName,
+	  order_code orderCode
+   from <include refid="Table"/>
+	  , (SELECT @rownum:=0) r
+			<include refid="Query_Condition"/>
+			order by tr.id desc
+  </select>
+  
+ 	<update id="resupply">
+ 		update TRANS_RECHARGE SET
+ 			 TRANS_STATUS=2,
+ 			 SUPPLEMENT_BY = #{userName},
+ 			 MODIFY_BY = #{userName},
+ 			 MODIFY_TIME = now()
+	  WHERE TRANS_STATUS = 1 AND
+	  ID in
+	  <foreach item="id" collection="ids" open="(" separator="," close=")">
+	     #{id}
+	  </foreach>
+ 	</update>
+</mapper>

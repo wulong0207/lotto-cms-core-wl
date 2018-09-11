@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityInfoDaoMapper">
+
+    <sql id="Where_Clause">
+        <where>
+            <if test="type !=null and type !=''">
+                and ${type} in
+                <foreach collection="values" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+    <delete id="delete" parameterType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityInfoBO">
+        delete from operate_activity_info <include refid="Where_Clause"/>
+    </delete>
+
+    <insert id="addBatch" parameterType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityInfoBO" keyProperty="id" useGeneratedKeys="true">
+        insert into operate_activity_info (id, activity_code, activity_rule_id,
+        user_id, actual_name, id_num,
+        cus_mobile, rebate_money, order_code,
+        red_code, create_by, create_time,
+        modify_by, modify_time, update_time,
+        operaction_type, order_create_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id,jdbcType=INTEGER}, #{item.activityCode,jdbcType=VARCHAR}, #{item.activityRuleId,jdbcType=INTEGER},
+            #{item.userId,jdbcType=INTEGER}, #{item.actualName,jdbcType=VARCHAR}, #{item.idNum,jdbcType=VARCHAR},
+            #{item.cusMobile,jdbcType=VARCHAR}, #{item.rebateMoney,jdbcType=DECIMAL}, #{item.orderCode,jdbcType=VARCHAR},
+            #{item.redCode,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.modifyBy,jdbcType=VARCHAR}, #{item.modifyTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP},
+            #{item.operactionType}, #{item.orderCreateTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

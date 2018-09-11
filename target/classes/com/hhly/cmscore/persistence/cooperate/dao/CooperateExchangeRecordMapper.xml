@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.cooperate.dao.CooperateExchangeRecordMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.cooperate.po.CooperateExchangeRecordPO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="pay_class" jdbcType="VARCHAR" property="payClass"/>
+        <result column="channel_balance" jdbcType="DECIMAL" property="channelBalance"/>
+        <result column="serial_number" jdbcType="VARCHAR" property="serialNumber"/>
+        <result column="cdkey_id" jdbcType="INTEGER" property="cdkeyId"/>
+        <result column="channel_id" jdbcType="INTEGER" property="channelId"/>
+        <result column="exchange_record_time" jdbcType="TIMESTAMP" property="exchangeRecordTime"/>
+        <result column="exchange_over_time" jdbcType="TIMESTAMP" property="exchangeOverTime"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_by" jdbcType="VARCHAR" property="modifyBy"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, pay_class, channel_balance, serial_number, cdkey_id, channel_id, exchange_record_time,
+        exchange_over_time, order_code, create_by, create_time, modify_by, modify_time, remark
+    </sql>
+
+    <sql id="where_vo">
+        <where>
+            <if test="channelName != null and channelName != ''">
+                and b.channel_name like CONCAT('%', #{channelName,jdbcType=INTEGER}, '%')
+            </if>
+            <if test="serialType != null and serialType != ''">
+                and a.serial_type = #{serialType,jdbcType=INTEGER}
+            </if>
+            <if test="payClass != null and payClass != ''">
+                and a.pay_class = #{payClass,jdbcType=INTEGER}
+            </if>
+            <if test="serialNumber != null and serialNumber != ''">
+                and a.serial_number = #{serialNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="channelId != null and channelId != ''">
+                and a.channel_id = #{channelId,jdbcType=VARCHAR}
+            </if>
+            <if test="lotteryCode != null and lotteryCode != ''">
+                and d.lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+            </if>
+            <if test="cdKey != null  and cdKey != ''">
+                and a.my_cdkey  like CONCAT('%', #{cdKey,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="exchangeRecordBeginTime != null">
+                and (a.exchange_record_time >= #{exchangeRecordBeginTime,jdbcType=TIMESTAMP} or a.create_time >= #{exchangeRecordBeginTime,jdbcType=TIMESTAMP})
+            </if>
+            <if test="exchangeRecordEndTime != null">
+                and (a.exchange_record_time &lt;= #{exchangeRecordEndTime,jdbcType=TIMESTAMP} or a.create_time &lt;= #{exchangeRecordEndTime,jdbcType=TIMESTAMP})
+            </if>
+            <if test="field != null  and field != ''">
+                and e.${field} like CONCAT('%', #{fieldValue,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询流水total -->
+    <select id="selectCount" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateExchangeRecordVO"
+            resultType="int">
+        select
+        count(1)
+        from cooperate_exchange_record a
+        inner join operate_market_channel b on a.channel_id=b.channel_id
+        inner join cooperate_channel c on a.channel_id=c.market_channel_id
+        LEFT JOIN order_info d on d.order_code=a.order_code
+        left join m_user_info e on d.user_id=e.id
+        left join cooperate_cdkey f on f.id=a.cdkey_id
+        <include refid="where_vo"/>
+    </select>
+
+    <!-- 查询流水信息 -->
+    <select id="selectExchangeRecordList" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateExchangeRecordVO"
+            resultType="com.hhly.skeleton.cms.cooperate.bo.CooperateExchangeRecordBO">
+        select
+        a.id as id,
+        a.pay_class as payClass,
+        a.channel_balance as channelBalance,
+        a.serial_number as serialNumber,
+        a.cdkey_id as cdkeyId,
+        a.channel_id as channelId,
+        b.channel_name as channelName,
+        a.order_code as orderCode,
+        ifnull(a.exchange_record_time,a.create_time) as exchangeRecordTime,
+        a.remark as remark,
+        a.pay_amount as payAmount,
+        a.order_info as orderInfo,
+        a.`desc` as "desc",
+        e.account_name as account,
+        e.cus_mobile as phoneNum,
+        a.create_by as createBy,
+        a.create_time as createTime,
+        a.modify_by as modifyBy,
+        a.modify_time as modifyTime
+        from cooperate_exchange_record a
+        inner join operate_market_channel b on a.channel_id=b.channel_id
+        inner join cooperate_channel c on a.channel_id=c.market_channel_id
+        LEFT JOIN order_info d on d.order_code=a.order_code
+        left join m_user_info e on d.user_id=e.id
+        <include refid="where_vo"/>
+        order by id desc
+        <if test="startRow != null and pageSize != null">
+            limit #{startRow},#{pageSize}
+        </if>
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cooperate_exchange_record
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM cooperate_exchange_record
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateExchangeRecordVO">
+        INSERT INTO cooperate_exchange_record (id, pay_class, channel_balance,
+                                               serial_number, cdkey_id, channel_id,
+                                               exchange_record_time, exchange_over_time,
+                                               order_code, create_by, create_time,
+                                               modify_by, modify_time, remark
+        )
+        VALUES (#{id,jdbcType=INTEGER}, #{payClass,jdbcType=BIT}, #{channelBalance,jdbcType=DECIMAL},
+                                        #{serialNumber,jdbcType=VARCHAR}, #{cdkeyId,jdbcType=INTEGER},
+                                        #{channelId,jdbcType=INTEGER},
+                                        #{exchangeRecordTime,jdbcType=TIMESTAMP},
+                                        #{exchangeOverTime,jdbcType=TIMESTAMP},
+                                        #{orderCode,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR},
+                                        #{createTime,jdbcType=TIMESTAMP},
+                #{modifyBy,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateExchangeRecordVO">
+        insert into cooperate_exchange_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="payClass != null">
+                pay_class,
+            </if>
+            <if test="channelBalance != null">
+                channel_balance,
+            </if>
+            <if test="serialNumber != null">
+                serial_number,
+            </if>
+            <if test="cdkeyId != null">
+                cdkey_id,
+            </if>
+            <if test="channelId != null">
+                channel_id,
+            </if>
+            <if test="exchangeRecordTime != null">
+                exchange_record_time,
+            </if>
+            <if test="exchangeOverTime != null">
+                exchange_over_time,
+            </if>
+            <if test="orderCode != null">
+                order_code,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+
+            <if test="modifyBy != null">
+                modify_by,
+            </if>
+
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="desc != null">
+                `desc`,
+            </if>
+            <if test="payAmount != null">
+                pay_amount,
+            </if>
+            <if test="orderInfo != null">
+                order_info,
+            </if>
+            <if test="serialType != null and serialType != ''">
+                serial_type,
+            </if>
+            modify_time,
+            create_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="payClass != null">
+                #{payClass,jdbcType=BIT},
+            </if>
+            <if test="channelBalance != null">
+                #{channelBalance,jdbcType=DECIMAL},
+            </if>
+            <if test="serialNumber != null">
+                #{serialNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="cdkeyId != null">
+                #{cdkeyId,jdbcType=INTEGER},
+            </if>
+            <if test="channelId != null">
+                #{channelId,jdbcType=INTEGER},
+            </if>
+            <if test="exchangeRecordTime != null">
+                #{exchangeRecordTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="exchangeOverTime != null">
+                #{exchangeOverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderCode != null">
+                #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyBy != null">
+                #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="desc != null">
+                #{desc,jdbcType=VARCHAR},
+            </if>
+            <if test="payAmount != null">
+                #{payAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="orderInfo != null">
+                #{orderInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="serialType != null and serialType != ''">
+                #{serialType,jdbcType=INTEGER},
+            </if>
+            now(),
+            now()
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateExchangeRecordPO">
+        update cooperate_exchange_record
+        <set>
+            <if test="payClass != null">
+                pay_class = #{payClass,jdbcType=BIT},
+            </if>
+            <if test="channelBalance != null">
+                channel_balance = #{channelBalance,jdbcType=DECIMAL},
+            </if>
+            <if test="serialNumber != null">
+                serial_number = #{serialNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="cdkeyId != null">
+                cdkey_id = #{cdkeyId,jdbcType=INTEGER},
+            </if>
+            <if test="channelId != null">
+                channel_id = #{channelId,jdbcType=INTEGER},
+            </if>
+            <if test="exchangeRecordTime != null">
+                exchange_record_time = #{exchangeRecordTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="exchangeOverTime != null">
+                exchange_over_time = #{exchangeOverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderCode != null">
+                order_code = #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyBy != null">
+                modify_by = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateExchangeRecordPO">
+        UPDATE cooperate_exchange_record
+        SET pay_class            = #{payClass,jdbcType=BIT},
+            channel_balance      = #{channelBalance,jdbcType=DECIMAL},
+            serial_number        = #{serialNumber,jdbcType=VARCHAR},
+            cdkey_id             = #{cdkeyId,jdbcType=INTEGER},
+            channel_id           = #{channelId,jdbcType=INTEGER},
+            exchange_record_time = #{exchangeRecordTime,jdbcType=TIMESTAMP},
+            exchange_over_time   = #{exchangeOverTime,jdbcType=TIMESTAMP},
+            order_code           = #{orderCode,jdbcType=VARCHAR},
+            create_by            = #{createBy,jdbcType=VARCHAR},
+            create_time          = #{createTime,jdbcType=TIMESTAMP},
+            modify_by            = #{modifyBy,jdbcType=VARCHAR},
+            modify_time          = #{modifyTime,jdbcType=TIMESTAMP},
+            remark               = #{remark,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertList" parameterType="java.util.List">
+        insert into cooperate_exchange_record(
+        pay_class,
+        channel_balance,
+        serial_number,
+        serial_type,
+        cdkey_id,
+        channel_id,
+        exchange_over_time,
+        order_info,
+        create_by,
+        create_time,
+        modify_by,
+        modify_time,
+        pay_amount
+        )
+        VALUES
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.payClass,jdbcType=SMALLINT},
+            #{item.channelBalance,jdbcType=SMALLINT},
+            #{item.serialNumber,jdbcType=VARCHAR},
+            #{item.serialType,jdbcType=BIT},
+            #{item.cdkeyId,jdbcType=INTEGER},
+            #{item.channelId,jdbcType=VARCHAR},
+            #{item.exchangeOverTime,jdbcType=TIMESTAMP},
+            #{item.orderInfo,jdbcType=VARCHAR},
+            #{item.createBy,jdbcType=VARCHAR},
+            now(),
+            #{item.modifyBy,jdbcType=VARCHAR},
+            now(),
+            #{item.payAmount,jdbcType=DECIMAL})
+        </foreach>
+    </insert>
+
+
+    <!-- 查询过期订单 -->
+    <select id="selectOverTimeCdKey" resultType="com.hhly.skeleton.cms.cooperate.bo.CooperateExchangeRecordBO">
+        select
+        b.cdkey_id as cdkeyId,
+        a.lotto_cdkey as cdkey,
+        a.ticket_channel as channelId,
+        a.over_time as exchangeOverTime
+        from cooperate_cdkey a
+        inner join cooperate_exchange_record b on a.id=b.cdkey_id
+        where b.exchange_over_time &lt;=now() and (a.stauts=1 or a.stauts=3)
+    </select>
+
+
+    <!-- 查询过期流水 -->
+    <select id="selectOverTimeSerNumber" resultMap="BaseResultMap">
+        select * from cooperate_exchange_record where exchange_over_time &lt;= now() and exchange_over_time is not null
+        and (order_info='待兑换' or order_info is null)
+    </select>
+
+    <!-- 更新过期流水 -->
+    <update id="updateOverTimeSerNumber" parameterType="java.util.List">
+        update  cooperate_exchange_record set order_info='已过期'
+        where id in
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <!-- 根据渠道查询充值流水总数 -->
+    <select id="findTotalByChannelId" resultType="double">
+        SELECT ifnull(sum(pay_amount),0)
+        FROM cooperate_exchange_record
+        WHERE pay_class = 1 AND serial_type = 1 AND channel_id = #{channelId}
+    </select>
+</mapper>

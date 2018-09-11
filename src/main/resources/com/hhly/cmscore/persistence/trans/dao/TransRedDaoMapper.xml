@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.trans.dao.TransRedDaoMapper">
+  <resultMap type="com.hhly.skeleton.cms.transmgr.bo.TransRedBO" id="BaseResultMap">
+  	<id column="id" property="id" jdbcType="DECIMAL"/>
+  	<result column="NICK_NAME" property="nickName" jdbcType="VARCHAR"/>
+  	<result column="red_trans_code" property="redTransCode" jdbcType="VARCHAR"/>
+  	<result column="red_code" property="redCode" jdbcType="VARCHAR"/>
+  	<result column="trans_type" property="transType" jdbcType="INTEGER"/>
+  	<result column="trans_status" property="transStatus" jdbcType="INTEGER"/>
+  	<result column="trans_amount" property="transAmount" jdbcType="DECIMAL"/>
+  	<result column="aft_trans_amount" property="aftTransAmount" jdbcType="DECIMAL"/>
+  	<result column="order_info" property="orderInfo" jdbcType="VARCHAR"/>
+  	<result column="trans_time" property="transTime" jdbcType="TIMESTAMP"/>
+  	<result column="order_code" property="orderCode" jdbcType="VARCHAR"/>
+  	<result column="red_type" property="redType" jdbcType="INTEGER"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+  	tr.id,red_trans_code,tr.red_code,tr.order_code,tr.trans_type,tr.order_info,tr.trans_time,tr.trans_amount,aft_trans_amount,tr.trans_status,
+  	NICK_NAME,red_type
+  </sql>
+  
+  <sql id="Order_Condition">
+     <choose>  
+       <when test="sortField !=null and sortField!=''">  
+           ${sortField} ${sortOrder}
+       </when>   
+       <otherwise>  
+            tr.id desc
+       </otherwise>  
+     </choose>  
+  </sql>
+  
+  <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+   		limit #{startRow},#{pageSize}
+ 	 </if>
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+			<if test="lotteryCode != null">
+				lottery_code=#{lotteryCode}
+			</if>
+			<!-- 
+				如果endIssue不为空，且startIsse < endIssue,则查询[startIsse, endIssue],
+				否则查询issue=startIsse
+			 -->
+			<choose>
+				<when test="startIssue != null and endIssue != null">
+					<![CDATA[
+						and lottery_issue >= #{startIssue,jdbcType=BIGINT} and lottery_issue<=#{endIssue,jdbcType=BIGINT}
+					]]>
+				</when>
+				<when test="startIssue != null">
+					and lottery_issue=#{startIssue,jdbcType=BIGINT}
+				</when>
+			</choose>
+			<if test="orderInfo != null and orderInfo !=''">
+				and order_info like CONCAT('%',#{orderInfo},'%')
+			</if>
+			<if test="redTransCode != null and redTransCode !=''">
+				and red_trans_code = #{redTransCode}
+			</if>
+			<if test="orderCode != null and orderCode !=''">
+				and tr.order_code = #{orderCode}
+			</if>
+			<if test="redCode != null and redCode !=''">
+				and tr.red_code = #{redCode}
+			</if>
+			<if test="userSearchType != null and userSearchValue != null and userSearchValue != ''">
+				<choose>
+					<when test="userSearchType == 1">
+						and NICK_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 2">
+						and ACCOUNT_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 3">
+						and CUS_MOBILE = #{userSearchValue}
+					</when>
+					<when test="userSearchType == 4">
+						and ACTUAL_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 5">
+						and ID_NUM like CONCAT('%',#{userSearchValue},'%')
+					</when>
+				</choose>
+			</if>
+			<if test="searchTimeType != null and startTime != null and endTime != null">
+				<choose>
+					<when test="searchTimeType == 1">
+						<![CDATA[ and tr.create_time >= #{startTime} and tr.create_time <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 2">
+						<![CDATA[ and trans_time >= #{startTime} and trans_time <= #{endTime}]]>
+					</when>
+				</choose>
+			</if>
+			<if test="transType != null">
+				and tr.trans_type = #{transType}
+			</if>
+			<if test="transStatus != null">
+				and tr.trans_status = #{transStatus}
+			</if>
+			<if test="redType != null">
+				and tr.red_Type = #{redType}
+			</if>
+		</where>
+  </sql>
+  
+  <sql id="Table">
+  	trans_red tr 
+			left outer join order_info oi on tr.order_code=oi.order_code
+			left outer join M_USER_INFO lc on tr.user_id=lc.id
+  </sql>
+  
+  <select id="findTrans" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransRedVO" resultMap="BaseResultMap">
+     select <include refid="Base_Column_List"/>
+			from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+			order by
+			<include refid="Order_Condition"/>
+    		<include refid="Page_Condition"/>
+  </select>
+  
+  <select id="findStatis" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransRedVO" resultType="Map">
+	    select count(*) total,
+	    	sum(trans_amount) queryTransAmount,
+	    	sum(aft_trans_amount) queryAftTransAmount
+	    from <include refid="Table"/>
+				<include refid="Query_Condition"/>
+	</select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransRedVO" resultType="int">
+   select count(*) total
+   from <include refid="Table"/>
+		<include refid="Query_Condition"/>
+	</select>
+  
+  <select id="findExcel" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransRedVO" resultType="com.hhly.skeleton.cms.transmgr.bo.TransRedExcelBO">
+    select 
+      tr.id id,
+      NICK_NAME nickName,
+      RED_TRANS_CODE redTransCode,
+      tr.RED_CODE redCode,
+      TRANS_TYPE transType,
+      TRANS_AMOUNT transAmount,
+      TRANS_STATUS transStatus,
+      TRANS_AMOUNT transAmount,
+      AFT_TRANS_AMOUNT aftTransAmount,
+      tr.ORDER_INFO orderInfo,
+      tr.ORDER_CODE orderCode,
+      tr.red_type redtype,
+      date_format(TRANS_TIME, '%Y-%m-%d %H:%i:%s') transTime
+   from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+			order by tr.id desc
+  </select>
+</mapper>

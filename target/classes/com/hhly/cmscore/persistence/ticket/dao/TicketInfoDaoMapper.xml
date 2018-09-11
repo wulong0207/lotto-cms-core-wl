@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.ticket.dao.TicketInfoDaoMapper" >
+  
+	<!--                         COMMON                               -->
+  	<!-- sql公共结果集 -->
+  	<resultMap id="TicketResultMap" type="com.hhly.skeleton.cms.ticketmgr.bo.TicketInfoBO">
+  	  <id property="id" column="id" jdbcType="BIGINT"/>
+  	  <result property="lotteryCode" column="lottery_code" jdbcType="INTEGER"/>
+  	  <result property="lotteryName" column="lottery_name" jdbcType="VARCHAR"/>
+  	  <result property="lotteryIssue" column="lottery_issue" jdbcType="VARCHAR"/>
+  	  <result property="userId" column="user_id" jdbcType="BIGINT"/>
+  	  <result property="ticketStatus" column="ticket_status" jdbcType="SMALLINT"/>
+  	  <result property="ticketMoney" column="ticket_money" jdbcType="DECIMAL"/>
+  	  <result property="channelId" column="channel_id" jdbcType="VARCHAR"/>
+  	  <result property="orderCode" column="order_code" jdbcType="VARCHAR"/>
+  	  <result property="winningStatus" column="winning_status" jdbcType="SMALLINT"/>
+  	  <result property="preBonus" column="pre_bonus" jdbcType="DECIMAL"/>
+  	  <result property="aftBonus" column="aft_bonus" jdbcType="DECIMAL"/>
+  	  <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+  	  <result property="endTicketTime" column="end_ticket_time" jdbcType="TIMESTAMP"/>
+  	  <result property="sendChannelTime" column="send_channel_time" jdbcType="TIMESTAMP"/>
+  	  <result property="comeOutTime" column="come_out_time" jdbcType="TIMESTAMP"/>
+  	  <result property="receiptTime" column="receipt_time" jdbcType="TIMESTAMP"/>
+  	  <result property="lotteryTime" column="lottery_time" jdbcType="TIMESTAMP"/>
+  	  <result property="contentType" column="content_type" jdbcType="INTEGER"/>
+  	  <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+  	  <result property="buyScreen" column="buy_screen" jdbcType="VARCHAR"/>
+  	  <result property="lottoAdd" column="lotto_add" jdbcType="SMALLINT"/>
+  	  <result property="activitySource" column="activity_source" jdbcType="VARCHAR"/>
+  	  <result property="batchNum" column="batch_num" jdbcType="VARCHAR"/>
+  	  <result property="officialNum" column="official_num" jdbcType="VARCHAR"/>
+  	  <result property="winningDetail" column="winning_detail" jdbcType="VARCHAR"/>
+  	  <result property="multipleNum" column="multiple_num" jdbcType="INTEGER"/>
+  	  <result property="addedBonus" column="added_bonus" jdbcType="DECIMAL"/>
+  	  <result property="redCode" column="RED_CODE" jdbcType="VARCHAR"/>
+  	  <result property="thirdNum" column="third_num" jdbcType="VARCHAR"/>
+  	  <result property="channelRemark" column="channel_remark" jdbcType="VARCHAR"/>
+  	  <result property="ticketChange" column="ticket_change" jdbcType="VARCHAR"/>
+  	  <result property="ticketContent" column="ticket_content" jdbcType="VARCHAR"/>
+  	  <result property="receiptContent" column="receipt_content" jdbcType="VARCHAR"/>
+  	  <result property="receiptContentDetail" column="receipt_content_detail" jdbcType="VARCHAR"/>
+  	  <result property="ticketImg" column="ticket_img" jdbcType="VARCHAR"/>
+  	  <result property="ticketImgTxt" column="ticket_img_txt" jdbcType="VARCHAR"/>
+  	  <result property="modifyTime" column="modify_time" jdbcType="TIMESTAMP"/>
+  	  <result property="modifyBy" column="modify_by" jdbcType="VARCHAR"/>
+  	  <result property="ticketRemark" column="ticket_remark" jdbcType="VARCHAR"/>
+  	  <result property="lotteryChildCode" column="lottery_Child_Code" jdbcType="VARCHAR"/>
+  	  <result property="channelAllocationSendTime" column="channel_allocation_send_time" jdbcType="TIMESTAMP"/>
+  	  <result property="redeemCode" column="redeem_code" jdbcType="VARCHAR"/>
+  	  <association property="user" javaType="com.hhly.skeleton.cms.customermgr.bo.LottoCustomerBO">
+  	  	  <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+  	  	  <result property="accountName" column="account_name" jdbcType="VARCHAR"/>
+  	  	  <result property="cusMobile" column="cus_mobile" jdbcType="VARCHAR"/>
+  	  	  <result property="actualName" column="actual_name" jdbcType="VARCHAR"/>
+  	  	  <result property="idNum" column="id_num" jdbcType="VARCHAR"/>
+  	  	  <result property="cusMail" column="cus_mail" jdbcType="VARCHAR"/>
+  	  </association>
+  	  <association property="ticketChannel" javaType="com.hhly.skeleton.cms.ticketmgr.bo.TicketChannelBO">
+  	  	  <result property="drawerName" column="drawer_name" jdbcType="VARCHAR"/>
+  	  </association>
+  	</resultMap>
+  
+  	<!-- sql公共列:票表 -->
+  	<sql id="sql_columns_ticket">
+  		ti.id,
+        ti.lottery_code,
+        ti.lottery_name,
+        ti.lottery_issue,
+        ti.user_id,
+        ti.ticket_status,
+        ti.ticket_money,
+        ti.channel_id,
+        ti.order_code,
+        ti.winning_status,
+        ti.pre_bonus,
+        ti.aft_bonus,
+        ti.added_bonus,
+        ti.create_time,
+        ti.end_ticket_time,
+        ti.send_channel_time,
+        ti.come_out_time,
+        ti.receipt_time,
+        ti.lottery_time,
+        ti.send_time,
+        ti.winning_detail
+  	</sql>
+  	
+  	
+  	<!--                CMS 后台                                                 -->
+  <select id="listTicketInfoChannel" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketInfoVO"
+   resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketInfoBO">
+	  select count(1) count,
+	       ot.TICKET_STATUS TICKETSTATUS,
+	       sum(ot.TICKET_MONEY) TICKETMONEY,
+	       ot.channel_id channelid,
+	       min(ot.COME_OUT_TIME) COMEOUTTIME
+	  from TICKET_INFO ot
+	 where ot.LOTTERY_CODE  = #{lotteryCode}
+	 <if test="lotteryIssue != null and lotteryIssue != ''">
+	  and  ot.lottery_issue  = #{lotteryIssue}
+	 </if>
+	 <if test="endTicketTimeStart != null">
+	 and ot.END_TICKET_TIME >= #{endTicketTimeStart}
+	 </if>
+	 <if test="endTicketTimeEnd != null">
+	 and ot.END_TICKET_TIME <![CDATA[<=]]> #{endTicketTimeEnd}
+	 </if>
+	 group by ot.TICKET_STATUS,ot.channel_id
+  </select>
+  
+  <select id="getLotteryIssueMonitorSport" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketInfoBO">
+   select 
+     min(end_ticket_time) endtickettime
+    ,min(lottery_issue)  lotteryissue
+    from TICKET_INFO 
+	where LOTTERY_CODE = #{lotteryCode} 
+	and end_ticket_time <![CDATA[>]]> now()
+  </select>
+  
+  	<!--    票管理页面操作           -->
+	<!-- cms sql列：票列表查询 -->
+	<sql id="cms_sql_columns_ticket_list">
+        mui.nick_name,
+        mui.cus_mobile,
+        mui.cus_mail,
+        tc.drawer_name,
+        ti.lottery_Child_Code,
+        ti.third_num
+	</sql>
+	<!-- cms sql列：票详情查询 -->
+	<sql id="cms_sql_columns_ticket_detail">
+		ti.content_type,
+	 	ti.buy_screen,
+      	ti.lotto_add,
+        ti.activity_source,
+        ti.batch_num,
+        ti.official_num,
+        ti.multiple_num,
+        ti.added_bonus,
+        ti.red_code,
+        ti.third_num,
+        ti.channel_remark,
+        ti.ticket_change,
+        ti.ticket_content,
+        ti.receipt_content,
+        ti.receipt_content_detail,
+        ti.ticket_img,
+        ti.ticket_img_txt,
+     	ti.modify_time,
+     	ti.modify_by,
+     	ti.ticket_remark,
+     	mui.nick_name,
+     	mui.account_name,
+     	mui.cus_mobile,
+     	tc.drawer_name,
+        ti.lottery_Child_Code,
+        ti.channel_allocation_send_time,
+        ti.redeem_code
+	</sql>
+	<!-- sql语句块:票列表查询 -->
+	<sql id="cms_sql_statement_ticket_list">
+	  	select 
+	  		 <include refid="sql_columns_ticket"/>,
+	  		 <include refid="cms_sql_columns_ticket_list"/>
+          from TICKET_INFO ti
+          left join ticket_channel tc on ti.channel_id = tc.ticket_channel_id
+          left join m_user_info mui on ti.user_id = mui.id
+  	</sql>
+  	<!-- sql语句块:票详情查询 -->
+	<sql id="cms_sql_statement_ticket_detail">
+	  	select 
+	  		 <include refid="sql_columns_ticket"/>,
+	  		 <include refid="cms_sql_columns_ticket_detail"/>
+          from TICKET_INFO ti
+		  left join ticket_channel tc on ti.channel_id = tc.ticket_channel_id
+		  left join m_user_info mui on ti.user_id = mui.id
+  	</sql>
+  	<!-- sql查询条件：票列表查询 -->
+  	<sql id="cms_sql_condition_ticket_list">
+  		where 1 = 1
+  		<if test="id != null">
+  		and ti.id = #{id,jdbcType=BIGINT}
+  		</if>
+  		<if test="lotteryCode != null">
+  		and ti.lottery_code = #{lotteryCode,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryIssue != null and lotteryIssue != ''">
+  		and ti.lottery_issue = #{lotteryIssue,jdbcType=VARCHAR}
+  		</if>
+  		<if test="lotteryChildCode != null and lotteryChildCode != ''">
+  		and ti.lottery_child_code = #{lotteryChildCode,jdbcType=VARCHAR}
+  		</if>
+  		<if test="buyScreen != null and buyScreen != ''">
+  		and ti.buy_screen like CONCAT('%',#{buyScreen,jdbcType=VARCHAR}, '%')
+  		</if>
+  		<if test="minQryMoney != null">
+  		and ti.ticket_money >= #{minQryMoney,jdbcType=DECIMAL}
+  		</if>
+  		<if test="maxQryMoney != null">
+  		and ti.ticket_money <![CDATA[<=]]> #{maxQryMoney,jdbcType=DECIMAL}
+  		</if>
+  		<if test="orderCode != null and orderCode != ''">
+  		and ti.order_code = #{orderCode,jdbcType=VARCHAR}
+  		</if>
+  		<if test="batchNum != null and batchNum != ''">
+  		and ti.batch_num = #{batchNum,jdbcType=VARCHAR}
+  		</if>
+  		<if test="officialNum != null and officialNum != ''">
+  		and ti.official_num = #{officialNum,jdbcType=VARCHAR}
+  		</if>
+  		<if test="contentType != null">
+  		and ti.content_type = #{contentType,jdbcType=SMALLINT}
+  		</if>
+  		<if test="ticketStatus != null">
+  		and ti.ticket_status = #{ticketStatus,jdbcType=SMALLINT}
+  		</if>
+  		<if test="winningStatus != null">
+  		and ti.winning_status = #{winningStatus,jdbcType=SMALLINT}
+  		</if>
+  		<if test="winningDetail != null and winningDetail != ''">
+  		and ti.winning_detail like CONCAT('%',#{winningDetail,jdbcType=VARCHAR}, '%')
+  		</if>
+  		<if test="user != null">
+  			<if test="user.nickName != null and user.nickName != ''">
+	  		and mui.nick_name = #{user.nickName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.accountName != null and user.accountName != ''">
+	  		and mui.account_name = #{user.accountName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.cusMobile != null and user.cusMobile != ''">
+	  		and mui.cus_mobile = #{user.cusMobile,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.actualName != null and user.actualName != ''">
+	  		and mui.actual_name = #{user.actualName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.idNum != null and user.idNum != ''">
+	  		and mui.id_num = #{user.idNum,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.cusMail != null and user.cusMail != ''">
+	  		and mui.cus_mail = #{user.cusMail,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.id != null">
+	  		and mui.id = #{user.id,jdbcType=BIGINT}
+	  		</if>
+  		</if>
+  		<if test="timeType != null">
+            <if test="startQryTime != null">
+                 and ${timeTypeField} >= #{startQryTime,jdbcType=TIMESTAMP} 
+            </if>
+            <if test="endQryTime != null">
+                 and ${timeTypeField} <![CDATA[<=]]> #{endQryTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+        <if test="channelId != null and channelId != ''">
+        	and ti.channel_id = #{channelId}
+        </if>
+        <if test="queryChange != null">
+            and ti.change_id is not null
+        </if>
+        <if test="queryReceipt != null">
+  			and ti.receipt_content is null
+  		</if>
+  		<if test="thirdNum != null and thirdNum != ''">
+  		and ti.third_num = #{thirdNum,jdbcType=VARCHAR}
+  		</if>
+  	</sql>
+  	<!-- sql排序：票列表查询 -->
+  	<!-- 按照ticket_status 指定的顺序（出票失败——送票失败——已送票——待分配——已分配——不出票——已出票）排序，create_time降序排序 -->
+  	<sql id="cms_sql_orderby_ticket">
+  		<!-- 
+  		<choose>
+  			<when test="sortField != null and sortField != ''">
+  				order by ${sortField}  ${sortOrder}
+  			</when>
+  			<otherwise>
+  				order by ti.id desc
+  			</otherwise>
+  		</choose>
+  		-->
+  		 	order by FIELD(ti.ticket_status,'-2','-1','3','1','2','0','4'), ti.create_time desc  
+  	</sql>
+  	
+  	<!-- 票管理：分页查询 -->
+  	<select id="findPagingTicket" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketInfoVO" resultMap="TicketResultMap">
+  		<include refid="cms_sql_statement_ticket_list" />
+  		<include refid="cms_sql_condition_ticket_list" />
+  		<include refid="cms_sql_orderby_ticket" />
+  		limit #{startRow,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER} 
+  	</select>
+  	<!-- 票管理：分页查询记录数 -->
+  	<select id="findCountTicket" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketInfoVO" resultType="map">
+		select count(1) count,
+		       sum(ti.ticket_money) totalTicketMoney,
+		       sum(ti.pre_bonus) totalPreBonus,
+		       sum(ti.aft_bonus) totalAftBonus,
+		       sum(ti.added_bonus) totalAddedBonus
+		  from TICKET_INFO ti
+		  <if test="joinUser != null and joinUser == true">
+		  left join m_user_info mui on ti.user_id = mui.id
+		  </if>
+		<include refid="cms_sql_condition_ticket_list" />
+  	</select>
+  	<!-- 票管理：查询单条记录 -->
+  	<select id="findSingleTicket" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketInfoVO" resultMap="TicketResultMap">
+		<include refid="cms_sql_statement_ticket_detail" />
+		where ti.id = #{id,jdbcType=BIGINT}
+		limit 1
+  	</select>
+  	<!-- 票管理：查询excel导出 -->
+  	<select id="findExcelTicket" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketInfoVO" resultMap="TicketResultMap">
+		<include refid="cms_sql_statement_ticket_list" />
+		<include refid="cms_sql_condition_ticket_list" />
+		<include refid="cms_sql_orderby_ticket" />
+  	</select>
+  	<!-- 票管理：修改票信息(包括票状态、回执内容、票图片、票内容、备注) -->
+  	<update id="updTicket" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketInfoVO">
+  		update TICKET_INFO ti
+		   set ti.receipt_content = #{receiptContent,jdbcType=VARCHAR},
+		   	   ti.receipt_content_detail = #{receiptContentDetail,jdbcType=VARCHAR},
+		       ti.ticket_img      = #{ticketImg,jdbcType=VARCHAR},
+		       ti.ticket_img_txt  = #{ticketImgTxt,jdbcType=VARCHAR},
+		       ti.ticket_remark   = #{ticketRemark,jdbcType=VARCHAR},
+		       ti.modify_time     = now(),
+		       ti.modify_by       = #{modifyBy,jdbcType=VARCHAR},
+		       ti.come_Out_Time     = #{comeOutTime},
+		       ti.end_ticket_time  = #{endTicketTime}
+		 where ti.id 			  = #{id,jdbcType=BIGINT}
+  	</update>
+  	<select id="countTicketInfoNotEqual" resultType="int">
+  	     select count(1)
+  	     from TICKET_INFO 
+  	     where ORDER_CODE = #{orderCode} 
+  	     and ticket_status != #{status}
+  	</select>
+  	<select id="listTicketStatus" resultType="com.hhly.cmscore.cms.remote.service.status.entity.TicketStatusBO">
+  	    select 
+  	       id,
+  	       ticket_Status ticketStatus,
+  	       end_Ticket_Time endTicketTime,
+  	       batch_Num batchNum
+  	    from TICKET_INFO
+  	    where id in (
+  	      <foreach collection="ids" item="item" separator=",">
+  	        #{item}
+  	      </foreach>
+  	    )
+  	</select>
+  	<update id="updateTicketStatus" >
+       update TICKET_INFO 
+       set ticket_Status  = #{status},
+            modify_time     = now(),
+		    modify_by       = #{modifyBy}
+		where id in 
+		(
+	  	   <foreach collection="ids" item="item" separator=",">
+	  	      #{item}  
+	  	   </foreach>
+  	   )
+  	</update>
+
+	<select id="queryFailTicketInfo" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketInfoSingleBO">
+		select t.order_code     orderCode,
+			   t.ticket_status  ticketStatus,
+			   t.channel_remark channelRemark
+		  from TICKET_INFO t
+		  where t.order_code=#{orderCode}
+		   and t.ticket_status=#{ticketStatus}
+	</select>
+
+	<insert id="addTicketInfoList" parameterType="java.util.List">
+		<foreach collection="ticketInfoBOs" item="ticketInfo" index="idx">
+			INSERT INTO TICKET_INFO
+			<trim prefix="(" suffix=")" suffixOverrides=",">
+				<if test="ticketInfo.lotteryCode != null">
+					LOTTERY_CODE,
+				</if>
+				<if test="ticketInfo.lotteryName != null">
+					LOTTERY_NAME,
+				</if>
+				<if test="ticketInfo.lotteryIssue != null">
+					LOTTERY_ISSUE,
+				</if>
+				<if test="ticketInfo.userId != null">
+					USER_ID,
+				</if>
+				TICKET_STATUS,
+				<if test="ticketInfo.ticketMoney != null">
+					TICKET_MONEY,
+				</if>
+				<if test="ticketInfo.orderCode != null">
+					ORDER_CODE,
+				</if>
+				<if test="ticketInfo.winningStatus != null">
+					WINNING_STATUS,
+				</if>
+				CREATE_TIME,
+				<if test="ticketInfo.endTicketTime != null">
+					END_TICKET_TIME,
+				</if>				
+				<if test="ticketInfo.contentType != null">
+					CONTENT_TYPE,
+				</if>
+				<if test="ticketInfo.buyScreen != null">
+					BUY_SCREEN,
+				</if>
+				<if test="ticketInfo.lottoAdd != null">
+					LOTTO_ADD,
+				</if>
+				<if test="ticketInfo.multipleNum != null">
+					MULTIPLE_NUM,
+				</if>
+				<if test="ticketInfo.ticketContent != null">
+					TICKET_CONTENT,
+				</if>
+				<if test="ticketInfo.saleTime != null">
+					SALE_TIME,
+				</if>				
+			</trim>
+			<trim prefix="values (" suffix=")" suffixOverrides=",">
+				<if test="ticketInfo.lotteryCode != null">
+					#{ticketInfo.lotteryCode},
+				</if>
+				<if test="ticketInfo.lotteryName != null">
+					#{ticketInfo.lotteryName},
+				</if>
+				<if test="ticketInfo.lotteryIssue != null">
+					#{ticketInfo.lotteryIssue},
+				</if>
+				<if test="ticketInfo.userId != null">
+					#{ticketInfo.userId},
+				</if>
+				1,
+				<if test="ticketInfo.ticketMoney != null">
+					#{ticketInfo.ticketMoney},
+				</if>
+				<if test="ticketInfo.orderCode != null">
+					#{ticketInfo.orderCode},
+				</if>
+				<if test="ticketInfo.winningStatus != null">
+					#{ticketInfo.winningStatus},
+				</if>
+				now(),
+				<if test="ticketInfo.endTicketTime != null">
+					#{ticketInfo.endTicketTime},
+				</if>					
+				<if test="ticketInfo.contentType != null">
+					#{ticketInfo.contentType},
+				</if>
+				<if test="ticketInfo.buyScreen != null">
+					#{ticketInfo.buyScreen},
+				</if>
+				<if test="ticketInfo.lottoAdd != null">
+					#{ticketInfo.lottoAdd},
+				</if>
+				<if test="ticketInfo.multipleNum != null">
+					#{ticketInfo.multipleNum},
+				</if>
+				<if test="ticketInfo.ticketContent != null">
+					#{ticketInfo.ticketContent},
+				</if>
+				<if test="ticketInfo.saleTime != null">
+					#{ticketInfo.saleTime},
+				</if>				
+			</trim>
+		</foreach>
+	</insert>
+	<select id="countTicketStatus" resultType="int">
+	 SELECT
+		count(*)
+	 FROM
+		ticket_info
+	 WHERE
+		order_code = #{orderCode}
+	 AND ticket_status = #{status}
+	</select>
+
+
+	<!--/////////////////////////前端出票页面接口////////////////////////////////-->
+	<!-- 出票明细页面：分页查询 -->
+	<select id="findTicketList" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="com.hhly.skeleton.lotto.base.ticket.bo.TicketInfoBO">
+		select
+		ti.ticket_status ticketStatus,
+		ti.ticket_money ticketMoney,
+		ti.winning_status winningStatus,
+		ti.pre_bonus preBonus,
+		ti.content_type contentType,
+		ti.multiple_num multipleNum,
+		ti.ticket_content
+	    from ticket_info ti
+		where ti.order_code=#{orderCode} and  ti.user_id=#{userId}
+		limit #{startRow,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+	</select>
+	<!-- 出票明细页面：分页查询记录数 -->
+	<select id="findTicketListCount" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="int">
+		select count(1)
+		from ticket_info ti
+		where ti.order_code=#{orderCode} and  ti.user_id=#{userId}
+	</select>
+
+
+</mapper>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateHelpTypeDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateHelpTypeBO">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="FULL_NAME" jdbcType="VARCHAR" property="fullName" />
+    <result column="SHORT_NAME" jdbcType="VARCHAR" property="shortName" />
+    <result column="PARENT" jdbcType="DECIMAL" property="parent" />
+    <result column="MENU" jdbcType="INTEGER" property="menu" />
+    <result column="STATUS" jdbcType="INTEGER" property="status" />
+    <result column="ORDER_ID" jdbcType="INTEGER" property="orderId" />
+    <result column="IDENTIFIERS" jdbcType="VARCHAR" property="identifiers" />
+    <result column="DESCRIPTOR" jdbcType="VARCHAR" property="descriptor" />
+    <result column="ISVIRTUAL" jdbcType="TINYINT" property="virtual" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    ID, CODE, FULL_NAME, SHORT_NAME, PARENT, MENU, STATUS, ORDER_ID, IDENTIFIERS, DESCRIPTOR, 
+    ISVIRTUAL
+  </sql>
+  
+  <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+   		limit #{startRow},#{pageSize}
+ 	 </if>
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+  		<if test="parent != null">
+			PARENT = #{parent}
+  		</if>
+  		<if test="id != null">
+			and id = #{id}
+  		</if>
+  		<if test="excludedId != null">
+			and id != #{excludedId}
+  		</if>
+  		<if test="identifiers != null">
+			and IDENTIFIERS = #{identifiers}
+  		</if>
+	</where>
+  </sql>
+  
+  <sql id="Table">
+  	OPERATE_HELP_TYPE
+  </sql>
+  
+  <insert id="merge" parameterType="com.hhly.cmscore.persistence.operate.po.OperateHelpTypePO">
+  	INSERT INTO <include refid="Table"/>
+  	(
+	  	ID 	,						
+		CODE ,			
+		FULL_NAME ,	
+		SHORT_NAME ,
+		PARENT ,		
+		MENU 	,		
+		STATUS 		,			
+		ORDER_ID,
+		IDENTIFIERS ,		
+		DESCRIPTOR,
+		ISVIRTUAL			
+	 )
+     VALUES
+     (
+	      #{id,jdbcType=DECIMAL}, 
+	      #{code,jdbcType=VARCHAR}, 
+	      #{fullName,jdbcType=VARCHAR}, 
+	      #{shortName,jdbcType=VARCHAR}, 
+	      #{parent,jdbcType=DECIMAL}, 
+	      #{menu,jdbcType=INTEGER}, 
+	      #{status,jdbcType=INTEGER}, 
+	      #{orderId,jdbcType=INTEGER}, 
+	      #{identifiers,jdbcType=VARCHAR}, 
+	      #{descriptor,jdbcType=VARCHAR},
+	      #{virtual,jdbcType=SMALLINT}
+     )
+    ON DUPLICATE KEY UPDATE
+     <!-- parent, menu,code,IDENTIFIERS只能新增，不能修改 -->
+      <!--  
+      A.CODE 			= B.code,
+      A.IDENTIFIERS 		= B.identifiers,  
+      -->     
+      FULL_NAME	= values(FULL_NAME), 
+      SHORT_NAME= values(SHORT_NAME), 
+      STATUS	= values(STATUS),    
+      DESCRIPTOR= values(DESCRIPTOR), 
+      ISVIRTUAL	= values(ISVIRTUAL)
+	</insert>
+  
+  <update id="updateOrder" parameterType="java.util.List">
+   	<foreach collection="list" item="item" separator=";" >
+ 	  update <include refid="Table"/>
+	    set
+	      ORDER_ID = #{item.orderId,jdbcType=INTEGER}
+	    where ID = #{item.id,jdbcType=DECIMAL}
+  	</foreach>
+  </update>
+  
+  <select id="list" resultMap="BaseResultMap">
+     select <include refid="Base_Column_List"/>
+			from <include refid="Table"/> 
+			order by order_id,id
+  </select>
+  
+  <select id="find" resultMap="BaseResultMap">
+     select <include refid="Base_Column_List"/>
+			from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+  </select>
+  
+  <select id="findMaxTypeCode" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateHelpTypeVO" resultType="String">
+     select max(CODE)
+		from <include refid="Table"/>
+		<include refid="Query_Condition"/>
+		and length(CODE) = (select max(length(CODE)) from <include refid="Table"/> <include refid="Query_Condition"/>)
+  </select>
+  
+  <select id="count" resultType="int">
+     select count(*) from <include refid="Table"/> 
+		<include refid="Query_Condition"/>
+  </select>
+    
+  <select id="findParents" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateHelpVO" resultType="string">
+	SELECT IDENTIFIERS
+	FROM (
+	    SELECT
+	        @r AS _id,
+	        (SELECT @r := parent FROM <include refid="Table"/> WHERE id = _id) AS parent_id,
+	        @l := @l + 1 AS lvl
+	    FROM
+	        (SELECT @r := #{typeId}, @l := 0) vars,
+	        <include refid="Table"/> h
+	    WHERE @r > 0) T1
+	JOIN <include refid="Table"/> T2
+	ON T1._id = T2.id
+	ORDER BY T1.lvl DESC
+  </select>
+</mapper>

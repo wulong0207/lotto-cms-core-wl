@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.trans.dao.TransRemittingDaoMapper" >
+	<resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.transmgr.bo.TransRemittingBO">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="user_id" jdbcType="INTEGER" property="userId" />
+		<result column="remitting_bank" jdbcType="SMALLINT" property="remittingBank" />
+		<result column="remitting_amount" jdbcType="DECIMAL" property="remittingAmount" />
+		<result column="commit_time" jdbcType="TIMESTAMP" property="commitTime" />
+		<result column="status" jdbcType="BIT" property="status" />
+		<result column="screenshot" jdbcType="VARCHAR" property="screenshot" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+		<result column="create_by" jdbcType="VARCHAR" property="createBy" />
+		<result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+		<result column="NICK_NAME" property="nickName" jdbcType="VARCHAR"/>
+		<result column="ACCOUNT_NAME" property="accountName" jdbcType="VARCHAR"/>
+		<result column="CUS_MOBILE" property="cusMobile" jdbcType="VARCHAR"/>
+		<result column="ACTUAL_NAME" property="actualName" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<update id="update">
+		update trans_remitting
+    set
+      status = #{status,jdbcType=BIT},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_by = #{modifyBy,jdbcType=VARCHAR}
+    where id in
+    <foreach collection="ids" separator="," open="(" close=")" item="item">
+		#{item}
+	</foreach>
+
+	</update>
+
+
+	<select id="count" resultType="java.lang.Integer">
+		select count(1)
+		from trans_remitting t
+		<if test="userSearchType != null and userSearchValue != null and userSearchValue != ''">
+			left join m_user_info m on t.user_id = m.id
+		</if>
+		<include refid="Query_Condition"/>
+	</select>
+
+	<select id="find" resultMap="BaseResultMap">
+		select
+		t.id, NICK_NAME, ACCOUNT_NAME,CUS_MOBILE,ACTUAL_NAME,remitting_bank, remitting_amount, commit_time, status, screenshot
+		from trans_remitting t left join m_user_info m on t.user_id=m.id
+		<include refid="Query_Condition"/>
+		order by t.id desc
+		<include refid="Page_Condition"/>
+	</select>
+
+	<select id="excel" resultType="com.hhly.skeleton.cms.transmgr.bo.TransRemittingExcelBO">
+		select
+		@rownum:=@rownum + 1 as id,
+		NICK_NAME nickName,
+		ACCOUNT_NAME accountName,
+		CUS_MOBILE cusMobile,
+		ACTUAL_NAME actualName,
+		remitting_bank remittingBank,
+		remitting_amount remittingAmount,
+		commit_time commitTime,
+		status
+		from trans_remitting t left join m_user_info m on t.user_id=m.id,
+		(SELECT @rownum := 0) r
+		<include refid="Query_Condition"/>
+		order by t.id desc
+	</select>
+
+	<sql id="Query_Condition">
+
+		<where>
+
+			<if test="remittingBank!=null">
+				and remitting_bank = #{remittingBank}
+			</if>
+			<if test="startTime != null">
+				<![CDATA[and commit_time >= #{startTime}]]>
+			</if>
+			<if test="endTime != null">
+				<![CDATA[and commit_time <= #{endTime}]]>
+			</if>
+			<if test="status != null">
+				and status = #{status}
+			</if>
+			<if test="userSearchType != null and userSearchValue != null and userSearchValue != ''">
+				<choose>
+					<when test="userSearchType == 1">
+						and NICK_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 2">
+						and ACCOUNT_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 3">
+						and CUS_MOBILE = #{userSearchValue}
+					</when>
+					<when test="userSearchType == 4">
+						and ACTUAL_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 5">
+						and ID_NUM like CONCAT('%',#{userSearchValue},'%')
+					</when>
+				</choose>
+			</if>
+		</where>
+
+	</sql>
+	<sql id="Page_Condition">
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow},#{pageSize}
+		</if>
+	</sql>
+</mapper>

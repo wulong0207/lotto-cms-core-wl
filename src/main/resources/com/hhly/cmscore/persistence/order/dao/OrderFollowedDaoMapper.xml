@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.order.dao.OrderFollowedDaoMapper" >
+  
+  	<!-- ********************Used to Cms******************** -->
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.ordermgr.bo.OrderFollowedBO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="ACCOUNT_NAME" property="accountName" jdbcType="VARCHAR" />
+    <result column="order_amount" property="orderAmount" jdbcType="DECIMAL" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="order_code" property="orderCode" jdbcType="VARCHAR" />
+    <result column="pre_bonus" property="preBonus" jdbcType="DECIMAL" />
+    <result column="aft_bonus" property="aftBonus" jdbcType="DECIMAL" />
+    <result column="commission_amount" property="commissionAmount" jdbcType="DECIMAL" />
+    <result column="send_amount" property="sendAmount" typeHandler="com.hhly.cmscore.persistence.customer.typehandler.OrderFollowedTypeHandler"/>
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <resultMap id="BaseExcelResultMap" type="com.hhly.skeleton.cms.ordermgr.bo.OrderFollowedExcelBO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="ACCOUNT_NAME" property="accountName" jdbcType="VARCHAR" />
+    <result column="order_amount" property="orderAmount" jdbcType="DECIMAL" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="order_code" property="orderCode" jdbcType="VARCHAR" />
+    <result column="pre_bonus" property="preBonus" jdbcType="DECIMAL" />
+    <result column="aft_bonus" property="aftBonus" jdbcType="DECIMAL" />
+    <result column="commission_amount" property="commissionAmount" jdbcType="DECIMAL" />
+    <result column="send_amount" property="sendAmount" typeHandler="com.hhly.cmscore.persistence.customer.typehandler.OrderFollowedTypeHandler"/>
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <select id="count" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderFollowedVO"
+		resultType="int">
+		select count(1) from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+	
+	<select id="list" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderFollowedVO" resultMap="BaseResultMap">
+		select 
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+		<include refid="Limit_Condition" />
+	</select>
+	
+	<select id="excel" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderFollowedVO" resultMap="BaseExcelResultMap">
+		select 
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+
+	<sql id="Table">
+		order_followed_info follow
+		<if test="joinOrder">
+			left join order_info orderInfo on follow.order_code = orderInfo.order_code
+		</if>
+		<if test="joinUser">
+		left join m_user_info user on follow.user_id = user.id
+		</if>
+	</sql>
+
+	<sql id="Where_Clause">
+		<where>
+			<if test="orderIssueId != null">
+				and follow.order_issue_id = #{orderIssueId}
+			</if>
+			<if test="orderStatus != null">
+				and orderInfo.order_status = #{orderStatus}
+			</if>
+			<if test="orderCode != null and orderCode !=''">
+				and follow.order_code = #{orderCode}
+			</if>
+			<if test="accountName != null and accountName !=''">
+				and user.ACCOUNT_NAME like CONCAT('%',#{userSearchValue},'%')
+			</if>
+		</where>
+	</sql>
+
+	<sql id="Limit_Condition">
+		<if test="startRow != null and endRow !=null">
+			limit #{startRow},#{endRow}
+		</if>
+	</sql>
+	
+	<sql id="Base_Column_List">
+		follow.id,
+		follow.order_code,
+		follow.commission_amount,
+		follow.create_time,
+		-1 send_amount,
+		/*follow.type,*/
+		
+		orderInfo.order_amount,
+		orderInfo.order_status,
+		ifnull(orderInfo.pre_bonus,0) pre_bonus,
+		ifnull(orderInfo.aft_bonus,0) aft_bonus,
+		
+		user.ACCOUNT_NAME
+		
+	</sql>
+  	<!-- ********************Used to Cms******************** -->
+  	
+  	<sql id="Ruc_Column_List">
+  		mui.account_name userAccount,
+		mui.id_num idNum,
+		mui.cus_mobile cusMobile,
+		ruc.id id,
+		ruc.apply_source applySource,
+		ruc.apply_type applyType,
+		ruc.lottery_code lotteryCode,
+		ruc.apply_time applyTime,
+		ruc.check_time checkTime,
+		ruc.`status` checkStatus,
+		ruc.is_show_record isShowRecord,
+		ruc.modify_by modifyBy,
+		ruc.summary summary
+  	</sql>
+  	
+  	<update id="setStatus" parameterType="com.hhly.skeleton.cms.recommend.vo.RcmdUserCheckVO">
+  		update rcmd_user_check set status=#{status} where id = #{id}
+  	</update>
+  	
+  	<select id="findRcmdUserCheckList" parameterType="com.hhly.skeleton.cms.recommend.vo.RcmdUserCheckVO" 
+  							resultType="com.hhly.skeleton.cms.recommend.bo.RcmdUserCheckBO">
+		select 
+		<include refid="Ruc_Column_List" />
+		from
+		rcmd_user_check ruc LEFT JOIN m_user_info mui ON ruc.user_id = mui.id
+		<include refid="Ruc_Where_Clause" />
+		<include refid="Limit_Condition" />
+	</select>
+	
+	<select id="findRcmdUserCheckCount" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderFollowedVO"
+		resultType="int">
+		select count(1) from
+		rcmd_user_check ruc LEFT JOIN m_user_info mui ON ruc.user_id = mui.id
+		<include refid="Ruc_Where_Clause" />
+	</select>
+  	
+  	<sql id="Ruc_Where_Clause">
+		<where>
+			<if test="userAccount != null and userAccount != ''">
+				AND mui.account_name = #{userAccount}
+			</if>
+			<if test="applySource != null">
+				AND ruc.apply_source = #{applySource}
+			</if>
+			<if test="id != null">
+				AND ruc.id = #{id}
+			</if>
+			<if test="applyStartTime != null">
+				AND ruc.apply_time >= #{applyStartTime}
+			</if>
+			<if test="applyEndTime != null">
+				AND ruc.apply_time <![CDATA[<=]]> #{applyEndTime}
+			</if>
+			<if test="startTime != null">
+				AND ruc.check_time >= #{startTime}
+			</if>
+			<if test="endTime != null">
+				AND ruc.check_time <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="status != null">
+				AND ruc.status = #{status}
+			</if>
+			<if test="applyType != null">
+				AND ruc.apply_type = #{applyType}
+			</if>
+		</where>
+	</sql>
+	
+	<insert id="addRcmdUser" parameterType="com.hhly.skeleton.cms.recommend.vo.RcmdUserCheckVO">
+		insert into rcmd_user_check(user_id,apply_source,apply_type,lottery_code,summary,is_show_record,apply_time,create_time)
+		values(#{userId},#{applySource},#{applyType},#{lotteryCode},#{summary},#{isShowRecord},NOW(),NOW())
+	</insert>
+	
+	<!-- ********************Rcmd User Check to Cms******************** -->
+
+</mapper>

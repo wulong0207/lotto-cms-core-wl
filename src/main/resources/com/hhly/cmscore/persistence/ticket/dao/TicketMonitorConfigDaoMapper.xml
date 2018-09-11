@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.ticket.dao.TicketMonitorConfigDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.ticket.po.TicketMonitorConfigPO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="LOTTERY_ID" property="lotteryId" jdbcType="DECIMAL" />
+    <result column="LOTTERY_NAME" property="lotteryName" jdbcType="OTHER" />
+    <result column="NO_SPLIT" property="noSplit" jdbcType="DECIMAL" />
+    <result column="NO_OUT" property="noOut" jdbcType="DECIMAL" />
+    <result column="NO_OUT_MONEY" property="noOutMoney" jdbcType="DECIMAL" />
+    <result column="NO_SEND" property="noSend" jdbcType="DECIMAL" />
+    <result column="SEND" property="send" jdbcType="DECIMAL" />
+    <result column="END_TIME" property="endTime" jdbcType="DECIMAL" />
+    <result column="CHANNEL_TICKET_NUM" property="channelTicketNum" jdbcType="DECIMAL" />
+    <result column="CHANNEL_MONEY" property="channelMoney" jdbcType="DECIMAL" />
+    <result column="MAX_SENDTIME" property="maxSendtime" jdbcType="DECIMAL" />
+    <result column="REFRESH_TIME" property="refreshTime" jdbcType="VARCHAR" />
+    <result column="BEFORE_ISSUE_END" property="beforeIssueEnd" jdbcType="DECIMAL" />
+    <result column="BEFORE_ISSUE_END_SECOND" property="beforeIssueEndSecond" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="CREATE_BY" jdbcType="OTHER" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="OTHER" property="modifyBy" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    ID, LOTTERY_ID, LOTTERY_NAME, NO_SPLIT, NO_OUT, NO_OUT_MONEY, NO_SEND, SEND, END_TIME, 
+    CHANNEL_TICKET_NUM, CHANNEL_MONEY, MAX_SENDTIME, REFRESH_TIME, `STATUS`,CREATE_BY, MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+    CREATE_TIME,BEFORE_ISSUE_END,BEFORE_ISSUE_END_SECOND
+  </sql>
+ <sql id="Column_List">
+	ID,
+	LOTTERY_ID LOTTERYID,
+	LOTTERY_NAME LOTTERYNAME,
+	NO_SPLIT NOSPLIT,
+	NO_OUT NOOUT,
+	NO_OUT_MONEY NOOUTMONEY,
+	NO_SEND NOSEND,
+	SEND,
+	END_TIME ENDTIME,
+	CHANNEL_TICKET_NUM CHANNELTICKETNUM,
+	CHANNEL_MONEY CHANNELMONEY,
+	MAX_SENDTIME MAXSENDTIME,
+	REFRESH_TIME REFRESHTIME,
+	`STATUS`,
+	CREATE_BY CREATEBY,
+	MODIFY_BY MODIFYBY,
+	MODIFY_TIME MODIFYTIME,
+	UPDATE_TIME UPDATETIME,
+	CREATE_TIME CREATETIME,
+	BEFORE_ISSUE_END BEFOREISSUEEND,
+	BEFORE_ISSUE_END_SECOND BEFOREISSUEENDSECOND
+</sql>
+	<sql id="sql_condition_TicketMonitorConfigVO">
+		<where>
+		   <if test="lotteryId != null">
+		      and lottery_id = #{lotteryId}
+		   </if>
+		</where>
+	</sql>
+	<select id="listPage" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketMonitorConfigVO"
+		resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketMonitorConfigBO">
+		select
+		<include refid="Column_List" />
+		from TICKET_MONITOR_CONFIG
+		<include refid="sql_condition_TicketMonitorConfigVO" />
+		order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				id
+			</otherwise>
+		</choose>		
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow}, #{pageSize}
+		</if>
+	</select>
+	<select id="countPage" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketMonitorConfigVO" resultType="int">
+	    select count(1)
+	    from TICKET_MONITOR_CONFIG
+		<include refid="sql_condition_TicketMonitorConfigVO" />
+	</select>
+ 
+  <insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.hhly.cmscore.persistence.ticket.po.TicketMonitorConfigPO" >
+    insert into TICKET_MONITOR_CONFIG (LOTTERY_ID, LOTTERY_NAME, 
+      NO_SPLIT, NO_OUT, NO_OUT_MONEY, 
+      NO_SEND, SEND, END_TIME, 
+      CHANNEL_TICKET_NUM, CHANNEL_MONEY, MAX_SENDTIME, 
+      REFRESH_TIME, `STATUS`,CREATE_TIME,CREATE_BY, MODIFY_BY,
+		MODIFY_TIME, UPDATE_TIME,BEFORE_ISSUE_END,BEFORE_ISSUE_END_SECOND)
+    values (#{lotteryId,jdbcType=DECIMAL}, #{lotteryName,jdbcType=OTHER}, 
+      #{noSplit,jdbcType=DECIMAL}, #{noOut,jdbcType=DECIMAL}, #{noOutMoney,jdbcType=DECIMAL}, 
+      #{noSend,jdbcType=DECIMAL}, #{send,jdbcType=DECIMAL}, #{endTime,jdbcType=DECIMAL}, 
+      #{channelTicketNum,jdbcType=DECIMAL}, #{channelMoney,jdbcType=DECIMAL}, #{maxSendtime,jdbcType=DECIMAL}, 
+      #{refreshTime,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},now(),#{createBy,jdbcType=OTHER},#{modifyBy,jdbcType=OTHER},
+	  now(),now(),#{beforeIssueEnd,jdbcType=DECIMAL},#{beforeIssueEndSecond,jdbcType=DECIMAL})
+  </insert>
+  <update id="update" parameterType="com.hhly.cmscore.persistence.ticket.po.TicketMonitorConfigPO" >
+    update TICKET_MONITOR_CONFIG
+    set 
+      NO_SPLIT = #{noSplit,jdbcType=DECIMAL},
+      NO_OUT = #{noOut,jdbcType=DECIMAL},
+      NO_OUT_MONEY = #{noOutMoney,jdbcType=DECIMAL},
+      NO_SEND = #{noSend,jdbcType=DECIMAL},
+      SEND = #{send,jdbcType=DECIMAL},
+      END_TIME = #{endTime,jdbcType=DECIMAL},
+      CHANNEL_TICKET_NUM = #{channelTicketNum,jdbcType=DECIMAL},
+      CHANNEL_MONEY = #{channelMoney,jdbcType=DECIMAL},
+      MAX_SENDTIME = #{maxSendtime,jdbcType=DECIMAL},
+      REFRESH_TIME = #{refreshTime,jdbcType=VARCHAR},
+      `STATUS` = #{status,jdbcType=DECIMAL},
+       MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+	  UPDATE_TIME = now(),
+	  MODIFY_TIME =now(),
+	  BEFORE_ISSUE_END = #{beforeIssueEnd,jdbcType=DECIMAL},
+	  BEFORE_ISSUE_END_SECOND = #{beforeIssueEndSecond,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+   <select id="getRefreshTime" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketMonitorConfigBO">
+		select
+		<include refid="Column_List" />
+		from TICKET_MONITOR_CONFIG
+		where LOTTERY_ID = #{lotteryCode}
+   </select>
+   
+   <select id="queryLotteryMonitorConfig" resultType="string">
+		select tmc.lottery_id from ticket_monitor_config tmc 
+		left join lottery_type lt on tmc.lottery_id = lt.lottery_code 
+		where tmc.`status` = 1
+		<if test="lotteryCategory">
+			and lt.lottery_category = #{lotteryCategory,jdbcType=VARCHAR}	
+		</if>
+   </select>
+	
+</mapper>

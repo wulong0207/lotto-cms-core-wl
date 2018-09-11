@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.hhly.cmscore.persistence.operate.dao.OperateAdMenuDaoMapper">
+	<resultMap id="BaseResultMap"
+		type="com.hhly.skeleton.cms.operatemgr.bo.OperateAdMenuBO">
+		<result column="ID" jdbcType="DECIMAL" property="id" />
+		<result column="MENU" jdbcType="INTEGER" property="menu" />
+		<result column="POSITION" jdbcType="INTEGER" property="position" />
+		<result column="REMARK" jdbcType="VARCHAR" property="remark" />
+		<result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+		<result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, MENU, POSITION, REMARK, CREATE_BY, MODIFY_BY, CREATE_TIME,
+		MODIFY_TIME
+	</sql>
+
+	<sql id="Table">
+		OPERATE_ADV_MENU
+	</sql>
+
+	<sql id="Page_Condition">
+			<if test="startRow != null and pageSize != null">
+				limit #{startRow} ,#{pageSize}
+			</if>
+	</sql>
+
+	<sql id="Query_Condition">
+		<where>
+			<if test="menu != null">
+				AND MENU = #{menu}
+			</if>
+		</where>
+		order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				ID
+			</otherwise>
+		</choose>		
+	</sql>
+
+	<select id="list" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateAdMenuVO" resultMap="BaseResultMap">
+		select t.* from (
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Query_Condition" />
+		) as t
+		<include refid="Page_Condition" />
+	</select>
+
+	<delete id="delete">
+		delete from
+		<include refid="Table" />
+		where id in
+		<foreach collection="ids" item="id" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="count" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateAdMenuVO"
+		resultType="int">
+		select count(*) from
+		<include refid="Table" />
+		<include refid="Query_Condition" />
+	</select>
+
+
+	<update id="merge"
+		parameterType="com.hhly.cmscore.persistence.operate.po.OperateAdMenuPO">
+		INSERT INTO <include refid="Table" /> 
+		 (
+		 	ID,
+			MENU,
+			POSITION,
+			REMARK,
+			CREATE_BY,
+			CREATE_TIME
+		)
+		VALUES(
+			#{id},
+			#{menu,jdbcType=INTEGER},
+			#{position,jdbcType=INTEGER},
+			#{remark,jdbcType=VARCHAR},
+			#{createBy,jdbcType=VARCHAR},
+			now()
+		)
+		ON DUPLICATE KEY
+		UPDATE
+		MENU = #{menu,jdbcType=INTEGER},
+		POSITION = #{position,jdbcType=INTEGER},
+		REMARK = #{remark,jdbcType=VARCHAR},
+		MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+		MODIFY_TIME = now()
+	</update>
+</mapper>

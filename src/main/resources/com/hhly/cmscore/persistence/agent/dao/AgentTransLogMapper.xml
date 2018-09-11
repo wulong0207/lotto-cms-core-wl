@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.agent.dao.AgentTransLogMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.agent.bo.AgentTransLogBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="agent_id" jdbcType="INTEGER" property="agentId" />
+    <result column="trans_code" jdbcType="VARCHAR" property="transCode" />
+    <result column="trans_type" jdbcType="BIT" property="transType" />
+    <result column="trans_info" jdbcType="VARCHAR" property="transInfo" />
+    <result column="trans_end_time" jdbcType="TIMESTAMP" property="transEndTime" />
+    <result column="trans_amount" jdbcType="DECIMAL" property="transAmount" />
+    <result column="trans_status" jdbcType="BIT" property="transStatus" />
+    <result column="service_charge" jdbcType="DECIMAL" property="serviceCharge" />
+    <result column="real_amount" jdbcType="DECIMAL" property="realAmount" />
+    <result column="tax_charge" jdbcType="DECIMAL" property="taxCharge" />
+    <result column="total_cash_balance" jdbcType="DECIMAL" property="totalCashBalance" />
+    <result column="trade_code" jdbcType="VARCHAR" property="tradeCode" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="account_name" jdbcType="VARCHAR" property="accountName" />
+  </resultMap>
+
+  <sql id="Where_Clause">
+    <where>
+      <if test="start != null">
+        and create_time &gt;= #{start}
+      </if>
+      <if test="end != null">
+        and create_time &lt;= #{end}
+      </if>
+      <if test="agentAccount !=null and agentAccount!=''">
+        and agent_id = (select id from agent_info where user_id = (select id from m_user_info where account_name=#{agentAccount}))
+      </if>
+    </where>
+  </sql>
+
+  <sql id="Page_Clause">
+    <if test="startRow != null and endRow !=null">
+      limit #{startRow},#{pageSize}
+    </if>
+  </sql>
+
+  <select id="count" parameterType="com.hhly.skeleton.cms.agent.vo.AgentQueryVO" resultType="int">
+    SELECT count(*) from agent_trans_log <include refid="Where_Clause"/>
+  </select>
+
+  <select id="find" parameterType="com.hhly.skeleton.cms.agent.vo.AgentQueryVO" resultMap="BaseResultMap">
+    SET @row_number = 0;
+    SELECT c.*,u.account_name,(@row_number:=@row_number + 1) AS rank from
+    (
+    SELECT a.*,b.user_id from
+    (
+    SELECT create_time,trans_amount,trans_info,tax_charge,agent_id
+    from agent_trans_log
+    <include refid="Where_Clause"/>
+    ) a
+    join agent_info b
+    on a.agent_id = b.id
+    ) c
+    LEFT JOIN
+    m_user_info u
+    on c.user_id = u.id
+    order by create_time desc
+    <include refid="Page_Clause"/>
+  </select>
+
+</mapper>

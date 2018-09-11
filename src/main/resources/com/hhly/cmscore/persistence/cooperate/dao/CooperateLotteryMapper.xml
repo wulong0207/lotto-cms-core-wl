@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.cooperate.dao.CooperateLotteryMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.cooperate.bo.CooperateLotteryBO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="channel_id" jdbcType="VARCHAR" property="channelId"/>
+        <result column="lottery_code" jdbcType="INTEGER" property="lotteryCode"/>
+        <result column="denomination" jdbcType="DECIMAL" property="denomination"/>
+        <result column="exchange_balance" jdbcType="DECIMAL" property="exchangeBalance"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_by" jdbcType="VARCHAR" property="modifyBy"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, channel_id, lottery_code, denomination, exchange_balance, create_by, create_time,
+        modify_by, modify_time
+    </sql>
+
+
+    <sql id="where_vo">
+        where 1=1
+        <if test="channelId != null">
+            and channel_id = #{channelId,jdbcType=VARCHAR}
+        </if>
+        <if test="lotteryCode != null">
+            and lottery_code = #{lotteryCode,jdbcType=INTEGER}
+        </if>
+    </sql>
+
+
+    <select id="count" resultType="int" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateLotteryVO">
+        select count(1)
+        from cooperate_lottery
+        <include refid="where_vo"/>
+    </select>
+
+    <select id="findCooperateLotteryList" resultMap="BaseResultMap"
+            parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateLotteryVO">
+        select
+        <include refid="Base_Column_List"/>
+        from cooperate_lottery
+        <include refid="where_vo"/>
+        <if test="startRow != null and pageSize != null">
+            limit #{startRow},#{pageSize}
+        </if>
+    </select>
+
+    <!-- 查询渠道彩种信息 -->
+    <select id="findCooperateLotteryListByChannelId" resultType="com.hhly.skeleton.base.bo.DictionaryBO"
+            parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateLotteryVO">
+        select
+        a.lottery_code as id,
+        b.lottery_name as text
+        from cooperate_lottery a
+        INNER JOIN lottery_type b on a.lottery_code=b.lottery_code
+        where channel_id = #{channelId,jdbcType=INTEGER}
+    </select>
+
+    <!-- 查询渠道彩种信息 -->
+    <select id="selective" resultMap="BaseResultMap"
+            parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateLotteryVO">
+        select
+        <include refid="Base_Column_List"/>
+        from cooperate_lottery a
+        where a.channel_id = #{channelId,jdbcType=INTEGER} and a.lottery_code=#{lotteryCode}
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cooperate_lottery
+        <include refid="where_vo"/>
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from cooperate_lottery
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteByChannelId" parameterType="java.lang.String">
+        delete from cooperate_lottery
+        where channel_id = #{id,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateLotteryPO">
+        insert into cooperate_lottery (id, channel_id, lottery_code,
+        denomination, exchange_balance, create_by,
+        create_time, modify_by, modify_time
+        )
+        values (#{id,jdbcType=INTEGER}, #{channelId,jdbcType=VARCHAR}, #{lotteryCode,jdbcType=SMALLINT},
+        #{denomination,jdbcType=DECIMAL}, #{exchangeBalance,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR},
+        now(), #{modifyBy,jdbcType=VARCHAR}, now()
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateLotteryPO">
+        insert into cooperate_lottery
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="channelId != null">
+                channel_id,
+            </if>
+            <if test="lotteryCode != null">
+                lottery_code,
+            </if>
+            <if test="denomination != null">
+                denomination,
+            </if>
+            <if test="exchangeBalance != null">
+                exchange_balance,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="modifyBy != null">
+                modify_by,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="channelId != null">
+                #{channelId,jdbcType=VARCHAR},
+            </if>
+            <if test="lotteryCode != null">
+                #{lotteryCode,jdbcType=SMALLINT},
+            </if>
+            <if test="denomination != null">
+                #{denomination,jdbcType=DECIMAL},
+            </if>
+            <if test="exchangeBalance != null">
+                #{exchangeBalance,jdbcType=DECIMAL},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyBy != null">
+                #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateLotteryPO">
+        update cooperate_lottery
+        <set>
+            <if test="channelId != null">
+                channel_id = #{channelId,jdbcType=VARCHAR},
+            </if>
+            <if test="lotteryCode != null">
+                lottery_code = #{lotteryCode,jdbcType=SMALLINT},
+            </if>
+            <if test="denomination != null">
+                denomination = #{denomination,jdbcType=DECIMAL},
+            </if>
+            <if test="exchangeBalance != null">
+                exchange_balance = #{exchangeBalance,jdbcType=DECIMAL},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+
+            <if test="modifyBy != null">
+                modify_by = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            create_time = now(),
+            modify_time = now()
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateLotteryPO">
+        update cooperate_lottery
+        set channel_id = #{channelId,jdbcType=VARCHAR},
+        lottery_code = #{lotteryCode,jdbcType=SMALLINT},
+        denomination = #{denomination,jdbcType=DECIMAL},
+        exchange_balance = #{exchangeBalance,jdbcType=DECIMAL},
+        create_by = #{createBy,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        modify_by = #{modifyBy,jdbcType=VARCHAR},
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

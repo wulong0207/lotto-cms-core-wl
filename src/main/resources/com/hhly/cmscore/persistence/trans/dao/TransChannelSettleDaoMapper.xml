@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.trans.dao.TransChannelSettleDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.transmgr.bo.TransChannelSettleBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="TRANS_CHANNEL_SETTLE_CODE" property="transChannelSettleCode" jdbcType="VARCHAR" />
+    <result column="CHANNEL_NAME" property="channelName" jdbcType="VARCHAR" />
+    <result column="CHANNEL_ID" property="channelId" jdbcType="VARCHAR" />
+    <result column="SETTLE_COMMISSION" property="settleCommission" jdbcType="DECIMAL" />
+    <result column="SETTLE_STATUS" property="settleStatus" jdbcType="SMALLINT" />
+    <result column="SETTLE_TYPE" property="settleType" jdbcType="SMALLINT" />
+    <result column="SETTLE_COUNT" property="settleCount" jdbcType="DECIMAL" />
+    <result column="SETTLE_RATE" property="settleRate" jdbcType="DECIMAL" />
+    <result column="SETTLE_START_TIME" property="settleStartTime" jdbcType="TIMESTAMP" />
+    <result column="SETTLE_END_TIME" property="settleEndTime" jdbcType="TIMESTAMP" />
+    <result column="SETTLE_TIME" property="settleTime" jdbcType="TIMESTAMP" />
+    <result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="SEND_TIME" property="sendTime" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+		tcs.ID, TRANS_CHANNEL_SETTLE_CODE, SETTLE_COMMISSION, SETTLE_STATUS, SETTLE_TYPE, 
+    SETTLE_COUNT, SETTLE_RATE, SETTLE_START_TIME, SETTLE_END_TIME, SETTLE_TIME, tcs.MODIFY_TIME,SEND_TIME, 
+    tcs.MODIFY_BY,tcs.CREATE_BY, tcs.CREATE_TIME, tcs.REMARK,tcs.CHANNEL_ID,
+		channel_name
+  </sql>
+  
+  <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+   		limit #{startRow},#{pageSize}
+ 	 </if>
+  </sql>
+  
+  <sql id="Order_Condition">
+  	<choose>  
+       <when test="sortField !=null and sortField!=''">  
+           ${sortField} ${sortOrder}
+       </when>   
+       <otherwise>  
+            tcs.id desc
+       </otherwise>  
+     </choose>
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+			<if test="transChannelSettleCode != null and transChannelSettleCode !=''">
+				and TRANS_CHANNEL_SETTLE_CODE = #{transChannelSettleCode}
+			</if>
+			<if test="channelName != null and channelName !=''">
+				and channel_name like CONCAT('%',#{channelName},'%')
+			</if>
+			<if test="settleStatus != null">
+				and SETTLE_STATUS = #{settleStatus}
+			</if>
+			<if test="settleType != null">
+				and SETTLE_TYPE = #{settleType}
+			</if>
+			<if test="searchTimeType != null and startTime != null and endTime != null">
+				<choose>
+					<when test="searchTimeType == 1">
+						<![CDATA[ and tcs.SETTLE_START_TIME >= #{startTime} and tcs.SETTLE_END_TIME <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 2">
+						<![CDATA[ and SETTLE_TIME >= #{startTime} and SETTLE_TIME <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 3">
+						<![CDATA[ and SEND_TIME >= #{startTime} and SEND_TIME <= #{endTime}]]>
+					</when>
+				</choose>
+			</if>
+		</where>
+  </sql>
+  
+  <sql id="Table">
+  	TRANS_CHANNEL_SETTLE tcs 
+  	left outer join operate_market_channel omc on tcs.channel_id=omc.channel_id
+  </sql>
+  
+  <select id="findTrans" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransChannelSettleVO" resultMap="BaseResultMap">
+     select <include refid="Base_Column_List"/>
+			from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+			order by 
+			<include refid="Order_Condition"/>
+   			<include refid="Page_Condition"/>
+  </select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransChannelSettleVO" resultType="int">
+	    select count(*) total
+	    from <include refid="Table"/>
+				<include refid="Query_Condition"/>
+	</select>
+  
+  <select id="findExcel" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransChannelSettleVO" resultType="com.hhly.skeleton.cms.transmgr.bo.TransChannelSettleExcelBO">
+    select 
+      tcs.id id,
+      TRANS_CHANNEL_SETTLE_CODE transChannelSettleCode,
+      channel_name channelName,
+      SETTLE_COMMISSION settleCommission,
+      SETTLE_STATUS settleStatus, 
+      SETTLE_TYPE settleType,
+      SETTLE_COUNT settleCount,
+      SETTLE_RATE settleRate,
+      date_format(SETTLE_START_TIME, '%Y-%m-%d %H:%i:%s') settleStartTime,
+      date_format(SETTLE_END_TIME, '%Y-%m-%d %H:%i:%s') settleEndTime,
+      date_format(SETTLE_TIME, '%Y-%m-%d %H:%i:%s') settleTime,
+      tcs.REMARK remark
+   		from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+			order by tcs.id desc
+  </select>
+</mapper>

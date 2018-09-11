@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityAddedDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityAddedBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_config_id" jdbcType="INTEGER" property="activityConfigId" />
+    <result column="lottery_child_code" jdbcType="VARCHAR" property="lotteryChildCode" />
+    <result column="rule_type" jdbcType="BIT" property="ruleType" />
+    <result column="operate_activity_coupon_id" jdbcType="INTEGER" property="operateActivityCouponId" />
+    <result column="add_num" jdbcType="SMALLINT" property="addNum" />
+    <result column="give_num" jdbcType="SMALLINT" property="giveNum" />
+    <result column="single_user_num" jdbcType="SMALLINT" property="singleUserNum" />
+    <result column="rule_offer_num" jdbcType="INTEGER" property="ruleOfferNum" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List">
+    id, activity_config_id, lottery_child_code, rule_type, operate_activity_coupon_id, 
+    add_num, give_num, single_user_num, rule_offer_num, modify_time, modify_by, create_time, 
+    create_by
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from operate_activity_added
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from operate_activity_added
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityAddedPO">
+    insert into operate_activity_added (id, activity_config_id, lottery_child_code, 
+      rule_type, operate_activity_coupon_id, add_num, 
+      give_num, single_user_num, rule_offer_num, 
+      modify_time, modify_by, create_time, 
+      create_by)
+    values (#{id,jdbcType=INTEGER}, #{activityConfigId,jdbcType=INTEGER}, #{lotteryChildCode,jdbcType=VARCHAR}, 
+      #{ruleType,jdbcType=BIT}, #{operateActivityCouponId,jdbcType=INTEGER}, #{addNum,jdbcType=SMALLINT}, 
+      #{giveNum,jdbcType=SMALLINT}, #{singleUserNum,jdbcType=SMALLINT}, #{ruleOfferNum,jdbcType=INTEGER}, 
+      #{modifyTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createBy,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityAddedVO">
+    update operate_activity_added
+    set activity_config_id = #{activityConfigId,jdbcType=INTEGER},
+      lottery_child_code = #{lotteryChildCode,jdbcType=VARCHAR},
+      rule_type = #{ruleType,jdbcType=BIT},
+      operate_activity_coupon_id = #{operateActivityCouponId,jdbcType=INTEGER},
+      add_num = #{addNum,jdbcType=SMALLINT},
+      give_num = #{giveNum,jdbcType=SMALLINT},
+      single_user_num = #{singleUserNum,jdbcType=SMALLINT},
+      rule_offer_num = #{ruleOfferNum,jdbcType=INTEGER},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_by = #{modifyBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_by = #{createBy,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+   <insert id="merge"
+		parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityAddedPO" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO operate_activity_added 
+		 (
+		 	  id, lottery_child_code, rule_type, operate_activity_coupon_id,
+		      add_num, give_num, single_user_num,
+		      rule_offer_num, modify_time, modify_by, 
+		      create_time, create_by, activity_config_id
+		)
+		VALUES(
+			#{id,jdbcType=INTEGER}, #{lotteryChildCode,jdbcType=VARCHAR}, #{ruleType,jdbcType=BIT}, #{operateActivityCouponId,jdbcType=INTEGER},
+      #{addNum,jdbcType=SMALLINT}, #{giveNum,jdbcType=SMALLINT}, #{singleUserNum,jdbcType=SMALLINT}, 
+      #{ruleOfferNum,jdbcType=INTEGER}, now(), #{modifyBy,jdbcType=VARCHAR}, 
+     	now(), #{createBy,jdbcType=VARCHAR}, #{activityConfigId}
+		)
+		ON DUPLICATE KEY
+		UPDATE
+		lottery_child_code = #{lotteryChildCode,jdbcType=VARCHAR},
+      	rule_type = #{ruleType,jdbcType=BIT},
+      	operate_activity_coupon_id = #{operateActivityCouponId,jdbcType=INTEGER},
+     	add_num = #{addNum,jdbcType=SMALLINT},
+      	give_num = #{giveNum,jdbcType=SMALLINT},
+      	single_user_num = #{singleUserNum,jdbcType=SMALLINT},
+     	rule_offer_num = #{ruleOfferNum,jdbcType=INTEGER},
+      	modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+     	modify_by = #{modifyBy,jdbcType=VARCHAR}
+	</insert>
+	 <update id="updateLotterChildCode" parameterType="java.util.List">   
+	    <foreach collection="list" item="item" index="index" open="" close="" separator=";">  
+	        update operate_activity_added
+	    	set
+	    	lottery_child_code=   #{item.lotteryChildCode,jdbcType=VARCHAR} 
+	    	where id = #{item.id,jdbcType=INTEGER}
+	    </foreach>  
+ 	 </update>
+ 	 <update id="updateAddCodeIssue" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityAddedVO">   
+	        update operate_activity_added
+	    	set
+	    	give_issue=   #{giveIssue} 
+	    	where id = #{id,jdbcType=INTEGER}
+	  </update>
+</mapper>

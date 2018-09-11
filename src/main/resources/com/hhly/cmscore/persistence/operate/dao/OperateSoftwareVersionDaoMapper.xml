@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateSoftwareVersionDaoMapper">
+
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.operate.po.OperateSoftwareVersionPO">
+    <result column="ID" jdbcType="INTEGER" property="id" />
+    <result column="CODE" jdbcType="INTEGER" property="code" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="TYPE" jdbcType="INTEGER" property="type" />    
+    <result column="ISNEW" jdbcType="INTEGER" property="isnew" />
+    <result column="ISUPDATE" jdbcType="INTEGER" property="isupdate" />
+    <result column="SIZES" jdbcType="VARCHAR" property="size" />
+    <result column="DESCRIBE" jdbcType="VARCHAR" property="describe" />
+    <result column="URL" jdbcType="VARCHAR" property="url" />
+    <result column="APP_URL" jdbcType="VARCHAR" property="appUrl" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  <resultMap id="BoResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateSoftwareVersionBO">
+    <result column="ID" jdbcType="INTEGER" property="id" />
+	<result column="CODE" jdbcType="INTEGER" property="code" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" /> 
+    <result column="TYPE" jdbcType="INTEGER" property="type" />         
+    <result column="ISNEW" jdbcType="INTEGER" property="isnew" />
+    <result column="ISUPDATE" jdbcType="INTEGER" property="isupdate" />
+    <result column="SIZES" jdbcType="VARCHAR" property="size" />
+    <result column="DES" jdbcType="VARCHAR" property="describe" />
+    <result column="URL" jdbcType="VARCHAR" property="url" />
+    <result column="APP_URL" jdbcType="VARCHAR" property="appUrl" />    
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="HIDE" jdbcType="VARCHAR" property="hide" />
+    <result column="HIDE_AREA" jdbcType="VARCHAR" property="hideArea" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="CHANNEL_ID" jdbcType="INTEGER" property="channelId" />         
+    <result column="CHANNEL_NAME" jdbcType="VARCHAR" property="channelName" />         
+    <result column="STATUS" jdbcType="INTEGER" property="status" />         
+    <result column="SYN_OFFICIAL" jdbcType="INTEGER" property="synOfficial" />         
+    <result column="SWITCH_REMARK" jdbcType="VARCHAR" property="switchRemark" />  
+    <result column="SWITCH_MODIFY_BY" jdbcType="VARCHAR" property="switchModifyBy" />  
+    <result column="SWITCH_MODIFY_TIME" jdbcType="TIMESTAMP" property="switchModifyTime" />  
+    <result column="PARENT_CHANNEL_ID" jdbcType="INTEGER" property="parentChannelId" />  
+    <result column="TERMINAL_PLATFORM" jdbcType="INTEGER" property="terminalPlatform" />  
+    <result column="APP_URL" jdbcType="VARCHAR" property="newAppUrl" />  
+  </resultMap>  
+  
+  <sql id="Base_Column_List">
+    ID, CODE, NAME, TYPE, ISNEW, ISUPDATE, SIZES, `DESCRIBE`, URL, REMARK, CREATE_BY, MODIFY_BY, CREATE_TIME, 
+    MODIFY_TIME, HIDE
+  </sql>
+  
+  <sql id="Base_Where_Clause">
+     1 = 1
+      <if test="id != null">
+       AND ID = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="code != null">
+       AND CODE = #{code,jdbcType=INTEGER}
+      </if>
+      <if test="name != null">
+       AND NAME = #{name,jdbcType=VARCHAR}
+      </if>
+      <if test="type != null">
+       AND TYPE = #{type,jdbcType=INTEGER}
+      </if>            
+      <if test="isnew != null">
+       AND ISNEW = #{isnew,jdbcType=INTEGER}
+      </if>
+      <if test="isupdate != null">
+       AND ISUPDATE = #{isupdate,jdbcType=INTEGER}
+      </if>
+      <if test="size != null">
+       AND SIZES = #{size,jdbcType=VARCHAR}
+      </if>      
+      <if test="describe != null">
+       AND `DESCRIBE` = #{describe,jdbcType=VARCHAR}
+      </if>
+      <if test="url != null">
+       AND URL = #{url,jdbcType=VARCHAR}
+      </if>
+      <if test="appUrl != null">
+       AND APPURL = #{appUrl,jdbcType=VARCHAR}
+      </if>      
+      <if test="remark != null">
+       AND REMARK = #{remark,jdbcType=VARCHAR}
+      </if>
+      <if test="createBy != null">
+       AND CREATE_BY = #{createBy,jdbcType=OTHER}
+      </if>
+      <if test="modifyBy != null">
+       AND MODIFY_BY = #{modifyBy,jdbcType=OTHER}
+      </if>
+      <if test="createTime != null">
+       AND CREATE_TIME = #{createTime,jdbcType=DATE}
+      </if>
+      <if test="modifyTime != null">
+       AND MODIFY_TIME = #{modifyTime,jdbcType=DATE}
+      </if>
+      <if test="channelId != null">
+       AND CHANNEL_ID = #{channelId}
+      </if>
+  </sql>
+
+	<sql id="SQL_STATEMENT_ALL">
+		SELECT S.ID id, S.CODE code, S.NAME name, S.TYPE type, S.ISNEW isnew, 
+		S.ISUPDATE isupdate, S.SIZES sizes, S.DESCRIBE des,
+		S.URL url, S.APP_URL appUrl, S.REMARK remark,
+		S.CREATE_BY createBy, S.MODIFY_BY modifyBy,
+		S.CREATE_TIME createTime,
+		S.MODIFY_TIME modifyTime,
+		S.CHANNEL_ID channelId,
+		S.STATUS status,
+		HIDE,
+		HIDE_AREA,
+		SYN_OFFICIAL,
+		SWITCH_REMARK,
+		SWITCH_MODIFY_BY,
+		SWITCH_MODIFY_TIME
+		FROM OPERATE_SOFTWARE_VERSION S
+		<include refid="SQL_CONDITION_ALL" /> 
+		order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				S.ID
+			</otherwise>
+		</choose>
+	</sql>
+	   
+  <sql id="SQL_CONDITION_ALL">
+  	where 1 = 1
+      <if test="id != null">
+        AND S.ID = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="negativeId != null">
+        AND S.ID != #{negativeId,jdbcType=INTEGER}
+      </if>
+      <if test="code != null">
+        AND S.CODE = #{code,jdbcType=INTEGER}
+      </if>
+      <if test="name != null and name != ''">
+        AND S.NAME = #{name,jdbcType=VARCHAR}
+      </if>      
+      <if test="type != null">
+        AND TYPE = #{type,jdbcType=INTEGER}
+      </if>         
+      <if test="isnew != null">
+        AND S.ISNEW = #{isnew,jdbcType=INTEGER}
+      </if>      
+      <if test="isupdate != null">
+        AND S.ISUPDATE = #{isupdate,jdbcType=INTEGER}
+      </if>
+      <if test="beginTime != null">
+       AND S.CREATE_TIME >= #{beginTime,jdbcType=TIMESTAMP} 
+      </if>
+      <if test="endTime != null">
+        AND S.CREATE_TIME <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+	  </if>                   
+      <if test="channelId != null">
+        AND S.CHANNEL_ID = #{channelId}
+	  </if>                   
+      <if test="channelIds != null">
+        AND S.CHANNEL_ID in
+        <foreach collection="channelIds" open="(" separator="," close=")" item="channelId">
+       	 #{channelId}
+        </foreach>
+	  </if>                   
+  </sql>
+
+  <select id="find" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO" resultMap="BoResultMap">
+  	<include refid="SQL_STATEMENT_ALL" /> 
+  	 <if test="startRow != null and pageSize != null">
+		limit #{startRow} ,#{pageSize}
+	</if> 	
+  </select>
+
+  <select id="distinctName" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO" resultMap="BoResultMap">
+  	SELECT distinct(NAME) name,code
+		FROM OPERATE_SOFTWARE_VERSION 
+  	 <if test="startRow != null and pageSize != null">
+		limit #{startRow} ,#{pageSize}
+	</if> 	
+  </select>
+
+  <select id="findOne" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO" resultMap="BoResultMap">
+  	<include refid="SQL_STATEMENT_ALL" /> 
+  </select>
+
+  <select id="findNew" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO" resultMap="BoResultMap">
+	SELECT
+	OMC.PARENT_CHANNEL_ID,
+	OMC.channel_name,
+	OMC.CHANNEL_ID,
+	OMC.terminal_platform,
+	OMC.app_url,
+	S.*
+	FROM
+	OPERATE_MARKET_CHANNEL OMC
+	left join (
+	SELECT
+	hide,
+	syn_official,
+	switch_remark,
+	switch_modify_by,
+	switch_modify_time,
+	s1.CHANNEL_ID,
+	name,
+	s1.code
+	from operate_software_version s1,
+	(
+	select max(code) code ,osv.channel_id FROM operate_software_version osv
+	group by channel_id
+	) s2
+	where s1.channel_id = s2.channel_id and s1.`code` = s2.`code`
+	) S
+	on OMC.channel_id=S.channel_id
+	ORDER BY OMC.id
+  </select>
+  
+  <select id="findSingle" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateLottSoftwareVersionBO">
+	  select hide 	  
+  	  from OPERATE_SOFTWARE_VERSION S
+  	  <include refid="SQL_CONDITION_ALL" />
+  </select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO" resultType="java.lang.Integer">
+    SELECT count(1) FROM OPERATE_SOFTWARE_VERSION S
+    <include refid="SQL_CONDITION_ALL" />
+  </select>  
+  
+  <select id="valiSoftwareVersionCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+  	select count(1) from OPERATE_SOFTWARE_VERSION where code = #{code,jdbcType=INTEGER}
+  </select>
+  
+  <select id="findBaseSoftwareVersion" resultMap="BoResultMap" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO">
+  	select ID id, Code code from 
+  	OPERATE_SOFTWARE_VERSION S 
+  	<include refid="SQL_CONDITION_ALL" />
+  	ORDER BY ID 
+  </select>    
+  
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.OperateSoftwareVersionPO" useGeneratedKeys="true" keyProperty="id" >
+    insert into OPERATE_SOFTWARE_VERSION ( CODE, ISNEW, 
+      ISUPDATE, `DESCRIBE`, URL, 
+      REMARK, CREATE_BY, MODIFY_BY, 
+      CREATE_TIME, MODIFY_TIME, NAME, SIZES, TYPE, APP_URL,
+      CHANNEL_ID,HIDE)
+    values ( #{code,jdbcType=INTEGER}, #{isnew,jdbcType=INTEGER}, 
+      #{isupdate,jdbcType=INTEGER}, #{describe,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{modifyBy,jdbcType=OTHER}, 
+      now(), now(), #{name,jdbcType=VARCHAR}, #{size,jdbcType=VARCHAR},
+      #{type,jdbcType=INTEGER}, #{appUrl,jdbcType=VARCHAR},
+      #{channelId},#{hide}
+      )
+  </insert>
+  
+  <delete id="deleteByIds" parameterType="java.util.List">
+	delete from OPERATE_SOFTWARE_VERSION
+	where ID in
+	<foreach collection="list" item="item" open="(" close=")"
+		separator=",">
+		#{item}
+	</foreach>
+  </delete> 
+   
+  <delete id="delete" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateSoftwareVersionVO">
+	delete from OPERATE_SOFTWARE_VERSION
+	 <where>
+   		<if test="type != null">
+        and TYPE = #{type,jdbcType=INTEGER}
+      </if>
+       <if test="code != null">
+        and CODE = #{code,jdbcType=INTEGER}
+      </if>    
+       <if test="negativeId != null">
+        and id != #{negativeId,jdbcType=INTEGER}
+      </if>    
+    </where>
+  </delete>  
+
+  <update id="updateById" parameterType="com.hhly.cmscore.persistence.operate.po.OperateSoftwareVersionPO">
+    update OPERATE_SOFTWARE_VERSION
+    <set>
+    	MODIFY_TIME = now(),
+      <if test="code != null">
+        CODE = #{code,jdbcType=INTEGER},
+      </if>
+      <if test="name != null and name != ''">
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        TYPE = #{type,jdbcType=INTEGER},
+      </if>              
+      <if test="isnew != null">
+        ISNEW = #{isnew,jdbcType=INTEGER},
+      </if>
+      <if test="isupdate != null">
+        ISUPDATE = #{isupdate,jdbcType=INTEGER},
+      </if>
+      <if test="size != null and size != ''">
+        SIZES = #{size,jdbcType=VARCHAR},
+      </if>       
+      <if test="describe != null and describe != ''">
+        `DESCRIBE` = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null and url != ''">
+        URL = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="appUrl != null and appUrl != ''">
+        APP_URL = #{appUrl,jdbcType=VARCHAR},
+      </if>      
+      <if test="remark != null and remark != ''">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyBy != null and modifyBy != ''">
+        MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null">
+        CHANNEL_ID = #{channelId},
+      </if>
+      <if test="status != null">
+        STATUS = #{status},
+      </if>
+      <if test="hide != null and hide != ''">
+        HIDE = #{hide,jdbcType=VARCHAR},
+      </if>
+      <if test="synOfficial != null">
+        syn_official = #{synOfficial},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="update" parameterType="com.hhly.cmscore.persistence.operate.po.OperateSoftwareVersionPO">
+    update OPERATE_SOFTWARE_VERSION
+    <set>
+    	MODIFY_TIME = now(),
+      <if test="code != null">
+        CODE = #{code,jdbcType=INTEGER},
+      </if>
+      <if test="name != null and name != ''">
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        TYPE = #{type,jdbcType=INTEGER},
+      </if>              
+      <if test="isnew != null">
+        ISNEW = #{isnew,jdbcType=INTEGER},
+      </if>
+      <if test="isupdate != null">
+        ISUPDATE = #{isupdate,jdbcType=INTEGER},
+      </if>
+      <if test="size != null and size != ''">
+        SIZES = #{size,jdbcType=VARCHAR},
+      </if>       
+      <if test="describe != null and describe != ''">
+        `DESCRIBE` = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null and url != ''">
+        URL = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="appUrl != null and appUrl != ''">
+        APP_URL = #{appUrl,jdbcType=VARCHAR},
+      </if>      
+      <if test="remark != null and remark != ''">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyBy != null and modifyBy != ''">
+        MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null">
+        CHANNEL_ID = #{channelId},
+      </if>
+      <if test="status != null">
+        STATUS = #{status},
+      </if>
+    </set>
+    <where>
+   		<if test="type != null">
+        and TYPE = #{type,jdbcType=INTEGER}
+      </if>
+       <if test="code != null">
+        and CODE = #{code,jdbcType=INTEGER}
+      </if>    
+    </where>
+  </update>
+
+  <update id="updSwitch" parameterType="com.hhly.cmscore.persistence.operate.po.OperateSoftwareVersionPO">
+    update OPERATE_SOFTWARE_VERSION
+    <set>
+      <if test="synOfficial != null">
+        syn_official = #{synOfficial},
+      </if>
+      <if test="switchRemark != null and switchRemark != ''">
+        switch_remark = #{switchRemark},
+      </if>
+      <if test="switchModifyBy != null and switchModifyBy != ''">
+        switch_modify_by = #{switchModifyBy},
+      </if>
+      <if test="switchModifyTime != null">
+        switch_modify_time = #{switchModifyTime},
+      </if>
+      <if test="hide != null">
+        hide = #{hide},
+      </if>
+      <if test="hideArea != null">
+          hide_area = #{hideArea},
+      </if>
+    </set>
+    where
+    <include refid="Base_Where_Clause" />
+  </update>
+  
+  <update id="updateIsnew" parameterType="Map">
+  	update OPERATE_SOFTWARE_VERSION set ISNEW = #{newIsnew,jdbcType=INTEGER} where  
+  	ISNEW = #{isnew,jdbcType=INTEGER} and TYPE = #{type,jdbcType=INTEGER}
+  </update>
+  
+  <!-- rap接口根据客户端信息查询最新的版本号 -->
+   <select id="findNewVersion" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateLottSoftwareVersionBO" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateLottSoftwareVersionVO">
+  	  select URL as downloadUrl,SIZES as fileSize , ISUPDATE as upgradeType , CODE as versionCode ,`DESCRIBE` as versionDesc,NAME as versionName,APP_URL wapAppUrl 	  
+  	  from OPERATE_SOFTWARE_VERSION
+  	    <where>
+	      <if test="type != null">
+	        AND TYPE = #{type,jdbcType=INTEGER}
+	      </if>         
+	      <if test="channelId != null">
+	        AND CHANNEL_ID = #{channelId}
+		  </if>                   
+	      <if test="synOfficial != null">
+	        AND syn_official = #{synOfficial}
+		  </if>
+  	    </where>
+  </select>   
+</mapper>

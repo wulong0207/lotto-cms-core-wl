@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.hhly.cmscore.persistence.ticket.dao.TicketAlarmInfoDaoMapper">
+	<resultMap id="BaseResultMap"
+		type="com.hhly.cmscore.persistence.ticket.po.TicketAlarmInfoPO">
+		<id column="ID" property="id" jdbcType="DECIMAL" />
+		<result column="TYPE_ID" property="typeId" jdbcType="DECIMAL" />
+		<result column="ALARM_TYPE" property="alarmType" jdbcType="DECIMAL" />
+		<result column="ALARM_CHILD" property="alarmChild" jdbcType="DECIMAL" />
+		<result column="ALARM_LEVEL" property="alarmLevel" jdbcType="DECIMAL" />
+		<result column="STATUS" property="status" jdbcType="DECIMAL" />
+		<result column="ALARM_INFO" property="alarmInfo" jdbcType="OTHER" />
+		<result column="REMARK" property="remark" jdbcType="OTHER" />
+		<result column="DEAL_BY" property="dealBy" jdbcType="OTHER" />
+		<result column="ALARM_TIME" property="alarmTime" jdbcType="TIMESTAMP" />
+		<result column="DEAL_TIME" property="dealTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, TYPE_ID, ALARM_TYPE, ALARM_CHILD, ALARM_LEVEL, `STATUS`, ALARM_INFO,
+		REMARK, DEAL_BY,
+		ALARM_TIME, DEAL_TIME
+	</sql>
+	<sql id="Column_List">
+		ID,
+		ALARM_TYPE ALARMTYPE,
+		ALARM_CHILD ALARMCHILD,
+		ALARM_LEVEL ALARMLEVEL,
+		`STATUS` `STATUS`,
+		ALARM_INFO ALARMINFO,
+		REMARK,
+		DEAL_BY DEALBY,
+		ALARM_TIME ALARMTIME,
+		DEAL_TIME DEALTIME
+	</sql>
+	<sql id="sql_condition_TicketAlarmInfoVO">
+		<where>
+			<if test="alarmType != null">
+				and ALARM_TYPE=#{alarmType}
+			</if>
+			<if test="alarmChild !=null">
+				and ALARM_CHILD  = #{alarmChild}
+			</if>
+			<if test="alarmLevel !=null">
+				and ALARM_LEVEL  = #{alarmLevel}
+			</if>
+			<if test="status !=null">
+				and `status`  = #{status}
+			</if>
+			<if test="dealBy !=null and dealBy != ''">
+				and DEAL_BY  = #{dealBy}
+			</if>
+			<if test="alarmTimeStart !=null">
+				and ALARM_TIME  >= #{alarmTimeStart}
+			</if>
+			<if test="alarmTimeEnd !=null">
+				and ALARM_TIME  <![CDATA[<=]]> #{alarmTimeEnd}
+			</if>
+			<if test="dealTimeStart !=null">
+				and DEAL_TIME  >= #{dealTimeStart}
+			</if>
+			<if test="dealTimeEnd !=null">
+				and DEAL_TIME  <![CDATA[<=]]> #{dealTimeEnd}
+			</if>
+			<if test="alarmInfo !=null">
+				and alarm_info  like CONCAT('%',#{alarmInfo},'%')
+			</if>
+			<if test="orderCode !=null and orderCode !=''">
+				and alarm_info like CONCAT('%',#{orderCode},'%')
+			</if>
+			<if test="alarmChildList != null">
+		        and ALARM_CHILD in (
+		          <foreach collection="alarmChildList" item="item" separator=",">
+		             #{item}
+		          </foreach>
+		        )
+		    </if>
+		</where>
+	</sql>
+	<select id="listPage"
+		parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketAlarmInfoVO"
+		resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketAlarmInfoBO">
+		select
+		<include refid="Column_List" />
+		from TICKET_ALARM_INFO
+		<include refid="sql_condition_TicketAlarmInfoVO" />
+			order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				id desc
+			</otherwise>
+		</choose>		
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow},#{pageSize}
+		</if>
+	</select>
+	<select id="countPage"
+		parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketAlarmInfoVO"
+		resultType="int">
+		select count(1)
+		from TICKET_ALARM_INFO
+		<include refid="sql_condition_TicketAlarmInfoVO" />
+	</select>
+	
+	<update id="updTicketAlarmInfoStatus"
+		parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketAlarmInfoVO">
+		update TICKET_ALARM_INFO
+		set
+		`STATUS` = #{status,jdbcType=DECIMAL},
+		DEAL_BY = #{dealBy,jdbcType=OTHER},
+		DEAL_TIME = now()
+		where ID in (
+		   <foreach collection="ids" separator="," item="item">
+		      #{item}
+		   </foreach>
+		)
+		and `STATUS` = 0
+	</update>
+	<insert id="addTicketAlarmInfo" parameterType="com.hhly.cmscore.persistence.ticket.po.TicketAlarmInfoPO" useGeneratedKeys="true" keyProperty="id" >
+	    insert into TICKET_ALARM_INFO ( TYPE_ID, ALARM_TYPE, 
+	      ALARM_CHILD, ALARM_LEVEL, STATUS, 
+	      ALARM_INFO, REMARK,ALARM_TIME)
+	    values (#{typeId,jdbcType=DECIMAL}, #{alarmType,jdbcType=DECIMAL}, 
+	      #{alarmChild,jdbcType=DECIMAL}, #{alarmLevel,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
+	      #{alarmInfo,jdbcType=OTHER}, #{remark,jdbcType=OTHER}, #{alarmTime,jdbcType=TIMESTAMP})
+  	</insert>
+</mapper>

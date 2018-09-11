@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.payment.dao.PayBankLimitDaoMapper">
+	<resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.payment.po.PayBankLimitPO">
+		<result column="ID" property="id" jdbcType="DECIMAL" />
+		<result column="BANKID" property="bankid" jdbcType="DECIMAL" />
+		<result column="LIMITTIME" property="limittime" jdbcType="VARCHAR" />
+		<result column="LIMITDAY" property="limitday" jdbcType="VARCHAR" />
+		<result column="LIMITMONTH" property="limitmonth" jdbcType="VARCHAR" />
+		<result column="CONDITION" property="condition" jdbcType="VARCHAR" />
+		<result column="REMARK" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="find" resultType="com.hhly.skeleton.cms.payment.bo.PayBankLimitBO">
+		select
+		id,
+		limittime,
+		limitday,
+		limitmonth,
+		`condition`,
+		remark,
+		card_type cardType
+		from PAY_BANK_LIMIT
+		where bankid= #{bankId,jdbcType=DECIMAL}
+	</select>
+
+	<insert id="saveList">
+	  	<foreach collection="po" item="item" >
+			insert into PAY_BANK_LIMIT (BANKID, LIMITTIME,LIMITDAY,LIMITMONTH, `CONDITION`,REMARK,card_type)
+			values (#{item.bankid,jdbcType=DECIMAL},
+			#{item.limittime,jdbcType=VARCHAR},
+			#{item.limitday,jdbcType=VARCHAR}, #{item.limitmonth,jdbcType=VARCHAR}, #{item.condition,jdbcType=VARCHAR},
+			#{item.remark,jdbcType=VARCHAR},#{item.cardType});
+		</foreach>
+	</insert>
+	
+
+	<update id="updateList">
+	  	<foreach collection="po" item="item" >
+			update PAY_BANK_LIMIT
+			set 
+				BANKID = #{item.bankid,jdbcType=DECIMAL},
+				LIMITTIME = #{item.limittime,jdbcType=VARCHAR},
+				LIMITDAY = #{item.limitday,jdbcType=VARCHAR},
+				LIMITMONTH = #{item.limitmonth,jdbcType=VARCHAR},
+				`CONDITION` = #{item.condition,jdbcType=VARCHAR},
+				REMARK = #{item.remark,jdbcType=VARCHAR},
+				card_type=#{item.cardType}
+			where
+				ID = #{item.id,jdbcType=DECIMAL};
+		</foreach>
+	</update>
+	
+	<delete id="delete">
+		delete from PAY_BANK_LIMIT
+		<where>
+			<if test="id != null">
+				and id = ${id}
+			</if>
+			<if test="ids != null">
+				and id in
+				<foreach collection="ids" item="id" open="(" close=")" separator=",">
+					${id}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+
+</mapper>

@@ -1,0 +1,870 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.order.dao.OrderAddDaoMapper" >
+  
+  	<!--                           Used to LOTTO                           -->
+  	<!-- 追号计划入库处理 -->
+	<insert id="addOrderAdd" parameterType="com.hhly.cmscore.persistence.order.po.OrderAddPO" useGeneratedKeys="true" keyProperty="id">
+		insert into ORDER_ADDED
+		  (order_add_code,
+		   lottery_code,
+		   issue_code,
+		   user_id,
+		   buy_time,
+		   end_time,
+		   channel_id,
+		   add_amount,
+		   multiple_num,
+		   add_type,
+		   add_count,
+		   stop_type,
+		   stop_condition,
+		   update_time,
+		   create_time,
+		   is_dlt_add,
+		   issue_amount,
+		   pay_end_time,
+		   contain_cur_issue,
+		   platform,
+		   activity_id)
+		values
+		  (#{orderAddCode,jdbcType=VARCHAR},
+		  #{lotteryCode,jdbcType=INTEGER},
+		  #{issueCode,jdbcType=VARCHAR},
+		  #{userId,jdbcType=INTEGER},
+		  now(),
+		  now(),
+		  #{channelId,jdbcType=VARCHAR},
+		  #{addAmount,jdbcType=DECIMAL},
+		  #{multipleNum,jdbcType=INTEGER},
+		  #{addType,jdbcType=SMALLINT},
+		  #{addCount,jdbcType=INTEGER},
+		  #{stopType,jdbcType=SMALLINT},
+		  #{stopCondition,jdbcType=VARCHAR},
+		  now(),
+		  now(),
+		  #{isDltAdd,jdbcType=SMALLINT},
+		  #{issueAmount,jdbcType=INTEGER},
+		  #{payEndTime,jdbcType=TIMESTAMP},
+		  #{containCurIssue,jdbcType=SMALLINT},
+		  #{platform,jdbcType=SMALLINT},
+		  #{activityId}
+		  )
+	</insert>
+	<insert id="addOrderAddContent" parameterType="java.util.List">
+			insert into ORDER_ADDED_CONTENT
+				  (order_add_code,
+				   plan_content,
+				   multiple,
+				   amount,
+				   play_intro,
+				   code_way,
+				   content_type,
+				   lottery_child_code,
+				   buy_number,
+				   update_time,
+				   create_time)
+			values
+		<foreach collection="list" item="item" index="idx" separator=",">
+			  (#{item.orderAddCode,jdbcType=VARCHAR},
+			  #{item.planContent,jdbcType=VARCHAR},
+			  #{item.multiple,jdbcType=INTEGER},
+			  #{item.amount,jdbcType=DECIMAL},
+			  #{item.playIntro,jdbcType=INTEGER},
+			  #{item.codeWay,jdbcType=INTEGER},
+			  #{item.contentType,jdbcType=INTEGER},
+			  #{item.lotteryChildCode,jdbcType=INTEGER},
+			  #{item.buyNumber,jdbcType=INTEGER},
+			  now(),
+			  now()
+			  )
+		</foreach>
+	</insert>
+	<insert id="addOrderAddIssue" parameterType="java.util.List">
+			insert into ORDER_ADDED_ISSUE
+			  (order_add_code,
+			   issue_code,
+			   buy_amount,
+			   multiple,
+			   add_status,
+			   flag,
+			   update_time,
+			   create_time)
+			values
+		<foreach collection="list" item="item" index="idx" separator=",">
+			  (#{item.orderAddCode,jdbcType=VARCHAR},
+			  #{item.issueCode,jdbcType=VARCHAR},
+			  #{item.buyAmount,jdbcType=DECIMAL},
+			  #{item.multiple,jdbcType=INTEGER},
+			  default,
+			  #{item.flag,jdbcType=VARCHAR},
+			  now(),
+			  now()
+			  )
+		</foreach>
+	</insert>
+	
+	<!-- 前端接口：用户中心-查询用户追号详情-追号内容详情(分页查列表)-->
+	<select id="findPagingUserChaseContent" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="com.hhly.skeleton.lotto.base.order.bo.UserNumOrderDetailBO">
+  		select oac.plan_content       planContent,
+               oac.multiple           multiple,
+               oac.amount             amount,
+               oac.content_type       contentType,
+               oac.lottery_child_code lotteryChildCode,
+               oac.buy_number         buyNumber,
+               lc.child_name          childName
+          from ORDER_ADDED_CONTENT oac left join LOTTERY_CHILD lc on oac.lottery_child_code = lc.lottery_child_code
+         where oac.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+           and exists (select 1
+                  from ORDER_ADDED oa
+                 where oa.order_add_code = oac.order_add_code
+                   and oa.user_id = #{userId,jdbcType=INTEGER})
+         order by oac.id desc
+         LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+	<!--  前端接口：用户中心-查询用户追号详情-追号内容详情数据条数(一个计划对应的内容数量) -->
+  	<select id="findCountUserChaseContent" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="int">
+		select count(*)
+		  from ORDER_ADDED_CONTENT oac
+		 where oac.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		   and exists (select 1
+		          from ORDER_ADDED oa
+		         where oa.order_add_code = oac.order_add_code
+		           and oa.user_id = #{userId,jdbcType=INTEGER})
+	</select>
+	<!-- 前端接口：用户中心-查询用户追号详情-追号期号及中奖信息(分页查列表)-->
+	<select id="findPagingUserChaseDetail" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="com.hhly.skeleton.lotto.base.order.bo.UserChaseDetailBO">
+  		select oai.issue_code    issueCode,
+               oai.multiple      multiple,
+               oai.buy_amount    buyAmount,
+               oai.add_status    addStatus,
+               oi.winning_status winningStatus,
+               li.lottery_code   lotteryCode,
+               oi.order_code     orderCode,
+               oi.pre_bonus      preBonus,
+               oi.draw_code drawCode
+          from ORDER_ADDED_ISSUE oai
+          	   left join (select * from LOTTERY_ISSUE li where li.lottery_code = (select oa.lottery_code from ORDER_ADDED oa where oa.order_add_code = #{orderAddCode,jdbcType=VARCHAR} LIMIT 1)) li
+				 on oai.issue_code = li.issue_code
+		       left join (select * from ORDER_INFO where buy_type = 2) oi
+		         on oai.order_code = oi.order_code
+         where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+           and exists (select 1
+                  from ORDER_ADDED oa
+                 where oa.order_add_code = oai.order_add_code
+                   and oa.user_id = #{userId,jdbcType=INTEGER})
+         order by oai.issue_code
+  		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+	<!--  前端接口：用户中心-查询用户追号详情-追号期号及中奖信息数据条数(一个计划对应的期号数量) -->
+  	<select id="findCountUserChaseDetail" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="int">
+		select count(*)
+		  from ORDER_ADDED_ISSUE oai
+		 where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		   and exists (select 1
+		          from ORDER_ADDED oa
+		         where oa.order_add_code = oai.order_add_code
+		           and oa.user_id = #{userId,jdbcType=INTEGER})
+	</select>
+	<!--  前端接口(调用)：用户中心-查询正在执行的追号彩期 -->
+  	<select id="findCurChasingIssue" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="string">
+		select oai.issue_code issueCode
+          from ORDER_ADDED_ISSUE oai
+         where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+           and exists (select 1
+                  from ORDER_ADDED oa
+                 where oa.order_add_code = oai.order_add_code
+                   and oa.user_id = #{userId,jdbcType=INTEGER})
+           and oai.add_status = 5
+		order by oai.issue_code
+		LIMIT 1
+	</select>
+
+	<!--  前端接口(调用)：用户中心-查询从哪期停止追号的彩期 -->
+	<select id="findStopChasingIssue" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="string">
+		select oai.issue_code
+			from ORDER_ADDED_ISSUE oai
+		 where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		   and oai.issue_code >
+			   (
+			   select oai.issue_code
+				  from ORDER_ADDED_ISSUE oai
+				 where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+				   and order_code is not null
+				 order by oai.issue_code desc
+				 LIMIT 1
+			   )
+		order by oai.issue_code desc
+		LIMIT 1
+	</select>
+
+
+
+	<!--前端接口：用户中心-用户终止追号任务 （用户撤单：追号期号中所有等待追号的全撤）-->
+	<!-- 0.查询指定条件的撤单数据（追号计划和对应追号期信息）,判断是否符合撤单条件 -->
+  	<select id="findCountChaseCancel" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="int">
+		select count(*)
+		  from ORDER_ADDED oa inner join ORDER_ADDED_ISSUE oai on oa.order_add_code = oai.order_add_code
+		 where oa.pay_status = 2
+		   and oa.add_status = 1
+		   and oai.add_status = 5
+		   and oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		   and oa.user_id = #{userId,jdbcType=INTEGER}
+  	</select>
+  	<!-- 0.1.前端接口：用户中心-用户终止追号任务,查询目标追号计划是否存在，存在则返回部分相关信息(包括编号，用户，是否有活动等) -->
+  	<select id="findChaseCancel" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderAddBO">
+		select 
+			oa.order_add_code orderAddCode,
+			oa.user_id userId,
+			oa.activity_id activityId
+		from ORDER_ADDED oa inner join ORDER_ADDED_ISSUE oai on oa.order_add_code = oai.order_add_code
+	 where oa.pay_status = 2
+		 and oa.add_status = 1
+		 and oai.add_status = 5
+		 and oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		 and oa.user_id = #{userId,jdbcType=INTEGER}
+	  LIMIT 1
+  	</select>
+	<!--1.用户撤单：查询退款总额（查询剩余"等待追号"的金额总和） -->
+  	<select id="findChaseRefundAmount" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="com.hhly.skeleton.lotto.base.order.bo.UserChaseRefundBO">
+		select sum(oai.buy_amount) refundAmount
+		  from ORDER_ADDED_ISSUE oai
+		 where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		   and oai.add_status = #{addStatus,jdbcType=SMALLINT}
+		   and exists (select 1
+		          from ORDER_ADDED oa
+		         where oa.order_add_code = oai.order_add_code
+		           and oa.user_id = #{userId,jdbcType=INTEGER})
+  	</select>
+  	<!-- 2.用户撤单修改：剩余追号期数明细状态修改为"用户撤单中8"(“等待追号5”-“用户撤单中8”) -->
+  	<update id="updChaseIssue" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO">
+		update ORDER_ADDED_ISSUE oai
+		   set oai.add_status  = #{newAddStatus,jdbcType=SMALLINT},
+		       oai.modify_time = now(),
+		       oai.update_time = now()
+		 where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		   and exists (select 1
+		          from ORDER_ADDED oa
+		         where oa.order_add_code = oai.order_add_code
+		           and oa.user_id = #{userId,jdbcType=INTEGER})
+		   and oai.add_status = #{addStatus,jdbcType=SMALLINT}
+	</update>
+	<!-- 3.用户撤单修改：修改追号计划状态为"用户撤单4"("追号中1"-"用户撤单4"),追号结束时间、已追期数同步更新  -->
+  	<update id="updChaseEnd" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO">
+		update ORDER_ADDED oa
+		   set oa.add_status  = #{newAddStatus,jdbcType=SMALLINT},
+		       oa.had_issue   = oa.issue_amount,
+		       oa.end_time    = now(),
+		       oa.update_time = now()
+		 where oa.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		   and oa.user_id = #{userId,jdbcType=BIGINT}
+		   and oa.add_status = #{addStatus,jdbcType=SMALLINT}
+  	</update>
+  	
+	
+	<!-- 前端接口：用户中心-查询追号计划中奖金额（税前或税后）的组成明细，追号彩期关联追号订单获取-->
+	<select id="findUserChaseWinningDetail" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserChaseDetailQueryVO" resultType="com.hhly.skeleton.lotto.base.order.bo.UserChaseWinningDetailBO">
+  		select oai.issue_code issueCode,
+		       oi.pre_bonus   preBonus,
+		       oi.aft_bonus   aftBonus,
+		       oi.added_bonus addedBonus
+		  from ORDER_ADDED_ISSUE oai 
+		       inner join (select * from order_info oi where oi.buy_type = 2 and oi.winning_status in (3, 4)) oi
+		         on oai.order_code = oi.order_code
+		 where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		   and exists (select 1
+		          from ORDER_ADDED oa
+		         where oa.order_add_code = oai.order_add_code
+		           and oa.user_id = #{userId,jdbcType=INTEGER})
+		   and oai.add_status = 1
+		 order by oai.issue_code
+	</select>
+
+	<update id="batchCancelAddOrderList">
+		update  ORDER_ADDED
+		set  PAY_STATUS = #{payStatus},
+		update_time = now()
+		where order_add_code in (
+		<foreach collection="addOrderCodes" item="item" separator=",">
+			#{item}
+		</foreach>
+		)
+	</update>
+
+	<!--订单详情页面，追号相关-->
+	<select id="queryOrderAddedIssueList" parameterType="String"
+			resultType="com.hhly.skeleton.lotto.base.order.bo.OrderAddedIssueBO">
+        SELECT
+			oai.add_status addStatus,
+			oai.add_time addTime,
+			oai.issue_code issueCode,
+			oai.update_time updateTime,
+			oai.create_time  createTime
+		FROM
+			order_added_issue oai
+        where oai.order_add_code=#{orderAddCode}
+        order by issue_code desc
+	</select>
+
+	<sql id="Query_Condition">
+	<where>
+			<if test="userId != null">
+				and user_id = #{userId}
+			</if>
+			<if test="negativeUserId != null">
+				and user_id != #{negativeUserId}
+			</if>
+			<if test="activityId != null">
+				and activity_id = #{activityId}
+			</if>
+			<if test="negativePayStatuses != null">
+				and pay_status not in
+				<foreach collection="negativePayStatuses" open="(" close=")" separator="," item="payStatus">
+					#{payStatus}
+				</foreach>
+			</if>
+			<if test="payStatuses != null">
+				and pay_status in
+				<foreach collection="payStatuses" open="(" close=")" separator="," item="payStatus">
+					#{payStatus}
+				</foreach>
+			</if>
+			<if test="joinUser">
+				and (
+				<trim suffixOverrides="or">
+					<if test="true">
+						1=2 or
+					</if>
+					<if test="idCard != null">
+						mui.id_num = #{idCard} or 
+					</if>
+					<if test="mobile != null">
+						mui.cus_mobile = #{mobile} or
+					</if>
+					<if test="actualName != null">
+						mui.actual_name = #{actualName} or
+					</if>
+				</trim>
+				)
+			</if>
+		</where>
+	</sql>
+	
+	<select id="count" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderAddQueryVO" resultType="int">
+		/*MASTER*/
+		select count(*) from order_added oa
+		<if test="joinUser">
+			left join m_user_info mui on oa.user_id=mui.id
+		</if>
+		<include refid="Query_Condition"/>
+	</select>
+	
+	<select id="find" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderAddQueryVO" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderAddBO">
+		/*MASTER*/
+		select 
+		order_add_code orderAddCode
+		from order_added oa
+		<if test="joinUser">
+			left join m_user_info mui on oa.user_id=mui.id
+		</if>
+		<include refid="Query_Condition"/>
+	</select>
+
+	
+	<!--                           Used to CMS                           -->
+  	<!-- 公共结果集 -->
+  	<resultMap id="OrderAddResultMap" type="com.hhly.skeleton.cms.ordermgr.bo.OrderAddBO">
+  	  <id property="id" column="id" jdbcType="BIGINT"/>
+  	  <result property="orderAddCode" column="order_add_code" jdbcType="VARCHAR"/>
+  	  <result property="lotteryCode" column="lottery_code" jdbcType="INTEGER"/>
+  	  <result property="issueCode" column="issue_code" jdbcType="VARCHAR"/>
+  	  <result property="userId" column="user_id" jdbcType="BIGINT"/>
+  	  <result property="buyTime" column="buy_time" jdbcType="TIMESTAMP"/>
+  	  <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+  	  <result property="channelId" column="channel_id" jdbcType="VARCHAR"/>
+  	  <result property="addAmount" column="add_amount" jdbcType="DECIMAL"/>
+  	  <result property="multipleNum" column="multiple_num" jdbcType="INTEGER"/>
+  	  <result property="addType" column="add_type" jdbcType="SMALLINT"/>
+  	  <result property="addCount" column="add_count" jdbcType="INTEGER"/>
+  	  <result property="preBonus" column="pre_bonus" jdbcType="DECIMAL"/>
+  	  <result property="aftBonus" column="aft_bonus" jdbcType="DECIMAL"/>
+  	  <result property="activityId" column="activity_id" jdbcType="VARCHAR"/>
+  	  <result property="payStatus" column="pay_status" jdbcType="SMALLINT"/>
+  	  <result property="addStatus" column="add_status" jdbcType="SMALLINT"/>
+  	  <result property="stopType" column="stop_type" jdbcType="SMALLINT"/>
+  	  <result property="stopCondition" column="stop_condition" jdbcType="VARCHAR"/>
+  	  <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+  	  <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+  	  <result property="isDltAdd" column="is_dlt_add" jdbcType="SMALLINT"/>
+  	  <result property="issueAmount" column="issue_amount" jdbcType="INTEGER"/>
+  	  <result property="hadIssue" column="had_issue" jdbcType="INTEGER"/>
+  	  <result property="redCodeUsed" column="red_code_used" jdbcType="VARCHAR"/>
+  	  <result property="platform" column="platform" jdbcType="INTEGER"/>
+  	  <association property="user" javaType="com.hhly.skeleton.cms.customermgr.bo.LottoCustomerBO">
+  	  	  <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+  	  	  <result property="accountName" column="account_name" jdbcType="VARCHAR"/>
+  	  	  <result property="cusMobile" column="cus_mobile" jdbcType="VARCHAR"/>
+  	  	  <result property="actualName" column="actual_name" jdbcType="VARCHAR"/>
+  	  	  <result property="idNum" column="id_num" jdbcType="VARCHAR"/>
+  	  	  <result property="cusMail" column="cus_mail" jdbcType="VARCHAR"/>
+  	  </association>
+  	  <association property="channel" javaType="com.hhly.skeleton.cms.operatemgr.bo.OperateMarketChannelBO">
+  	  	  <result property="channelName" column="channel_name" jdbcType="SMALLINT"/>
+  	  </association>
+  	  <association property="activity" javaType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityBO">
+  	  	  <result property="activityName" column="activity_name" jdbcType="VARCHAR"/>
+  	  	  <result property="activityDes" column="activity_des" jdbcType="VARCHAR"/>
+  	  </association>
+  	  <!-- <association property="orderAddIssueStatis" column="order_add_code" select="findCountOrderAddIssueDif"/> -->
+  	</resultMap>
+  	<!-- 追号内容结果集 -->
+  	<resultMap id="OrderAddContentResultMap" type="com.hhly.skeleton.cms.ordermgr.bo.OrderAddContentBO">
+  	  <id property="id" column="id" jdbcType="BIGINT"/>
+  	  <result property="orderAddCode" column="order_add_code" jdbcType="VARCHAR"/>
+  	  <result property="planContent" column="plan_content" jdbcType="VARCHAR"/>
+  	  <result property="multiple" column="multiple" jdbcType="INTEGER"/>
+  	  <result property="amount" column="amount" jdbcType="DECIMAL"/>
+  	  <result property="playIntro" column="play_intro" jdbcType="VARCHAR"/>
+  	  <result property="codeWay" column="code_way" jdbcType="SMALLINT"/>
+  	  <result property="contentType" column="content_type" jdbcType="SMALLINT"/>
+  	  <result property="lotteryChildCode" column="lottery_child_code" jdbcType="INTEGER"/>
+  	  <result property="buyNumber" column="buy_number" jdbcType="INTEGER"/>
+  	  <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+  	  <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+  	</resultMap>
+  	<!-- 追号期数结果集 -->
+  	<resultMap id="OrderAddIssueResultMap" type="com.hhly.skeleton.cms.ordermgr.bo.OrderAddIssueBO">
+  	  <id property="id" column="id" jdbcType="BIGINT"/>
+  	  <result property="orderAddCode" column="order_add_code" jdbcType="VARCHAR"/>
+  	  <result property="orderCode" column="order_code" jdbcType="VARCHAR"/>
+  	  <result property="issueCode" column="issue_code" jdbcType="VARCHAR"/>
+  	  <result property="buyAmount" column="buy_amount" jdbcType="DECIMAL"/>
+  	  <result property="multiple" column="multiple" jdbcType="INTEGER"/>
+  	  <result property="addStatus" column="add_status" jdbcType="SMALLINT"/>
+  	  <result property="preBonus" column="pre_bonus" jdbcType="DECIMAL"/>
+  	  <result property="addTime" column="add_time" jdbcType="TIMESTAMP"/>
+  	  <result property="flag" column="flag" jdbcType="VARCHAR"/>
+  	  <result property="modifyTime" column="modify_time" jdbcType="TIMESTAMP"/>
+  	  <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+  	  <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+  	</resultMap>
+  	<!-- 公共列（追号表） -->
+  	<sql id="sql_columns_orderadd">
+  		oa.id,
+        oa.order_add_code,
+        oa.lottery_code,
+        oa.issue_code,
+        oa.user_id,
+        oa.buy_time,
+        oa.end_time,
+        oa.channel_id,
+        oa.add_amount,
+        oa.multiple_num,
+        oa.add_type,
+        oa.add_count,
+        oa.pre_bonus,
+        oa.aft_bonus,
+        oa.activity_id,
+        oa.pay_status,
+        oa.add_status,
+        oa.stop_type,
+        oa.stop_condition,
+        oa.update_time,
+        oa.create_time,
+        oa.is_dlt_add,
+        oa.issue_amount,
+        oa.had_issue,
+        oa.red_code_used,
+        oa.platform
+  	</sql>
+  	<!-- 追号查询条件(公共的) -->
+  	<sql id="sql_condition_orderadd">
+  		where 1 = 1
+  		<if test="id != null">
+  		and oa.id = #{id,jdbcType=BIGINT}
+  		</if>
+  		<if test="orderAddCode != null and orderAddCode != ''">
+  		and oa.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+  		</if>
+  	</sql>
+  	
+	<!-- cms 扩充列(用于查询列表) -->
+	<sql id="cms_sql_columns_orderadd">
+        lc.nick_name,
+        omc.channel_name
+	</sql>
+	<!-- cms 扩充列(用于查询详情) -->
+	<sql id="cms_sql_columns_orderadd_detail">
+		lc.account_name,
+		lc.cus_mobile,
+		opa.activity_name,
+		opa.activity_des
+	</sql>
+	<!-- 追号列表查询sql语句块 -->
+	<sql id="cms_sql_statement_orderadd_list">
+	  	select 
+	  		 <include refid="sql_columns_orderadd"/>,
+	  		 <include refid="cms_sql_columns_orderadd"/>
+          from ORDER_ADDED oa
+          left join OPERATE_MARKET_CHANNEL omc on oa.channel_id = omc.channel_id
+          left join M_USER_INFO lc on oa.user_id = lc.id
+          <if test="activity != null and activity.activityName != null and activity.activityName != ''">
+          left join OPERATE_ACTIVITY opa on oa.activity_id = opa.activity_code
+          </if>
+          
+  	</sql>
+  	<!-- 追号详情查询sql语句块 -->
+	<sql id="cms_sql_statement_orderadd_detail">
+	  	select 
+	  		 <include refid="sql_columns_orderadd"/>,
+	  		 <include refid="cms_sql_columns_orderadd"/>,
+	  		 <include refid="cms_sql_columns_orderadd_detail"/>
+          from ORDER_ADDED oa
+          left join OPERATE_MARKET_CHANNEL omc on oa.channel_id = omc.channel_id
+          left join M_USER_INFO lc on oa.user_id = lc.id
+          left join OPERATE_ACTIVITY opa on oa.activity_id = opa.activity_code
+  	</sql>
+  	<!-- 追号列表查询条件(查询列表) -->
+  	<sql id="cms_sql_condition_orderadd_list">
+  		where 1 = 1
+  		<if test="lotteryCode != null">
+  		and oa.lottery_code = #{lotteryCode,jdbcType=INTEGER}
+  		</if>
+  		<if test="issueCode != null and issueCode != ''">
+  		and oa.issue_code = #{issueCode,jdbcType=VARCHAR}
+  		</if>
+  		<if test="activityId != null and activityId != ''">
+  		and oa.activity_id = #{activityId,jdbcType=VARCHAR}
+  		</if>
+  		<if test="activity != null and activity.activityName != null and activity.activityName != ''">
+  		and opa.activity_name like CONCAT('%',#{activity.activityName,jdbcType=VARCHAR},'%')
+  		</if>
+  		<if test="channelId != null and channelId != ''">
+  		and oa.channel_id = #{channelId,jdbcType=VARCHAR}
+  		</if>
+  		<if test="platform != null">
+  		and oa.platform = #{platform,jdbcType=INTEGER}
+  		</if>
+  		<if test="orderAddCode != null and orderAddCode != ''">
+  		and oa.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+  		</if>
+  		<if test="user != null">
+  			<if test="user.nickName != null and user.nickName != ''">
+	  		and lc.nick_name = #{user.nickName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.accountName != null and user.accountName != ''">
+	  		and lc.account_name = #{user.accountName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.cusMobile != null and user.cusMobile != ''">
+	  		and lc.cus_mobile = #{user.cusMobile,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.actualName != null and user.actualName != ''">
+	  		and lc.actual_name = #{user.actualName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.idNum != null and user.idNum != ''">
+	  		and lc.id_num = #{user.idNum,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.cusMail != null and user.cusMail != ''">
+	  		and lc.cus_mail = #{user.cusMail,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.id != null">
+	  		and lc.id = #{user.id,jdbcType=BIGINT}
+	  		</if>
+  		</if>
+  		<if test="isDltAdd != null">
+  	    and oa.is_dlt_add = #{isDltAdd,jdbcType=SMALLINT}
+  	 	</if>
+  		<if test="addType != null">
+  		and oa.add_type = #{addType,jdbcType=SMALLINT}
+  		</if>
+  		<if test="payStatus != null">
+  		and oa.pay_status = #{payStatus,jdbcType=SMALLINT}
+  		</if>
+  		<if test="addStatus != null">
+  		and oa.add_status = #{addStatus,jdbcType=SMALLINT}
+  		</if>
+  		<if test="stopType != null">
+  		and oa.stop_type = #{stopType,jdbcType=SMALLINT}
+  		</if>
+  		<if test="timeType != null">
+            <if test="startQryTime != null">
+                 and ${timeTypeField} >= #{startQryTime,jdbcType=TIMESTAMP} 
+            </if>
+            <if test="endQryTime != null">
+                 and ${timeTypeField} <![CDATA[<=]]> #{endQryTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+  		<if test="orderAddContent != null and (orderAddContent.codeWay != null or orderAddContent.contentType != null)">
+  		and exists
+        (select 1
+               from ORDER_ADDED_CONTENT oac
+              where oac.order_add_code = oa.order_add_code
+                <if test="orderAddContent.codeWay != null">
+                and oac.code_way = #{orderAddContent.codeWay,jdbcType=SMALLINT}
+                </if>
+                <if test="orderAddContent.contentType != null">
+                and oac.content_type = #{orderAddContent.contentType,jdbcType=SMALLINT}
+                </if>
+                )
+  		</if>
+  	</sql>
+  	<!-- 按照 支付状态（支付成功 - 支付中 - 等待支付  -支付失败 - 用户取消  - 未支付过期  - 退款），
+  		追号状态（追号中 — 追号结束 — 中奖停追——系统撤单——用户撤单）
+  		create_time desc
+  	-->
+  	<sql id="cms_sql_orderby_orderadd">
+  		<!-- 
+  		<choose>
+  			<when test="sortField != null and sortField != ''">
+  				order by ${sortField}  ${sortOrder}
+  			</when>
+  			<otherwise>
+  				order by oa.id desc
+  			</otherwise>
+  		</choose>
+  		 -->
+  		 order by FIELD(oa.pay_status,'2','7','1','4','5','3','6'),FIELD(oa.add_status,'1','3','2','5','4'),oa.create_time desc
+  	</sql>
+  <!-- 查询分页(追号计划) -->
+  <select id="findPagingOrderAdd" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddCmsVO" resultMap="OrderAddResultMap">
+  		<include refid="cms_sql_statement_orderadd_list" />
+		<include refid="cms_sql_condition_orderadd_list" />
+		<include refid="cms_sql_orderby_orderadd" />
+		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+  <!-- 查询记录数及汇总信息(追号计划) -->
+  <select id="findCountOrderAdd" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddCmsVO" resultType="map">
+		select count(*) count,
+		       sum(oa.add_amount) totalAddAmount,
+		       sum(oa.pre_bonus) totalPreBonus,
+		       sum(oa.aft_bonus) totalAftBonus
+		  from ORDER_ADDED oa
+		  <if test="channelId !=null and channelId != ''">
+		  left join OPERATE_MARKET_CHANNEL omc on oa.channel_id = omc.channel_id
+		  </if>
+		  <if test="joinUser != null and joinUser == true">
+		  left join M_USER_INFO lc on oa.user_id = lc.id
+		  </if>
+		  <if test="activity != null and activity.activityName != null and activity.activityName != ''">
+		  left join OPERATE_ACTIVITY opa on oa.activity_id = opa.activity_code
+		  </if>
+		<include refid="cms_sql_condition_orderadd_list" />
+  </select>
+  <!-- 查询单条(追号计划(关联 用户、渠道、活动)) -->
+  <select id="findSingleOrderAdd" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddCmsVO" resultMap="OrderAddResultMap">
+		<include refid="cms_sql_statement_orderadd_detail" />
+		<include refid="sql_condition_orderadd"/> 
+		LIMIT 1
+  </select>
+  <!-- 查询导出(追号计划(关联 用户、渠道、活动)) -->
+  <select id="findExcelOrderAdd" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddCmsVO" resultMap="OrderAddResultMap">
+		<include refid="cms_sql_statement_orderadd_list" />
+		<include refid="cms_sql_condition_orderadd_list" />
+		<include refid="cms_sql_orderby_orderadd" />
+  </select>
+  <!-- 查询导出(追号计划(关联 用户、渠道、活动)) -->
+  <select id="findExcelOrderAddUser" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddCmsVO" resultType="com.hhly.skeleton.cms.ordermgr.bo.OrderAddUserExcelCmsBO">
+        select @rownum := @rownum + 1 AS id ,
+		       oa.order_add_code orderAddCode,
+		       lc.account_name accountName,
+		       lc.cus_mobile cusMobile,
+		       lc.nick_name nickName,
+		       lc.actual_name actualName,
+		       lc.id_num idNum
+		  from ORDER_ADDED oa
+		  left join OPERATE_MARKET_CHANNEL omc on oa.channel_id = omc.channel_id
+		  left join M_USER_INFO lc on oa.user_id = lc.id
+		  <if test="activity != null and activity.activityName != null and activity.activityName != ''">
+          left join OPERATE_ACTIVITY opa on oa.activity_id = opa.activity_code
+          </if>
+          , (SELECT @rownum := 0) r
+		<include refid="cms_sql_condition_orderadd_list" />
+		order by oa.id desc
+  </select>
+  
+  
+  <!--              追号内容操作                                    -->
+  <!--  追号内容查询列表-->
+  <sql id="cms_sql_statement_orderaddcontent_list">
+  	    select oac.id,
+		       oac.order_add_code,
+		       oac.plan_content,
+		       oac.multiple,
+		       oac.amount,
+		       oac.play_intro,
+		       oac.code_way,
+		       oac.content_type,
+		       oac.lottery_child_code,
+               oac.buy_number,
+		       oac.update_time,
+		       oac.create_time
+		  from ORDER_ADDED_CONTENT oac
+  </sql>
+  <!--  追号内容查询条件-->
+  <sql id="cms_sql_condition_orderaddcontent">
+		where 1 = 1
+    	<if test="orderAddCode != null and orderAddCode != ''">
+		and oac.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		</if>
+  </sql>
+  <!--  追号内容排序-->
+  <sql id="cms_sql_orderby_orderaddcontent">
+  		<choose>
+  			<when test="sortField != null and sortField != ''">
+  				order by ${sortField}  ${sortOrder}
+  			</when>
+  			<otherwise>
+  				order by oac.id desc
+  			</otherwise>
+  		</choose>
+  </sql>
+  <!-- 查询分页(追号内容) -->
+  <select id="findPagingOrderAddContent" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddContentVO" resultMap="OrderAddContentResultMap">
+  		<include refid="cms_sql_statement_orderaddcontent_list" />
+		<include refid="cms_sql_condition_orderaddcontent" />
+		<include refid="cms_sql_orderby_orderaddcontent" />
+  		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+  <!-- 查询记录数(追号内容) -->
+  <select id="findCountOrderAddContent" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddContentVO" resultType="int">
+		select count(*) from ORDER_ADDED_CONTENT oac
+		<include refid="cms_sql_condition_orderaddcontent" />
+  </select>
+  
+  
+  <!--              追号期数操作                                    -->
+  <!--  追号期数查询列表-->
+  <sql id="cms_sql_statement_orderaddissue_list">
+  	    select oai.id,
+               oai.order_add_code,
+               oai.order_code,
+               oai.issue_code,
+               oai.buy_amount,
+               oai.multiple,
+               oai.add_status,
+               oai.pre_bonus,
+               oai.add_time,
+               oai.modify_time,
+               oai.update_time,
+               oai.create_time
+          from ORDER_ADDED_ISSUE oai
+  </sql>
+  <!--  追号期数查询条件-->
+  <sql id="cms_sql_condition_orderaddissue">
+		where 1 = 1
+    	<if test="orderAddCode != null and orderAddCode != ''">
+		and oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+		</if>
+		<if test="addStatus != null">
+		and oai.add_status = #{addStatus,jdbcType=SMALLINT}
+		</if>
+  </sql>
+  <!--  追号期数排序-->
+  <sql id="cms_sql_orderby_orderaddissue">
+  		<choose>
+  			<when test="sortField != null and sortField != ''">
+  				order by ${sortField}  ${sortOrder}
+  			</when>
+  			<otherwise>
+  				order by oai.issue_code
+  			</otherwise>
+  		</choose>
+  </sql>
+  <!-- 查询分页(追号期数) -->
+  <select id="findPagingOrderAddIssue" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddIssueVO" resultMap="OrderAddIssueResultMap">
+  		<include refid="cms_sql_statement_orderaddissue_list" />
+		<include refid="cms_sql_condition_orderaddissue" />
+		<include refid="cms_sql_orderby_orderaddissue" />
+		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+  <!-- 查询记录数(追号期数) -->
+  <select id="findCountOrderAddIssue" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddIssueVO" resultType="int">
+		select count(*) from ORDER_ADDED_ISSUE oai
+		<include refid="cms_sql_condition_orderaddissue" />
+  </select>
+  <select id="findCountOrderAddIssueDif" parameterType="string" resultType="com.hhly.skeleton.base.bo.StatisticBO">
+		select count(oai.id) countAll,
+		       count(case oai.add_status when 1 then 'y' end) count1,
+		       count(case oai.add_status when 2 then 'y' end) count2,
+		       count(case oai.add_status when 3 then 'y' end) count3,
+		       count(case oai.add_status when 4 then 'y' end) count4,
+		       count(case oai.add_status when 5 then 'y' end) count5
+		  from ORDER_ADDED_ISSUE oai
+		where oai.order_add_code = #{orderAddCode,jdbcType=VARCHAR}
+  </select>
+  <!--取消追号彩期(即 撤单操作) -->
+  <!-- <update id="updOrderAddIssueStatusByIds">
+  		update ORDER_ADDED_ISSUE oai
+		   set oai.add_status = 3, modify_time = now(), update_time = now()
+		 where oai.id in 
+  		<foreach collection="ids" item="item" open="(" close=")" separator=",">
+  			#{item}
+  		</foreach>
+  </update> -->
+  <!-- 查询要导出的追号彩期 -->
+  <select id="findExcelOrderAddIssue" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderAddIssueVO" resultMap="OrderAddIssueResultMap">
+		<include refid="cms_sql_statement_orderaddissue_list" />
+		<include refid="cms_sql_condition_orderaddissue" />
+		<include refid="cms_sql_orderby_orderaddissue" />
+  </select>
+
+	<!--订单列表 查询追号信息-->
+  <select id="findOrderAddInfo" parameterType="String" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderAddInfoBO">
+      select a.issue_amount totalIssueCount,(select count(*) from ORDER_ADDED_ISSUE oa where oa.order_code=#{orderCode} and
+         oa.add_status in (1,2) ) hadIssueCount,a.add_status addStatus
+       from ORDER_ADDED a left join ORDER_ADDED_ISSUE i on a.order_add_code = i.order_add_code where i.order_code = #{orderCode}
+  </select>
+
+  <select id="queryOrderAddInfo" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderBaseInfoBO">
+			  select oa.id             id,
+				   oa.order_add_code orderCode,
+				   oa.lottery_code   lotteryCode,
+				   oa.lottery_code   lotteryChildCode,
+				   oa.create_time    showDate,
+				   (select ifnull(sum(oi.pre_bonus),0) from order_added_issue oai join order_info oi on oai.order_code=oi.order_code
+				   where oai.order_add_code = oa.order_add_code AND oi.winning_status IN (3,4) and oi.order_status=6)      
+				                     preBonus,
+				   (select ifnull(sum(oi.aft_bonus),0) from order_added_issue oai join order_info oi on oai.order_code=oi.order_code
+				   where oai.order_add_code = oa.order_add_code AND oi.winning_status IN (3,4) and oi.order_status=6)
+				                     aftBonus,
+				   oa.issue_code     lotteryIssue,
+				   4                 buyType,
+				   oa.add_amount     orderAmount,
+				   oa.add_status     addStatus,
+				   oa.pay_status     payStatus,
+				   oa.STOP_TYPE      stopType,
+				   oa.stop_condition      stopCondition,
+				   oa.RED_CODE_USED        redCode,
+				   0                 winningStatus,
+				   oa.MULTIPLE_NUM  multipleNum,
+				   oa.PAY_END_TIME   endSaleTime,
+				   oa.ADD_COUNT    betNum,
+				   oa.issue_amount   totalIssue,
+				   oa.IS_DLT_ADD   isDltAdd,
+				   oa.create_time  addCreateTime,
+				   oa.buy_time     addBuyTime,
+				   oa.end_time     addEndTime,
+				   oa.platform     platform,
+				   oa.had_issue      hadIssue,
+				   oa.activity_id activityCode,
+				   (SELECT t.lottery_logo_url FROM lottery_type t WHERE t.lottery_code = (SELECT oai.lottery_code FROM order_added oai WHERE oai.order_add_code = oa.order_add_code)) lotteryLogoUrl
+				   from ORDER_ADDED oa
+				   where oa.USER_ID = #{userId}
+				   and oa.order_add_code = #{orderAddCode}
+  </select>
+
+	<select id="queryOrderAddStopReason" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderAddInfoSingleBO">
+		select oa.order_add_code orderAddCode,
+			   oa.stop_type stopType,
+			   oa.stop_condition stopCondition
+		  from ORDER_ADDED oa
+		   where oa.USER_ID = #{userId}
+		and oa.order_add_code = #{orderAddCode}
+	</select>
+	
+	<!-- 追号计划数字彩最新一期	开奖号码 -->
+	<select id="queryAddOrderDrawCode" resultType="string">
+		SELECT oi.draw_code FROM order_added_issue oai LEFT JOIN order_info oi ON oai.order_code = oi.order_code 
+		WHERE oai.order_add_code = #{orderAddCode} AND oi.winning_status IN (2,3,4) AND oai.add_status = 1 ORDER BY oai.issue_code DESC LIMIT 1
+	</select>
+</mapper>

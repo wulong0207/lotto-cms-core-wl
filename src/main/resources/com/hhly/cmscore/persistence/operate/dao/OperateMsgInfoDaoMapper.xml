@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateMsgInfoDaoMapper">
+
+	<sql id="Msg_Info_Columns">
+		ID,
+		MSG_TYPE MSGTYPE,
+		NICK_NAME NICKNAME,
+		ACCOUNT_NAME ACCOUNTNAME,
+		CUS_MOBILE CUSMOBILE,
+		TEMPLATE_ID TEMPLATEID, 
+		TEMPLATE_NAME TEMPLATENAME,
+		SEND_TYPE SENDTYPE,
+		STATUS STATUS,
+		SEND_ERROR SENDERROR,
+		MSG_TITLE MSGTITLE,
+		MSG_CONTENT MSGCONTENT,
+		MSG_BATCH MSGBATCH,
+		SEND_TIME SENDTIME,
+		READ_TIME READTIME,
+		MSG_DESC MSGDESC,
+		CREATE_TIME CREATETIME
+	</sql>
+	
+	<sql id="Msg_Template_Columns">
+		ID,
+		TYPE_ID TYPEID,
+		MSG_TYPE MSGTYPE,
+		TYPE_NAME TYPENAME,
+		TYPE_NODE TYPENODE,
+		STATUS STATUS,
+		MOB_STATUS MOBSTATUS, 
+		SITE_STATUS SITESTATUS,
+		APP_STATUS APPSTATUS,
+		WECHAT_STATUS WECHATSTATUS,
+		MOB_TITLE MOBTITLE,
+		MOB_CONTENT MOBCONTENT,
+		SITE_TITLE SITETITLE,
+		SITE_CONTENT SITECONTENT,
+		APP_TITLE APPTITLE,
+		APP_CONTENT APPCONTENT,
+		TYPE_DESC TYPEDESC,
+		CREATE_BY CREATEBY,
+		MODIFY_BY MODIFYBY,
+		UPDATE_TIME UPDATETIME,
+		CREATE_TIME CREATETIME,
+		WECHAT_ID WECHATID,
+		WECHAT_TITLE WECHATTITLE,
+		HEADER_CON HEADERCON,
+		FOOTER_CON FOOTERCON,
+		APP_ADD_FIELDS APPADDFIELDS,
+		to_lottery_code toLotteryCode,
+		activity_url activityUrl,
+		condition_key conditionKey,
+		start_days startDays,
+		end_days endDays,
+		lottery_code_limit lotteryCodeLimit,
+		money setMoney,
+		balance setBalance,
+		sms_send_channel smsSendChannel,
+		no_send_channel noSendChannel,
+		send_lottery_code sendLotteryCode
+	</sql>
+	
+	<sql id="Wechat_Template_Columns">
+		ID,
+		TYPE_NAME TYPENAME,
+		HEADER_COLOR HEADERCOLOR,
+		STATUS STATUS,
+		FOOTER_COLOR FOOTERCOLOR, 
+		TITLE TITLE,
+		COLOR COLOR
+	</sql>
+	
+	<sql id="New_Msg_Columns">
+		ID,
+		STATUS STATUS,
+		MOB_STATUS MOBSTATUS, 
+		SITE_STATUS SITESTATUS,
+		APP_STATUS APPSTATUS,
+		WECHAT_STATUS WECHATSTATUS,
+		MOB_TITLE MOBTITLE,
+		MOB_CONTENT MOBCONTENT,
+		SITE_TITLE SITETITLE,
+		SITE_CONTENT SITECONTENT,
+		APP_TITLE APPTITLE,
+		APP_CONTENT APPCONTENT,
+		REMARK REMARK,
+		CREATE_BY CREATEBY,
+		MODIFY_BY MODIFYBY,
+		UPDATE_TIME UPDATETIME,
+		CREATE_TIME CREATETIME,
+		WECHAT_ID WECHATID,
+		WECHAT_TITLE WECHATTITLE,
+		HEADER_CON HEADERCON,
+		FOOTER_CON FOOTERCON,
+		TEMPLATE_ID TEMPLATEID,
+		MSG_BATCH MSGBATCH,
+		PRE_SEND_TIME PRESENDTIME,
+		SEND_REASON SENDREASON,
+		MSG_TYPE MSGTYPE,
+		APP_FIELDS APPFIELDS,
+		WECHAT_FIELDS WECHATFIELDS,
+		to_lottery_code toLotteryCode,
+		activity_url activityUrl
+	</sql>
+	
+	<sql id="User_Config_Columns">
+		ID,
+		USER_ID USERID,
+		MOB MOB,
+		SITE SITE,
+		APP APP, 
+		WECHAT WECHAT
+	</sql>
+	
+	<sql id="User_Info_Columns">
+		ID,
+		ACCOUNT_ID,
+		ACCOUNT_NAME,
+		ACCOUNT_PASSWORD,
+		NICK_NAME,
+		RCODE,
+		ACCOUNT_STATUS,
+		HEAD_URL,
+		HEAD_STATUS,
+		CUS_MOBILE,
+		MOBILE_CHECK,
+		MOBILE_LOGIN,
+		CUS_MAIL,
+		EMAIL_CHECK,
+		EMAIL_LOGIN,
+		ACTUAL_NAME,
+		SEX,
+		ADDRESS,
+		ID_NUM,
+		REGIST_TIME,
+		LAST_LOGIN_TIME,
+		CHANNEL_ID,
+		MSG_MOB,
+		MSG_SITE,
+		MSG_APP,
+		MSG_WECHAT,
+		MOB_NOT_DISTURB,
+		APP_NOT_DISTURB
+	</sql>
+
+	<sql id="sql_condition_OperateNewMsgVO">
+			
+			<if test="searchTimeType!=null">
+				<choose>
+					<when test="searchTimeType==1">
+						<if test="startTime!=null">
+							and PRE_SEND_TIME >= #{startTime}
+						</if>
+						<if test="endTime!=null">
+							and PRE_SEND_TIME <![CDATA[<=]]> #{endTime}
+						</if>
+					</when>
+					<when test="searchTimeType==2">
+						<if test="startTime!=null">
+							and CREATE_TIME >= #{startTime}
+						</if>
+						<if test="endTime!=null">
+							and CREATE_TIME <![CDATA[<=]]> #{endTime}
+						</if>
+					</when>
+				</choose>
+			</if>
+			
+			<if test="templateId!=null">
+				and TEMPLATE_ID = #{templateId}
+			</if>
+			
+			<if test="msgType!=null">
+				and MSG_TYPE = #{msgType}
+			</if>
+
+	        <if test="status !=null">
+				and STATUS = #{status}
+			</if>
+			<if test="msgBatch!=null and msgBatch!=''">
+				and MSG_BATCH = #{msgBatch}
+			</if>
+	</sql>
+	
+	<sql id="sql_condition_OperateMsgInfoVO">
+
+			<if test="searchUserType!=null and searchUserInfo!=null and searchUserInfo!=''">
+				<choose>
+					<when test="searchUserType==1">
+						and NICK_NAME = #{searchUserInfo}
+					</when>
+					<when test="searchUserType==2">
+						and ACCOUNT_NAME = #{searchUserInfo}
+					</when>
+					<when test="searchUserType==3">
+						and CUS_MOBILE = #{searchUserInfo}
+					</when>
+				</choose>
+			</if>
+			
+			<if test="searchTimeType!=null">
+				<choose>
+					<when test="searchTimeType==1">
+						<if test="startTime!=null">
+							and CREATE_TIME >= #{startTime}
+						</if>
+						<if test="endTime!=null">
+							and CREATE_TIME <![CDATA[<=]]> #{endTime}
+						</if>
+					</when>
+					<when test="searchTimeType==2">
+						<if test="startTime!=null">
+							and SEND_TIME >= #{startTime}
+						</if>
+						<if test="endTime!=null">
+							and SEND_TIME <![CDATA[<=]]> #{endTime}
+						</if>
+					</when>
+					<when test="searchTimeType==3">
+						<if test="startTime!=null">
+							and READ_TIME >= #{startTime}
+						</if>
+						<if test="endTime!=null">
+							and READ_TIME <![CDATA[<=]]> #{endTime} 
+						</if>
+					</when>
+				</choose>
+			</if>
+			
+			<if test="templateId!=null">
+				and TEMPLATE_ID = #{templateId}
+			</if>
+			
+			<if test="msgType!=null">
+				and MSG_TYPE = #{msgType}
+			</if>
+			
+			<if test="sendType!=null">
+				and SEND_TYPE = #{sendType}
+			</if>
+	        <if test="status !=null">
+				and STATUS = #{status}
+			</if>
+			<if test="msgBatch!=null and msgBatch!=''">
+				and MSG_BATCH = #{msgBatch}
+			</if>
+	</sql>
+	
+	<sql id="sql_condition_OperateMsgTemplateVO">
+		<where>
+			<if test="status!=null">
+				and STATUS = #{status}
+			</if>
+			<if test="msgType!=null">
+				and MSG_TYPE = #{msgType}
+			</if>
+			<if test="id!=null">
+				and ID = #{id}
+			</if>
+			<if test="typeId!=null">
+				and TYPE_ID = #{typeId}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="findList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMsgInfoVO"
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgInfoBO">
+		select
+		<include refid="Msg_Info_Columns"/>
+		from OPERATE_MSG_INFO where 1=1
+		<include refid="sql_condition_OperateMsgInfoVO" />
+			order by
+			<choose>
+				<when test="sortField !=null and sortField!=''">
+					${sortField} ${sortOrder}
+				</when>
+				<otherwise>
+					SEND_TIME desc
+				</otherwise>
+			</choose>
+			<if test="startRow != null and pageSize != null">
+				limit #{startRow},#{pageSize}
+			</if>
+	</select>
+	<select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMsgInfoVO" resultType="int">
+	    select count(*)
+	    from OPERATE_MSG_INFO where 1=1
+		<include refid="sql_condition_OperateMsgInfoVO" />
+	</select>
+	
+	<select id="findMsgTemplate" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMsgTemplateVO" 
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgTemplateBO">
+	    select <include refid="Msg_Template_Columns"/> 
+	    		from OPERATE_MSG_TEMPLATE 
+	    			<include refid="sql_condition_OperateMsgTemplateVO"/>
+	    	order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				type_id 
+			</otherwise>
+		</choose>	
+	    <if test="startRow != null and pageSize != null">
+				limit #{startRow},#{pageSize}
+		</if>
+	</select>
+	
+	<select id="findMsgTemplateTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMsgTemplateVO" resultType="int">
+	    select count(*) from OPERATE_MSG_TEMPLATE
+				<include refid="sql_condition_OperateMsgTemplateVO" />
+	</select>
+	
+	<select id="findWechatTemplate" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateWechatTemplateVO" 
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateWechatTemplateBO">
+	    select <include refid="Wechat_Template_Columns"/> from OPERATE_WECHAT_TEMPLATE t 
+	    <where>
+	    	<if test="status!=null">
+	    		and t.STATUS=#{status}
+	    	</if>
+	    </where> order by t.ID
+	</select>
+	
+	<!-- 查询详情 -->
+	<select id="findMsgInfoById" parameterType="int" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgInfoBO">
+	    select <include refid="Msg_Info_Columns"/> from OPERATE_MSG_INFO where ID=#{id}
+	</select>
+	
+	<select id="findMsgTemplateById" parameterType="int" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgTemplateBO">
+	    select <include refid="Msg_Template_Columns"/>,TITLE wechatAddFields from 
+	    (select t1.*,t2.title as title from (
+	    select * from OPERATE_MSG_TEMPLATE where ID=#{id}) t1 
+	    left join OPERATE_WECHAT_TEMPLATE t2 on t1.WECHAT_ID=t2.id) t
+	</select>
+	
+	<select id="findWechatTemplateById" parameterType="int" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateWechatTemplateBO">
+	    select <include refid="Wechat_Template_Columns"/> from OPERATE_WECHAT_TEMPLATE where ID=#{id}
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="addMsgInfo" parameterType="java.util.List">
+			insert into OPERATE_MSG_INFO(
+					NICK_NAME,ACCOUNT_NAME,CUS_MOBILE,TEMPLATE_ID,MSG_TYPE,
+					SEND_TYPE,STATUS,MSG_TITLE,MSG_CONTENT,MSG_BATCH,SEND_TIME,MSG_DESC,CREATE_TIME,CREATE_BY,PRE_SEND_TIME,USER_ID) 
+			values
+			<foreach collection="list" item="item" index="index" separator=",">
+				(#{item.nickName,jdbcType=VARCHAR},#{item.accountName,jdbcType=VARCHAR},#{item.cusMobile,jdbcType=NUMERIC},#{item.templateId,jdbcType=NUMERIC}, #{item.msgType,jdbcType=NUMERIC},
+						#{item.sendType,jdbcType=NUMERIC},#{item.status,jdbcType=NUMERIC},#{item.msgTitle,jdbcType=VARCHAR},#{item.msgContent,jdbcType=VARCHAR},#{item.msgBatch,jdbcType=VARCHAR},#{item.sendTime,jdbcType=TIMESTAMP},#{item.msgDesc,jdbcType=VARCHAR},NOW(),#{item.createBy,jdbcType=VARCHAR},#{item.preSendTime,jdbcType=TIMESTAMP},#{item.userId,jdbcType=NUMERIC})
+			</foreach>
+	</insert>
+	
+	<insert id="addMsgTemplate" parameterType="com.hhly.cmscore.persistence.operate.po.OperateMsgTemplatePO">
+		insert into OPERATE_MSG_TEMPLATE(
+				TYPE_ID,TYPE_NAME,TYPE_NODE,STATUS,MOB_STATUS, SITE_STATUS,APP_STATUS,WECHAT_STATUS,MOB_TITLE,
+				MOB_CONTENT,SITE_TITLE,SITE_CONTENT,APP_TITLE,APP_CONTENT,TYPE_DESC,CREATE_BY,CREATE_TIME,WECHAT_ID,
+				WECHAT_TITLE,HEADER_CON,FOOTER_CON,MSG_TYPE,APP_ADD_FIELDS,to_lottery_code,activity_url,condition_key,start_days,end_days,lottery_code_limit,money,balance,sms_send_channel,no_send_channel,send_lottery_code
+			) 
+		values(
+			    #{typeId,jdbcType=NUMERIC},#{typeName,jdbcType=VARCHAR},#{typeNode,jdbcType=NUMERIC},#{status,jdbcType=NUMERIC},#{mobStatus,jdbcType=NUMERIC}, #{siteStatus,jdbcType=NUMERIC},#{appStatus,jdbcType=NUMERIC}, #{wechatStatus,jdbcType=NUMERIC},#{mobTitle,jdbcType=VARCHAR},
+				#{mobContent,jdbcType=VARCHAR},#{siteTitle,jdbcType=VARCHAR},#{siteContent,jdbcType=VARCHAR},#{appTitle,jdbcType=VARCHAR},#{appContent,jdbcType=VARCHAR},#{typeDesc,jdbcType=VARCHAR},#{createBy,jdbcType=VARCHAR},NOW(),#{wechatId,jdbcType=NUMERIC},
+				#{wechatTitle,jdbcType=VARCHAR},#{headerCon,jdbcType=VARCHAR},#{footerCon,jdbcType=VARCHAR},#{msgType,jdbcType=NUMERIC},#{appAddFields,jdbcType=VARCHAR},
+				#{toLotteryCode,jdbcType=NUMERIC},#{activityUrl,jdbcType=VARCHAR},#{conditionKey,jdbcType=VARCHAR},#{startDays,jdbcType=NUMERIC},#{endDays,jdbcType=NUMERIC},#{lotteryCodeLimit,jdbcType=NUMERIC},#{setMoney,jdbcType=DECIMAL},#{setBalance,jdbcType=DECIMAL},
+				#{smsSendChannel,jdbcType=NUMERIC},#{noSendChannel,jdbcType=VARCHAR},#{sendLotteryCode,jdbcType=VARCHAR}
+				)
+	</insert>
+	
+	<insert id="addWechatTemplate" parameterType="com.hhly.cmscore.persistence.operate.po.OperateWechatTemplatePO">
+		insert into OPERATE_WECHAT_TEMPLATE(
+				TYPE_NAME,HEADER_COLOR,STATUS,FOOTER_COLOR, TITLE,COLOR) 
+			values(#{typeName},#{headerColor},1,#{footerColor}, #{title},#{color})
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="updateMsgStatus" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			update OPERATE_MSG_INFO set STATUS=#{item.status} where ID=#{item.id}
+		</foreach>
+	</update>
+	
+	<update id="updateBatchMsgStatus" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			update OPERATE_MSG_INFO set STATUS=#{item.status} where MSG_BATCH=#{item.msgBatch} and status=0
+			</foreach>
+	</update>
+	
+	<update id="cancelSendMsg" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
+			update OPERATE_MSG_NEW set STATUS=#{item.status} where ID=#{item.id}
+		</foreach>
+	</update>
+	
+	<update id="updateMsgTemplate" parameterType="com.hhly.cmscore.persistence.operate.po.OperateMsgTemplatePO">
+				update OPERATE_MSG_TEMPLATE set
+						TYPE_NAME=#{typeName,jdbcType=VARCHAR},
+						TYPE_NODE=#{typeNode,jdbcType=NUMERIC},
+						TYPE_ID=#{typeId,jdbcType=NUMERIC},
+						STATUS=#{status,jdbcType=NUMERIC},
+						MOB_STATUS=#{mobStatus,jdbcType=NUMERIC}, 
+						SITE_STATUS=#{siteStatus,jdbcType=NUMERIC},
+						APP_STATUS=#{appStatus,jdbcType=NUMERIC},
+						WECHAT_STATUS=#{wechatStatus,jdbcType=NUMERIC},
+						MOB_TITLE=#{mobTitle,jdbcType=VARCHAR},
+						MOB_CONTENT=#{mobContent,jdbcType=VARCHAR},
+						SITE_TITLE=#{siteTitle,jdbcType=VARCHAR},
+						SITE_CONTENT=#{siteContent,jdbcType=VARCHAR},
+						APP_TITLE=#{appTitle,jdbcType=VARCHAR},
+						APP_CONTENT=#{appContent,jdbcType=VARCHAR},
+						TYPE_DESC=#{typeDesc,jdbcType=VARCHAR},
+						CREATE_BY=#{createBy,jdbcType=VARCHAR},
+						WECHAT_ID=#{wechatId,jdbcType=NUMERIC},
+						WECHAT_TITLE=#{wechatTitle,jdbcType=VARCHAR},
+						HEADER_CON=#{headerCon,jdbcType=VARCHAR},
+						FOOTER_CON=#{footerCon,jdbcType=VARCHAR},
+						MODIFY_BY=#{modifyBy,jdbcType=VARCHAR},
+						APP_ADD_FIELDS=#{appAddFields,jdbcType=VARCHAR},
+						MSG_TYPE=#{msgType,jdbcType=NUMERIC},
+						UPDATE_TIME=NOW(),
+						to_lottery_code=#{toLotteryCode,jdbcType=NUMERIC},
+						activity_url=#{activityUrl,jdbcType=VARCHAR},
+						condition_key=#{conditionKey,jdbcType=VARCHAR},
+						start_days=#{startDays,jdbcType=NUMERIC},
+						end_days=#{endDays,jdbcType=NUMERIC},
+						lottery_code_limit=#{lotteryCodeLimit,jdbcType=NUMERIC},
+						money=#{setMoney,jdbcType=DECIMAL},
+						balance=#{setBalance,jdbcType=DECIMAL},
+						sms_send_channel=#{smsSendChannel,jdbcType=NUMERIC},
+						no_send_channel=#{noSendChannel,jdbcType=VARCHAR},
+						send_lottery_code=#{sendLotteryCode,jdbcType=VARCHAR}
+				 where ID=#{id}
+	</update>
+	
+	<update id="updateWechatTemplate" parameterType="com.hhly.cmscore.persistence.operate.po.OperateWechatTemplatePO">
+		update OPERATE_WECHAT_TEMPLATE set
+				TYPE_NAME=#{typeName},
+				HEADER_COLOR=#{headerColor},
+				FOOTER_COLOR=#{footerColor},
+				TITLE=#{title},
+				COLOR=#{color}
+			where ID=#{id}
+	</update>
+	
+	<select id="findConfigByUserId" parameterType="int" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgConfigBO">
+	    select <include refid="User_Config_Columns"/> from OPERATE_MSG_CONFIG where USER_ID=#{userId}
+	</select>
+	
+	<!-- 查询用户接收配置信息 -->
+	<select id="findUserConfig" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgConfigBO" >
+	    select <include refid="User_Config_Columns"/>
+			from OPERATE_MSG_CONFIG 
+		<where>
+			<if test="userId != null and userId != ''">
+				and USER_ID=#{userId}
+			</if>
+			<if test="typeId!=null and typeId!=''">
+				and TEMPLATE_ID=#{typeId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findNewMsgList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMsgNewVO"
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgNewBO">
+		select
+		<include refid="New_Msg_Columns"/>
+		from OPERATE_MSG_NEW where 1=1
+		<include refid="sql_condition_OperateNewMsgVO" />
+		
+		order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				CREATE_TIME desc
+			</otherwise>
+		</choose>
+
+			<if test="startRow != null and pageSize != null">
+				limit #{startRow},#{pageSize}
+			</if>
+		
+	</select>
+	
+	<select id="findNewMsgTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMsgNewVO" resultType="int">
+	    select count(*)
+	    from OPERATE_MSG_NEW where 1=1
+		<include refid="sql_condition_OperateNewMsgVO" />
+	</select>
+	
+	<insert id="addNewMsg" parameterType="com.hhly.cmscore.persistence.operate.po.OperateMsgNewPO">
+		insert into OPERATE_MSG_NEW(
+				STATUS,MOB_STATUS,SITE_STATUS,APP_STATUS,WECHAT_STATUS,MOB_TITLE,
+					MOB_CONTENT,SITE_TITLE,SITE_CONTENT,APP_TITLE,APP_CONTENT,CREATE_BY,CREATE_TIME,WECHAT_ID,
+						WECHAT_TITLE,HEADER_CON,FOOTER_CON,TEMPLATE_ID,MSG_BATCH,PRE_SEND_TIME,SEND_REASON,REMARK,MSG_TYPE,
+						APP_FIELDS,WECHAT_FIELDS,to_lottery_code,activity_url) 
+			values(#{status,jdbcType=DECIMAL},#{mobStatus,jdbcType=DECIMAL}, #{siteStatus,jdbcType=DECIMAL},#{appStatus,jdbcType=DECIMAL},
+					#{wechatStatus,jdbcType=DECIMAL},#{mobTitle,jdbcType=VARCHAR},#{mobContent,jdbcType=VARCHAR},#{siteTitle,jdbcType=VARCHAR},#{siteContent,jdbcType=VARCHAR},
+					#{appTitle,jdbcType=VARCHAR},#{appContent,jdbcType=VARCHAR},#{createBy,jdbcType=VARCHAR},NOW(),#{wechatId,jdbcType=DECIMAL},#{wechatTitle,jdbcType=VARCHAR},
+					#{headerCon,jdbcType=VARCHAR},#{footerCon,jdbcType=VARCHAR},#{templateId,jdbcType=DECIMAL},#{msgBatch,jdbcType=VARCHAR},
+					#{preSendTime,jdbcType=TIMESTAMP},#{sendReason,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR},#{msgType,jdbcType=DECIMAL},
+					#{appFields,jdbcType=VARCHAR},#{wechatFields,jdbcType=VARCHAR},#{toLotteryCode,jdbcType=DECIMAL},#{activityUrl,jdbcType=VARCHAR})
+	</insert>
+	
+	<update id="updateNewMsg" parameterType="com.hhly.cmscore.persistence.operate.po.OperateMsgNewPO">
+				update OPERATE_MSG_NEW set
+						STATUS=#{status,jdbcType=DECIMAL},
+						MOB_STATUS=#{mobStatus,jdbcType=DECIMAL}, 
+						SITE_STATUS=#{siteStatus,jdbcType=DECIMAL},
+						APP_STATUS=#{appStatus,jdbcType=DECIMAL},
+						WECHAT_STATUS=#{wechatStatus,jdbcType=DECIMAL},
+						MOB_TITLE=#{mobTitle,jdbcType=VARCHAR},
+						MOB_CONTENT=#{mobContent,jdbcType=VARCHAR},
+						SITE_TITLE=#{siteTitle,jdbcType=VARCHAR},
+						SITE_CONTENT=#{siteContent,jdbcType=VARCHAR},
+						APP_TITLE=#{appTitle,jdbcType=VARCHAR},
+						APP_CONTENT=#{appContent,jdbcType=VARCHAR},
+						CREATE_BY=#{createBy,jdbcType=VARCHAR},
+						WECHAT_ID=#{wechatId,jdbcType=DECIMAL},
+						WECHAT_TITLE=#{wechatTitle,jdbcType=VARCHAR},
+						HEADER_CON=#{headerCon,jdbcType=VARCHAR},
+						FOOTER_CON=#{footerCon,jdbcType=VARCHAR},
+						MODIFY_BY=#{modifyBy,jdbcType=VARCHAR},
+						UPDATE_TIME=NOW(),
+						TEMPLATE_ID=#{templateId,jdbcType=DECIMAL},
+						PRE_SEND_TIME=#{preSendTime,jdbcType=TIMESTAMP},
+						SEND_REASON=#{sendReason,jdbcType=VARCHAR},
+						REMARK=#{remark,jdbcType=VARCHAR},
+						MSG_TYPE=#{msgType,jdbcType=DECIMAL},
+						APP_FIELDS=#{appFields,jdbcType=VARCHAR},
+						WECHAT_FIELDS=#{wechatFields,jdbcType=VARCHAR},
+						to_lottery_code=#{toLotteryCode,jdbcType=DECIMAL},
+						activity_url=#{activityUrl,jdbcType=VARCHAR}
+				 where ID=#{id,jdbcType=DECIMAL}
+	</update>
+
+	<!-- 查询详情 -->
+	<select id="findNewMsgById" parameterType="int" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgNewBO">
+	    select <include refid="New_Msg_Columns"/> from OPERATE_MSG_NEW where ID=#{id}
+	</select>
+	
+	<!-- 根据批次号查询详情 -->
+	<select id="findNewMsgByBatch" parameterType="string" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgNewBO">
+	    select <include refid="New_Msg_Columns"/> from OPERATE_MSG_NEW where MSG_BATCH=#{msgBatch} and STATUS = 0
+	</select>
+	
+	<!-- 根据用户账户查询用户短信信息 -->
+	<select id="findHomeMsg"  parameterType="string"
+		resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateMsgBO">
+		select  SEND_TIME as sendTime ,MSG_TITLE as msgTitle ,MSG_CONTENT as msgContent from OPERATE_MSG_INFO  
+		where  SEND_TYPE=1 and USER_ID =#{userId} and STATUS=0
+	</select>
+	
+	<!-- 查询用户关闭设置信息 -->
+	<select id="findUserCloseNoticConfig" parameterType="int" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgConfigBO">
+		select 
+			ID id,TEMPLATE_ID templateId,'' templateName,USER_ID userId,MOB mob,SITE site,APP app,WECHAT wechat
+		from 
+			OPERATE_MSG_CONFIG
+		where 
+			USER_ID=#{userId}
+	</select>
+	
+	<!-- 删除用户设置 -->
+	<update id="deleteMsgConfByUserId" parameterType="int">
+		delete from OPERATE_MSG_CONFIG where USER_ID=#{userId}
+	</update>
+	
+	<!-- 新增已关闭的信息类型 -->
+	<insert id="addMsgConfig" >
+		  	
+		  	 insert into 
+		  	 OPERATE_MSG_CONFIG 
+		  	 (TEMPLATE_ID,USER_ID,MOB,SITE,APP,WECHAT) 
+		  	 	values 
+		  	 <foreach collection="po" item="item" index="index" separator=",">
+		  	 	(#{item.templateId,jdbcType=DECIMAL},#{item.userId,jdbcType=DECIMAL},#{item.mob,jdbcType=DECIMAL},#{item.site,jdbcType=DECIMAL},#{item.app,jdbcType=DECIMAL},#{item.wechat,jdbcType=DECIMAL})
+		    </foreach>
+	</insert>
+	
+	<!-- 彩种配置查询 -->
+	
+	<select id="findLotteryConfig" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgLotteryConfigBO">
+		select 
+			ID id,LOTTERY_CODE lotteryCode,TYPE type,APP app
+		from 
+			OPERATE_MSG_CONFIG_LOTTERY
+		where
+			USER_ID=#{userId} and TYPE=#{type}
+	</select>
+	
+	<select id="findLotteryConfigById" parameterType="int" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMsgLotteryConfigBO">
+		select 
+			ID id,LOTTERY_CODE lotteryCode,TYPE type,APP app
+		from 
+			OPERATE_MSG_CONFIG_LOTTERY
+		where
+			ID=#{id,jdbcType=DECIMAL}
+	</select>
+	
+	<!-- 修改彩种开关配置 -->
+	<update id="updateLotteryConfig" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMsgLotteryConfigVO">
+		  	 update
+		  	 	OPERATE_MSG_CONFIG_LOTTERY 
+		  	 		set APP=#{app,jdbcType=DECIMAL}
+					  	 where
+					  	 	ID=#{id,jdbcType=DECIMAL}
+	</update>
+	
+	<!-- 新增彩种开关配置 -->
+	<insert id="addLotteryConfig" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMsgLotteryConfigVO">
+		  	 insert into
+		  	 	OPERATE_MSG_CONFIG_LOTTERY(LOTTERY_CODE,TYPE,APP,USER_ID) 
+			  	 	values(
+				  	 	#{lotteryCode,jdbcType=DECIMAL},
+				  	 	#{type,jdbcType=DECIMAL},
+				  	 	#{app,jdbcType=DECIMAL},
+				  	 	#{userId,jdbcType=DECIMAL})
+	</insert>
+	
+	<!-- 更新发布信息状态 -->
+	<update id="updateNewMsgStatus">
+		update OPERATE_MSG_NEW set STATUS=#{status} where ID=#{id}
+	</update>
+	
+	<select id="findUserInfoByIds" resultType="com.hhly.skeleton.user.bo.UserInfoBO">
+			SELECT
+				  	<include refid="User_Info_Columns" />
+				FROM M_USER_INFO 
+				WHERE 
+					ID in (
+					<foreach collection="list" item="item"  separator=",">
+						#{item}
+					</foreach>
+					)
+	</select>
+	
+	<select id="findValidUserInfoCount" resultType="int">
+		SELECT
+		  	count(*)
+				FROM M_USER_INFO WHERE ACCOUNT_STATUS=1
+	</select>
+	
+	<select id="findValidUserInfo" resultType="com.hhly.skeleton.user.bo.UserInfoBO">
+				SELECT
+				  	<include refid="User_Info_Columns" />
+				FROM M_USER_INFO WHERE ACCOUNT_STATUS=1 ORDER BY REGIST_TIME
+				limit #{begin},#{pageSize}
+	</select>
+	
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.ticket.dao.TicketMonitorCommonDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.ticket.po.TicketMonitorCommonPO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="PARAMETER" property="parameter" jdbcType="DECIMAL" />
+    <result column="REMARK" property="remark" jdbcType="OTHER" />
+    <result column="CREATE_BY" jdbcType="OTHER" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="OTHER" property="modifyBy" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List" >
+    ID, PARAMETER, REMARK,CREATE_BY, MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+    CREATE_TIME
+  </sql>
+  <select id="list" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketMonitorCommonBO">
+     select 
+        ID,
+        PARAMETER,
+        REMARK,
+        UPDATE_TIME UPDATETIME,
+        CREATE_TIME CREATETIME
+     from TICKET_MONITOR_COMMON
+  </select>
+  <update id="update">
+    <foreach collection="pos" item="item">
+	    update 
+	    TICKET_MONITOR_COMMON
+        set PARAMETER = #{item.parameter,jdbcType=DECIMAL},
+        MODIFY_BY = #{item.modifyBy,jdbcType=OTHER},
+	    UPDATE_TIME = now(),
+	    MODIFY_TIME =now(),
+	    REMARK = #{item.remark,jdbcType=OTHER}
+       where ID = #{item.id,jdbcType=DECIMAL};
+    </foreach>
+  </update>
+</mapper>

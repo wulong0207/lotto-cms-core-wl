@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.task.dao.TaskDaoMapper">
+
+  <sql id="sql_statement_all">
+	  	select tt.id       			  id,
+		       tt.job_name            jobName,
+		       tt.job_id              jobId,
+		       tt.job_manual_url      jobManualUrl,
+		       tt.job_cron_expression jobCronExpression,
+		       tt.job_group           jobGroup,
+		       tt.job_status          jobStatus,
+		       tt.job_autorun         jobAutorun,
+		       tt.param_key1          paramKey1,
+		       tt.param_value1        paramValue1,
+		       tt.param_key2          paramKey2,
+		       tt.param_value2        paramValue2,
+		       tt.param_key3          paramKey3,
+		       tt.param_value3        paramValue3,
+		       tt.modify_time         modifyTime,
+		       tt.modify_by           modifyBy,
+		       tt.create_by           createBy,
+		       tt.update_time         updateTime,
+		       tt.create_time         createTime,
+		       tt.remark              remark,
+		       tt.restart_run restartRun,
+		       tt.job_way jobWay
+		  from TIMED_TASK tt
+  </sql>
+  <sql id="sql_condition_all">
+  		where 1 = 1
+  		<if test="id != null">
+  			and tt.id = #{id,jdbcType=INTEGER}
+  		</if>
+  		<if test="jobName != null and jobName !=''">
+  			and tt.job_name like '%${jobName}%'
+  		</if>
+  		<if test="jobGroup != null and jobGroup != ''">
+  			and tt.job_group = #{jobGroup,jdbcType=VARCHAR}
+  		</if>
+  		<if test="jobStatus != null">
+  			and tt.job_status = #{jobStatus,jdbcType=SMALLINT}
+  		</if>
+  		<if test="jobAutorun != null">
+  			and tt.job_autorun = #{jobAutorun,jdbcType=SMALLINT}
+  		</if>
+  		<if test="jobId != null and jobId != ''">
+  			and tt.job_id = #{jobId,jdbcType=VARCHAR}
+  		</if>
+  </sql>
+  <sql id="sql_orderby">
+  		<choose>
+  			<when test="sortField != null and sortField != ''">
+  				order by ${sortField}  ${sortOrder}
+  			</when>
+  			<otherwise>
+  				order by id desc
+  			</otherwise>
+  		</choose>
+  </sql>
+  <!-- 查询单条 -->
+  <select id="findSingle" parameterType="com.hhly.skeleton.cms.taskmgr.vo.TaskVO" resultType="com.hhly.skeleton.cms.taskmgr.bo.TaskBO">
+		<include refid="sql_statement_all" />
+		<include refid="sql_condition_all" />
+		LIMIT 1
+  </select>
+  <!-- 查询多条 -->
+  <select id="findMultiple" parameterType="com.hhly.skeleton.cms.taskmgr.vo.TaskVO" resultType="com.hhly.skeleton.cms.taskmgr.bo.TaskBO">
+  		<include refid="sql_statement_all" />
+  		<include refid="sql_condition_all" />
+  		<include refid="sql_orderby" />
+  </select>
+  <!-- 查询分页 -->
+  <select id="findPaging" parameterType="com.hhly.skeleton.cms.taskmgr.vo.TaskVO" resultType="com.hhly.skeleton.cms.taskmgr.bo.TaskBO">
+  		<include refid="sql_statement_all" />
+		<include refid="sql_condition_all" />
+		<include refid="sql_orderby" />
+		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+  <!-- 查询记录数 -->
+  <select id="findCount" parameterType="com.hhly.skeleton.cms.taskmgr.vo.TaskVO" resultType="int">
+		select count(*) from TIMED_TASK tt
+		<include refid="sql_condition_all" />
+  </select>
+  <!-- 新增-->
+  <insert id="addTask" parameterType="com.hhly.cmscore.persistence.task.po.TaskPO" useGeneratedKeys="true" keyProperty="id">
+		insert into TIMED_TASK
+		  (job_name,
+		   job_manual_url,
+		   job_cron_expression,
+		   job_group,
+		   job_status,
+		   job_autorun,
+		   param_key1,
+		   param_value1,
+		   param_key2,
+		   param_value2,
+		   param_key3,
+		   param_value3,
+		   modify_time,
+		   modify_by,
+		   create_by,
+		   update_time,
+		   create_time,
+		   remark,
+		   restart_run,
+		   job_way,
+		   job_id)
+		values
+		  (#{jobName,jdbcType=VARCHAR},
+		   #{jobManualUrl,jdbcType=VARCHAR},
+		   #{jobCronExpression,jdbcType=VARCHAR},
+		   #{jobGroup,jdbcType=VARCHAR},
+		   #{jobStatus,jdbcType=SMALLINT},
+		   #{jobAutorun,jdbcType=SMALLINT},
+		   #{paramKey1,jdbcType=VARCHAR},
+		   #{paramValue1,jdbcType=VARCHAR},
+		   #{paramKey2,jdbcType=VARCHAR},
+		   #{paramValue2,jdbcType=VARCHAR},
+		   #{paramKey3,jdbcType=VARCHAR},
+		   #{paramValue3,jdbcType=VARCHAR},
+		   now(),
+		   #{modifyBy,jdbcType=VARCHAR},
+		   #{createBy,jdbcType=VARCHAR},
+		   now(),
+		   now(),
+		   #{remark,jdbcType=VARCHAR},
+		   #{restartRun,jdbcType=SMALLINT},
+		   #{jobWay,jdbcType=SMALLINT},
+		   #{jobId,jdbcType=VARCHAR}
+		  )
+  </insert>
+  <!-- 修改-->
+  <update id="updTask" parameterType="com.hhly.cmscore.persistence.task.po.TaskPO">
+		update TIMED_TASK
+		   set job_name            = #{jobName,jdbcType=VARCHAR},
+		       job_manual_url      = #{jobManualUrl,jdbcType=VARCHAR},
+		       job_cron_expression = #{jobCronExpression,jdbcType=VARCHAR},
+		       job_group           = #{jobGroup,jdbcType=VARCHAR},
+		       job_status          = #{jobStatus,jdbcType=SMALLINT},
+		       job_autorun         = #{jobAutorun,jdbcType=SMALLINT},
+		       param_key1          = #{paramKey1,jdbcType=VARCHAR},
+		       param_value1        = #{paramValue1,jdbcType=VARCHAR},
+		       param_key2          = #{paramKey2,jdbcType=VARCHAR},
+		       param_value2        = #{paramValue2,jdbcType=VARCHAR},
+		       param_key3          = #{paramKey3,jdbcType=VARCHAR},
+		       param_value3        = #{paramValue3,jdbcType=VARCHAR},
+		       modify_time         = now(),
+		       modify_by           = #{modifyBy,jdbcType=VARCHAR},
+		       update_time         = now(),
+		       remark              = #{remark,jdbcType=VARCHAR},
+		       restart_run         = #{restartRun,jdbcType=SMALLINT},
+		       job_way             = #{jobWay,jdbcType=SMALLINT},
+		       job_id              = #{jobId,jdbcType=VARCHAR}
+		 where id       		   = #{id,jdbcType=INTEGER}	    
+  </update>
+  <!--删除 (标识删除) -->
+  <update id="delTaskByIds">
+  	update TIMED_TASK tt set tt.job_status = 2 where tt.id in 
+  		<foreach collection="ids" item="item" open="(" close=")" separator=",">
+  			#{item}
+  		</foreach>
+  </update>
+  
+  
+  <!--  			下面是任务记录相关操作					-->
+  <resultMap id="TaskInfoResultMap" type="com.hhly.skeleton.cms.taskmgr.bo.TaskInfoBO">
+  	  <id property="id" column="id" jdbcType="INTEGER"/>
+  	  <result property="runTime" column="run_time" jdbcType="TIMESTAMP"/>
+  	  <result property="runWay" column="run_way" jdbcType="SMALLINT"/>
+  	  <result property="status" column="status" jdbcType="SMALLINT"/>
+  	  <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+  	  <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+  	  <result property="spendTime" column="spend_time" jdbcType="INTEGER"/>
+  	  <result property="result" column="result" jdbcType="SMALLINT"/>
+  	  <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+  	  <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+  	  <result property="remark" column="remark" jdbcType="VARCHAR"/>
+  	  <association property="task" javaType="com.hhly.skeleton.cms.taskmgr.bo.TaskBO">
+  	  	  <id property="id" column="tt_id" jdbcType="INTEGER"/>
+  	  	  <result property="jobName" column="job_name" jdbcType="VARCHAR"/>
+  	  	  <result property="jobGroup" column="job_group" jdbcType="VARCHAR"/>
+  	  </association>
+  </resultMap>
+  <sql id="sql_statement_all_taskinfo">
+	  	select tti.id,
+		       tt.id tt_id,
+		       tt.job_name,
+		       tt.job_group,
+		       tti.run_time,
+		       tti.run_way,
+		       tti.`status`,
+		       tti.start_time,
+		       tti.end_time,
+		       tti.spend_time,
+		       tti.result,
+		       tti.remark
+		  from TIMED_TASK_INFO tti inner join TIMED_TASK tt on tti.timed_task_id = tt.id
+  </sql>
+  <sql id="sql_condition_all_taskinfo">
+  		where 1 = 1
+  		<if test="id != null">
+  			and tti.id = #{id,jdbcType=INTEGER}
+  		</if>
+  		<if test="task != null and task.jobName != null and task.jobName !=''">
+  			and tt.job_name like CONCAT('%',#{task.jobName,jdbcType=VARCHAR},'%')
+  		</if>
+  		<if test="runWay != null">
+  			and tti.run_way = #{runWay,jdbcType=SMALLINT}
+  		</if>
+  		<if test="status != null">
+  			and tti.`status` = #{status,jdbcType=SMALLINT}
+  		</if>
+  		<if test="result != null">
+  			and tti.result = #{result,jdbcType=SMALLINT}
+  		</if>
+  </sql>
+  <sql id="sql_orderby_taskinfo">
+  		<choose>
+  			<when test="sortField != null and sortField != ''">
+  				order by ${sortField}  ${sortOrder}
+  			</when>
+  			<otherwise>
+  				order by tti.create_time desc
+  			</otherwise>
+  		</choose>
+  </sql>
+  <!-- 查询单条 -->
+  <select id="findSingleTaskInfo" parameterType="com.hhly.skeleton.cms.taskmgr.vo.TaskInfoVO" resultMap="TaskInfoResultMap">
+		<include refid="sql_statement_all_taskinfo" />
+		<include refid="sql_condition_all_taskinfo" />
+		LIMIT 1
+  </select>
+  <!-- 查询多条 -->
+  <select id="findMultipleTaskInfo" parameterType="com.hhly.skeleton.cms.taskmgr.vo.TaskInfoVO" resultMap="TaskInfoResultMap">
+  		<include refid="sql_statement_all_taskinfo" />
+  		<include refid="sql_condition_all_taskinfo" />
+  		<include refid="sql_orderby_taskinfo" />
+  </select>
+  <!-- 查询分页 -->
+  <select id="findPagingTaskInfo" parameterType="com.hhly.skeleton.cms.taskmgr.vo.TaskInfoVO" resultMap="TaskInfoResultMap">
+  		<include refid="sql_statement_all_taskinfo" />
+		<include refid="sql_condition_all_taskinfo" />
+		<include refid="sql_orderby_taskinfo" />
+		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+  <!-- 查询记录数 -->
+  <select id="findCountTaskInfo" parameterType="com.hhly.skeleton.cms.taskmgr.vo.TaskInfoVO" resultType="int">
+		select count(*) from TIMED_TASK_INFO tti inner join TIMED_TASK tt on tti.timed_task_id = tt.id
+		<include refid="sql_condition_all_taskinfo" />
+  </select>
+  <!-- 新增任务执行记录-->
+  <insert id="addTaskInfo" parameterType="com.hhly.cmscore.persistence.task.po.TaskInfoPO" useGeneratedKeys="true" keyProperty="id">
+		insert into TIMED_TASK_INFO (TIMED_TASK_ID, RUN_TIME, 
+	      RUN_WAY, STATUS, START_TIME, 
+	      END_TIME, SPEND_TIME, RESULT, 
+	      UPDATE_TIME, CREATE_TIME, REMARK, 
+	      TYPE)
+	    values (#{timedTaskId,jdbcType=DECIMAL}, #{runTime,jdbcType=TIMESTAMP}, 
+	      #{runWay,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{startTime,jdbcType=TIMESTAMP}, 
+	      #{endTime,jdbcType=TIMESTAMP}, #{spendTime,jdbcType=DECIMAL}, #{result,jdbcType=DECIMAL}, 
+	      now(), now(), #{remark,jdbcType=OTHER},
+	      0)
+  </insert>
+  <!-- 修改任务执行记录-->
+  <update id="updTaskInfo" parameterType="com.hhly.cmscore.persistence.task.po.TaskInfoPO">
+		update TIMED_TASK_INFO
+		   <set> 
+		   	   <if test="status != null">
+		   	   `status`           = #{status,jdbcType=SMALLINT},
+		   	   </if>
+		   	   <if test="startTime != null">
+		   	   start_time       = #{startTime,jdbcType=TIMESTAMP},
+		   	   </if>
+		       <if test="endTime != null">
+		       end_time         = #{endTime,jdbcType=TIMESTAMP},
+		   	   </if>
+		       <if test="spendTime != null">
+		       spend_time       = #{spendTime,jdbcType=INTEGER},
+		   	   </if>
+		       <if test="result != null">
+		       result           = #{result,jdbcType=SMALLINT},
+		   	   </if>
+		       update_time      = now(),
+		       <if test="remark != null">
+		       remark           = #{remark,jdbcType=VARCHAR}
+		   	   </if>
+		    </set>
+		 where id               = #{id,jdbcType=INTEGER}	    
+  </update>
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.sys.dao.CmsKeywordDaoMapper">
+
+	<sql id="sql_condition_cMSKeywordVO">
+		<where>
+			<if test="keyword!=null and keyword!=''">
+				and KEYWORD=#{keyword}
+			</if>
+		</where>
+	</sql>
+
+	<insert id="addList">
+		<foreach collection="list" item="item">
+		
+			insert into CMS_KEYWORD (KEYWORD, GRADE,`STATUS`, REPLACED, CREATE_BY,MODIFY_BY, MODIFY_TIME,UPDATE_TIME,CREATE_TIME)
+			values (#{item.keyword,jdbcType=VARCHAR},#{item.grade,jdbcType=DECIMAL},#{item.status,jdbcType=DECIMAL}, #{item.replaced,jdbcType=VARCHAR},
+			#{item.createBy,jdbcType=VARCHAR},#{item.modifyBy,jdbcType=VARCHAR},now(),now(), now());
+		
+		</foreach>
+	</insert>
+
+
+	<select id="find" resultType="com.hhly.skeleton.cms.sysmgr.bo.CmsKeywordBO"
+		parameterType="com.hhly.skeleton.cms.sysmgr.vo.CmsKeywordVO">
+			select
+				ID id,
+				KEYWORD keyword,
+				GRADE grade,
+				`STATUS` `status`,
+				REPLACED replaced,
+				UPDATE_TIME updateTime
+				from CMS_KEYWORD
+				<include refid="sql_condition_cMSKeywordVO" />
+				order by ID desc
+				<if test="startRow != null and pageSize != null">
+					limit #{startRow}, #{pageSize}
+				</if>
+	</select>
+
+	<!-- 查询敏感词信息 -->
+	<select id="queryKeywordInfo" resultType="com.hhly.skeleton.user.bo.KeywordBO" >
+		SELECT KEYWORD FROM CMS_KEYWORD WHERE STATUS = 1
+	</select>
+
+	<select id="findTotal"
+		parameterType="com.hhly.skeleton.cms.customerservice.vo.MUserMessageVO"
+		resultType="int">
+		select count(1)
+		from CMS_KEYWORD
+		<include refid="sql_condition_cMSKeywordVO" />
+	</select>
+
+
+	<update id="updateList">
+		<foreach collection="list" item="item">
+			update
+			CMS_KEYWORD
+			<set>
+				<if test="item.keyword != null">
+					KEYWORD = #{item.keyword,jdbcType=VARCHAR},
+				</if>
+				<if test="item.grade != null">
+					GRADE = #{item.grade,jdbcType=DECIMAL},
+				</if>
+				<if test="item.status != null">
+					`STATUS` = #{item.status,jdbcType=DECIMAL},
+				</if>
+				<if test="item.replaced != null">
+					REPLACED = #{item.replaced,jdbcType=VARCHAR},
+				</if>
+				<if test="item.modifyBy != null">
+					MODIFY_BY = #{item.modifyBy,jdbcType=OTHER},
+				</if>
+				MODIFY_TIME = now(),
+				UPDATE_TIME = now()
+			</set>
+			where ID=#{item.id,jdbcType=DECIMAL};
+		</foreach>
+	</update>
+	
+	<select id="excelList" resultType="com.hhly.skeleton.cms.sysmgr.bo.CmsKeywordBO"
+		parameterType="com.hhly.skeleton.cms.sysmgr.vo.CmsKeywordVO">
+		select  
+			ID id,
+			KEYWORD keyword,
+			GRADE grade,
+			`STATUS` `status`,
+			REPLACED 'replace',
+			UPDATE_TIME updateTime
+		from CMS_KEYWORD
+		<include refid="sql_condition_cMSKeywordVO" />
+	</select>
+
+
+</mapper>

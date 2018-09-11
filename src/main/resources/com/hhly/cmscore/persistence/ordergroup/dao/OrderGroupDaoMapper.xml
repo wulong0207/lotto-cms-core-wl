@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.ordergroup.dao.OrderGroupDaoMapper">
+	
+	<update id="updateRecommand" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderGroupVO">
+		update `order_group` set is_recommend = #{isRecommend} where id = #{id}
+	</update>
+	
+	<update id="top" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderGroupVO">
+		update `order_group` set is_top =#{isTop} where id = #{id}
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateCouponTempDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateCouponTempBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="config_id" jdbcType="DECIMAL" property="configId" />
+    <result column="red_type" jdbcType="TINYINT" property="redType" />
+    <result column="red_status" jdbcType="TINYINT" property="redStatus" />
+    <result column="red_value" jdbcType="DECIMAL" property="redValue" />
+    <result column="min_spend_amount" jdbcType="DECIMAL" property="minSpendAmount" />
+    <result column="ectivity_day" jdbcType="SMALLINT" property="ectivityDay" />
+    <result column="active_end_time" jdbcType="SMALLINT" property="activeEndTime" />
+    <result column="limit_platform" jdbcType="VARCHAR" property="limitPlatform" />
+    <result column="limit_lottery_child_type" jdbcType="VARCHAR" property="limitLotteryChildType" />
+    <result column="limit_num" jdbcType="INTEGER" property="limitNum" />
+    <result column="red_label" jdbcType="VARCHAR" property="redLabel" />
+    <result column="red_name" jdbcType="VARCHAR" property="redName" />   
+    <result column="operate_lottery_id" jdbcType="VARCHAR" property="operateLotteryId" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.hhly.skeleton.lotto.base.operate.bo.OperateCouponTempBO">
+    <result column="channel_id" jdbcType="LONGVARCHAR" property="channelId" />
+    <result column="limit_lottery" jdbcType="LONGVARCHAR" property="limitLottery" />
+    <result column="limit_lottery_child" jdbcType="LONGVARCHAR" property="limitLotteryChild" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id, config_id, red_type, red_status, red_value, min_spend_amount, ectivity_day, 
+    active_end_time, limit_platform, limit_lottery_child_type, limit_num, red_label, red_name,
+    operate_lottery_id, modify_time, create_time, update_time, modify_by, create_by
+  </sql>
+  <sql id="Blob_Column_List">
+    channel_id, limit_lottery, limit_lottery_child
+  </sql>
+<sql id="sql_condition_OperateCouponTempVO">
+		<where>
+		     <if test="id != null">
+		       and id = #{id,jdbcType=INTEGER}
+		      </if>
+		      <if test="configId != null">
+		        and config_id = #{configId,jdbcType=INTEGER}
+		      </if>
+		       <if test="configType != null">
+		        and config_type = #{configType,jdbcType=INTEGER}
+		      </if>		
+		        
+		</where>
+	</sql> 
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.OperateCouponTempPO" useGeneratedKeys="true" keyProperty="id">
+    insert into operate_coupon_temp ( config_id, red_type, 
+      red_status, red_value, min_spend_amount, 
+      ectivity_day, active_end_time, limit_platform, 
+      limit_lottery_child_type, limit_num, red_label, 
+      operate_lottery_id, modify_time, create_time, 
+      update_time, modify_by, create_by, 
+      channel_id, limit_lottery, limit_lottery_child,red_name,activity_code,config_type
+      )
+    values ( #{configId,jdbcType=DECIMAL}, #{redType,jdbcType=TINYINT}, 
+      #{redStatus,jdbcType=TINYINT}, #{redValue,jdbcType=DECIMAL}, #{minSpendAmount,jdbcType=DECIMAL}, 
+      #{ectivityDay,jdbcType=SMALLINT}, #{activeEndTime,jdbcType=SMALLINT}, #{limitPlatform,jdbcType=VARCHAR}, 
+      #{limitLotteryChildType,jdbcType=VARCHAR}, #{limitNum,jdbcType=INTEGER}, #{redLabel,jdbcType=VARCHAR}, 
+      #{operateLotteryId,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{channelId,jdbcType=LONGVARCHAR}, #{limitLottery,jdbcType=LONGVARCHAR}, #{limitLotteryChild,jdbcType=LONGVARCHAR}, #{redName,jdbcType=VARCHAR} ,
+      #{activityCode,jdbcType=VARCHAR}, #{configType,jdbcType=SMALLINT}
+      )
+  </insert>
+
+<insert id="mergeBatch" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityConfigPO">
+    insert into operate_coupon_temp (id,config_id, red_type , 
+      red_status, red_value, min_spend_amount, 
+      ectivity_day, active_end_time, limit_platform, 
+      limit_lottery_child_type, limit_num, red_label, 
+      operate_lottery_id, modify_time, create_time, 
+      update_time, modify_by, create_by, 
+      channel_id, limit_lottery, limit_lottery_child,red_name,activity_code,config_type)
+    	values
+		<foreach collection="operateActivityRulePOList" item="po" separator=",">
+			(
+          	#{po.id,jdbcType=INTEGER}, #{id,jdbcType=INTEGER}, #{po.redType,jdbcType=INTEGER} , 
+      #{po.redStatus,jdbcType=TINYINT}, #{po.redValue,jdbcType=DECIMAL}, #{po.minSpendAmount,jdbcType=DECIMAL}, 
+      #{po.ectivityDay,jdbcType=SMALLINT}, #{po.activeEndTime,jdbcType=SMALLINT}, #{po.limitPlatform,jdbcType=VARCHAR}, 
+      #{po.limitLotteryChildType,jdbcType=VARCHAR}, #{po.limitNum,jdbcType=INTEGER}, #{po.redLabel,jdbcType=VARCHAR}, 
+      #{po.operateLotteryId,jdbcType=VARCHAR},  now(),  now(), 
+       now(), #{po.modifyBy,jdbcType=VARCHAR}, #{po.createBy,jdbcType=VARCHAR}, 
+      #{po.channelId,jdbcType=LONGVARCHAR}, #{po.limitLottery,jdbcType=LONGVARCHAR}, #{po.limitLotteryChild,jdbcType=LONGVARCHAR}, #{po.redName,jdbcType=VARCHAR},
+		#{po.activityCode,jdbcType=VARCHAR}, #{po.configType,jdbcType=SMALLINT})
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+			config_id	= values(config_id), 
+	       	red_type = values(red_type),
+		      red_status = values(red_status),
+		      red_value = values(red_value),
+		      min_spend_amount = values(min_spend_amount),
+		      ectivity_day = values(ectivity_day),
+		      active_end_time = values(active_end_time),
+		      limit_platform = values(limit_platform),
+		      limit_lottery_child_type = values(limit_lottery_child_type),
+		      limit_num = values(limit_num),
+		      red_label = values(red_label),
+		      operate_lottery_id = values(operate_lottery_id),
+		      modify_time = now()	,
+		      create_time = now()	,
+		      update_time = now()	,
+		      modify_by = values(modify_by),
+		      create_by = values(create_by),
+		      channel_id = values(channel_id),
+		      limit_lottery = values(limit_lottery),
+		      limit_lottery_child = values(limit_lottery_child)	,
+		      red_name=values(red_name),
+		      activity_code=values(activity_code),
+		      config_type=values(config_type)
+  </insert>
+  <insert id="mergeBatchTemp" parameterType="com.hhly.cmscore.persistence.operate.po.OperateCouponTempPO">
+    <foreach collection="list" item="po" separator=";" >
+    insert into operate_coupon_temp (id,config_id, red_type , 
+      red_status, red_value, min_spend_amount, 
+      ectivity_day, active_end_time, limit_platform, 
+      limit_lottery_child_type, limit_num, red_label, 
+      operate_lottery_id, modify_time, create_time, 
+      update_time, modify_by, create_by, 
+      channel_id, limit_lottery, limit_lottery_child,red_name,activity_code,config_type)
+    	values
+			(
+          	#{po.id,jdbcType=INTEGER}, #{po.configId,jdbcType=INTEGER}, #{po.redType,jdbcType=INTEGER} , 
+      #{po.redStatus,jdbcType=TINYINT}, #{po.redValue,jdbcType=DECIMAL}, #{po.minSpendAmount,jdbcType=DECIMAL}, 
+      #{po.ectivityDay,jdbcType=SMALLINT}, #{po.activeEndTime,jdbcType=SMALLINT}, #{po.limitPlatform,jdbcType=VARCHAR}, 
+      #{po.limitLotteryChildType,jdbcType=VARCHAR}, #{po.limitNum,jdbcType=INTEGER}, #{po.redLabel,jdbcType=VARCHAR}, 
+      #{po.operateLotteryId,jdbcType=VARCHAR},  now(),  now(), 
+       now(), #{po.modifyBy,jdbcType=VARCHAR}, #{po.createBy,jdbcType=VARCHAR}, 
+      #{po.channelId,jdbcType=LONGVARCHAR}, #{po.limitLottery,jdbcType=LONGVARCHAR}, #{po.limitLotteryChild,jdbcType=LONGVARCHAR}, #{po.redName,jdbcType=VARCHAR},
+		#{po.activityCode,jdbcType=VARCHAR}, #{po.configType,jdbcType=SMALLINT})		
+		ON DUPLICATE KEY UPDATE
+			config_id	= values(config_id), 
+	       	red_type = values(red_type),
+		      red_status = values(red_status),
+		      red_value = values(red_value),
+		      min_spend_amount = values(min_spend_amount),
+		      ectivity_day = values(ectivity_day),
+		      active_end_time = values(active_end_time),
+		      limit_platform = values(limit_platform),
+		      limit_lottery_child_type = values(limit_lottery_child_type),
+		      limit_num = values(limit_num),
+		      red_label = values(red_label),
+		      operate_lottery_id = values(operate_lottery_id),
+		      modify_time = now()	,
+		      create_time = now()	,
+		      update_time = now()	,
+		      modify_by = values(modify_by),
+		      create_by = values(create_by),
+		      channel_id = values(channel_id),
+		      limit_lottery = values(limit_lottery),
+		      limit_lottery_child = values(limit_lottery_child)	,
+		      red_name=values(red_name),
+		      activity_code=values(activity_code),
+		      config_type=values(config_type)
+		</foreach>
+  </insert>
+ <insert id="mergeCoupon"
+		parameterType="com.hhly.cmscore.persistence.operate.po.OperateCouponTempPO" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO operate_coupon_temp 
+		 (
+			  id,config_id, red_type , 
+		      red_status, red_value, min_spend_amount, 
+		      ectivity_day, active_end_time, limit_platform, 
+		      limit_lottery_child_type, limit_num, red_label, 
+		      operate_lottery_id, modify_time, create_time, 
+		      update_time, modify_by, create_by, 
+		      channel_id, limit_lottery, limit_lottery_child,red_name,activity_code,config_type
+		)
+		VALUES(
+			#{id,jdbcType=INTEGER}, #{configId,jdbcType=DECIMAL}, #{redType,jdbcType=TINYINT}, 
+      #{redStatus,jdbcType=TINYINT}, #{redValue,jdbcType=DECIMAL}, #{minSpendAmount,jdbcType=DECIMAL}, 
+      #{ectivityDay,jdbcType=SMALLINT}, #{activeEndTime,jdbcType=SMALLINT}, #{limitPlatform,jdbcType=VARCHAR}, 
+      #{limitLotteryChildType,jdbcType=VARCHAR}, #{limitNum,jdbcType=INTEGER}, #{redLabel,jdbcType=VARCHAR}, 
+      #{operateLotteryId,jdbcType=VARCHAR}, now(),  now(), 
+      now(), #{modifyBy,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{channelId,jdbcType=LONGVARCHAR}, #{limitLottery,jdbcType=LONGVARCHAR}, #{limitLotteryChild,jdbcType=LONGVARCHAR}, #{redName,jdbcType=VARCHAR} ,
+     #{activityCode,jdbcType=VARCHAR}, #{configType,jdbcType=SMALLINT}
+		)
+		ON DUPLICATE KEY
+		UPDATE
+		red_type = #{redType,jdbcType=TINYINT},
+      red_status = #{redStatus,jdbcType=TINYINT},
+      red_value = #{redValue,jdbcType=DECIMAL},
+      min_spend_amount = #{minSpendAmount,jdbcType=DECIMAL},
+      ectivity_day = #{ectivityDay,jdbcType=SMALLINT},
+      active_end_time = #{activeEndTime,jdbcType=SMALLINT},
+      limit_platform = #{limitPlatform,jdbcType=VARCHAR},
+      limit_lottery_child_type = #{limitLotteryChildType,jdbcType=VARCHAR},
+      limit_num = #{limitNum,jdbcType=INTEGER},
+      red_label = #{redLabel,jdbcType=VARCHAR},
+      operate_lottery_id = #{operateLotteryId,jdbcType=VARCHAR},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      modify_by = #{modifyBy,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      channel_id = #{channelId,jdbcType=LONGVARCHAR},
+      limit_lottery = #{limitLottery,jdbcType=LONGVARCHAR},
+      limit_lottery_child = #{limitLotteryChild,jdbcType=LONGVARCHAR},
+      red_name = #{redName,jdbcType=VARCHAR},
+      activity_code= #{activityCode,jdbcType=VARCHAR},
+      config_type= #{configType,jdbcType=SMALLINT}
+	</insert>
+  <update id="update" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateCouponTempVO">
+    update operate_coupon_temp
+    set config_id = #{configId,jdbcType=DECIMAL},
+      red_type = #{redType,jdbcType=TINYINT},
+      red_status = #{redStatus,jdbcType=TINYINT},
+      red_value = #{redValue,jdbcType=DECIMAL},
+      min_spend_amount = #{minSpendAmount,jdbcType=DECIMAL},
+      ectivity_day = #{ectivityDay,jdbcType=SMALLINT},
+      active_end_time = #{activeEndTime,jdbcType=SMALLINT},
+      limit_platform = #{limitPlatform,jdbcType=VARCHAR},
+      limit_lottery_child_type = #{limitLotteryChildType,jdbcType=VARCHAR},
+      limit_num = #{limitNum,jdbcType=INTEGER},
+      red_label = #{redLabel,jdbcType=VARCHAR},
+      operate_lottery_id = #{operateLotteryId,jdbcType=VARCHAR},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      modify_by = #{modifyBy,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      channel_id = #{channelId,jdbcType=LONGVARCHAR},
+      limit_lottery = #{limitLottery,jdbcType=LONGVARCHAR},
+      limit_lottery_child = #{limitLotteryChild,jdbcType=LONGVARCHAR},
+      red_name = #{redName,jdbcType=VARCHAR},
+      activity_code= #{activityCode,jdbcType=VARCHAR},
+      config_type= #{configType,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <insert id="mergeBase"
+		parameterType="com.hhly.cmscore.persistence.operate.po.OperateCouponTempPO" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO operate_coupon_temp 
+		 (
+			  id,  config_id, red_type, 
+		      red_status, red_value, min_spend_amount, 
+		      ectivity_day, operate_lottery_id, modify_time, create_time, 
+		      update_time, modify_by, create_by, 
+		      channel_id,red_name,limit_num,activity_code,config_type
+		      
+		)
+		VALUES(
+			#{id,jdbcType=INTEGER}, #{configId,jdbcType=DECIMAL}, #{redType,jdbcType=TINYINT}, 
+      #{redStatus,jdbcType=TINYINT}, #{redValue,jdbcType=DECIMAL}, #{minSpendAmount,jdbcType=DECIMAL}, 
+      #{ectivityDay,jdbcType=SMALLINT},#{operateLotteryId,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{channelId,jdbcType=LONGVARCHAR},  #{redName,jdbcType=VARCHAR},  #{limitNum,jdbcType=VARCHAR},
+      #{activityCode,jdbcType=VARCHAR}, #{configType,jdbcType=SMALLINT}
+		)
+		ON DUPLICATE KEY
+		UPDATE
+		red_type = #{redType,jdbcType=TINYINT},
+      	red_status = #{redStatus,jdbcType=TINYINT},
+    	red_value = #{redValue,jdbcType=DECIMAL},
+     	min_spend_amount = #{minSpendAmount,jdbcType=DECIMAL},
+        ectivity_day = #{ectivityDay,jdbcType=SMALLINT},       
+        operate_lottery_id = #{operateLotteryId,jdbcType=VARCHAR},
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},  
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        modify_by = #{modifyBy,jdbcType=VARCHAR},       
+        channel_id = #{channelId,jdbcType=LONGVARCHAR},      
+        red_name = #{redName,jdbcType=VARCHAR},
+        limit_num = #{limitNum,jdbcType=VARCHAR},
+        activity_code= #{activityCode,jdbcType=VARCHAR},
+        config_type= #{configType,jdbcType=SMALLINT}
+	</insert>
+  
+  
+  
+  <delete id="deleteById" parameterType="java.lang.Integer">
+    delete from operate_coupon_temp
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteBatch" parameterType="java.util.List">
+    delete from operate_coupon_temp
+    where id in 
+    <foreach collection="list" item="id" open="(" close=")" separator=",">
+    	#{id,jdbcType=INTEGER}
+    </foreach>
+  </delete>
+  
+ <select id="findTotal" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateCouponTempVO">
+  		select count(1) from operate_coupon_temp 
+  		<include refid="sql_condition_OperateCouponTempVO" />
+  </select>
+  
+   <select id="findList" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateCouponTempVO" resultMap="BaseResultMap">
+  		select 
+  		<include refid="Base_Column_List" />,activity_code activityCode
+  		from 
+  		operate_coupon_temp
+  		<include refid="sql_condition_OperateCouponTempVO" />
+  </select>
+  
+  <select id="findDetailById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  		select 
+  		<include refid="Base_Column_List" />
+  		from 
+  		operate_coupon_temp
+  		where id = #{id,jdbcType=INTEGER}, 	
+  </select>
+  
+</mapper>

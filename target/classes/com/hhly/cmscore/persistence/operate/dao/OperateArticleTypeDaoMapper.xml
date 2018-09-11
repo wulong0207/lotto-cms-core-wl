@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateArticleTypeDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateArticleTypeBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="TYPE_CODE" property="typeCode" jdbcType="VARCHAR" />
+    <result column="TYPE_FULL_NAME" property="typeFullName" jdbcType="VARCHAR" />
+    <result column="TYPE_SHORT_NAME" property="typeShortName" jdbcType="VARCHAR" />
+    <result column="TYPE_PARENT" property="typeParent" jdbcType="DECIMAL" />
+    <result column="TYPE_LEVEL" property="typeLevel" jdbcType="TINYINT" />
+    <result column="STATUS" property="status" jdbcType="TINYINT" />
+    <result column="ORDER_ID" property="orderId" jdbcType="SMALLINT" />
+    <result column="IDENTIFIERS" property="identifiers" jdbcType="VARCHAR" />
+    <result column="TYPE_DESC" property="typeDesc" jdbcType="VARCHAR" />
+    <result column="ISVIRTUAL" property="virtual" jdbcType="TINYINT" />
+    <result column="RSS_STATUS" property="rstatus" jdbcType="TINYINT" />
+  </resultMap>
+  
+   <sql id="Base_Column_List" >
+    ID, TYPE_CODE, TYPE_FULL_NAME, TYPE_SHORT_NAME, TYPE_PARENT, TYPE_LEVEL, STATUS, 
+    ORDER_ID, IDENTIFIERS, TYPE_DESC,ISVIRTUAL,RSS_STATUS
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+  		<if test="typeParent != null">
+			TYPE_PARENT = #{typeParent}
+  		</if>
+  		<if test="id != null">
+			and id = #{id}
+  		</if>
+  		<if test="excludedId != null">
+			and id != #{excludedId}
+  		</if>
+  		<if test="identifiers != null">
+			and IDENTIFIERS = #{identifiers}
+  		</if>
+	</where>
+  </sql>
+  
+  <sql id="Table">
+  	OPERATE_ARTICLE_TYPE
+  </sql>
+  
+  <update id="merge" parameterType="com.hhly.cmscore.persistence.operate.po.OperateArticleTypePO">
+   INSERT INTO <include refid="Table" /> 
+   (		ID,				
+			TYPE_CODE ,			
+			TYPE_FULL_NAME ,	
+			TYPE_SHORT_NAME ,
+			TYPE_PARENT ,		
+			TYPE_LEVEL 	,		
+			STATUS 		,			
+			IDENTIFIERS ,		
+			TYPE_DESC,
+			ORDER_ID,
+			ISVIRTUAL,
+			rss_status			
+  	)
+  	VALUES(
+  		#{id,jdbcType=DECIMAL}, 
+		#{typeCode,jdbcType=VARCHAR} , 
+	    #{typeFullName,jdbcType=VARCHAR} , 
+	    #{typeShortName,jdbcType=VARCHAR} , 
+	    #{typeParent,jdbcType=DECIMAL}, 
+	    #{typeLevel,jdbcType=TINYINT} , 
+	    #{status,jdbcType=TINYINT} , 
+	    #{identifiers,jdbcType=VARCHAR} , 
+	    #{typeDesc,jdbcType=VARCHAR},
+	    #{orderId,jdbcType=SMALLINT}, 
+	    #{virtual,jdbcType=TINYINT},
+	    #{rstatus,jdbcType=TINYINT}
+	)
+	ON DUPLICATE KEY UPDATE
+		<!-- 
+		TYPE_CODE       = #{typeCode,jdbcType=VARCHAR} ,
+		IDENTIFIERS 	  = #{identifiers,jdbcType=VARCHAR} , 
+		 -->
+	      TYPE_FULL_NAME  = values(TYPE_FULL_NAME), 
+	      TYPE_SHORT_NAME = values(TYPE_SHORT_NAME),
+	      STATUS          = values(STATUS),
+	      TYPE_DESC 	  = values(TYPE_DESC),
+	      ISVIRTUAL 	  = values(ISVIRTUAL),
+	      rss_status 	  = values(rss_status)  	
+	</update>
+  
+  <update id="updateOrder" parameterType="java.util.List">
+   	<foreach collection="list" item="item" separator=";" >
+ 	  update <include refid="Table"/>
+	    set
+	      ORDER_ID = #{item.orderId,jdbcType=INTEGER}
+	    where ID = #{item.id,jdbcType=DECIMAL}
+  	</foreach>
+  </update>
+  
+  <select id="list" resultMap="BaseResultMap">
+     select <include refid="Base_Column_List"/>
+			from <include refid="Table"/> 
+			order by order_id,id
+  </select>
+  
+  <select id="find" resultMap="BaseResultMap">
+     select <include refid="Base_Column_List"/>
+			from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+  </select>
+  
+  <select id="findMaxTypeCode" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateArticleTypeVO" resultType="String">
+	 select max(TYPE_CODE) from <include refid="Table"/> 
+		<include refid="Query_Condition"/>
+ 		and length(TYPE_CODE) = (select max(length(TYPE_CODE)) from <include refid="Table"/> <include refid="Query_Condition"/>)
+  </select>
+  
+  <select id="count" resultType="int">
+     select count(*) from <include refid="Table"/> 
+		<include refid="Query_Condition"/>
+  </select>
+  
+    
+  <select id="findParents" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateArticleVO" resultType="string">
+  	SELECT IDENTIFIERS
+	FROM (
+	    SELECT
+	        @r AS _id,
+	        (SELECT @r := type_parent FROM <include refid="Table"/> WHERE id = _id) AS parent_id,
+	        @l := @l + 1 AS lvl
+	    FROM
+	        (SELECT @r := #{typeId}, @l := 0) vars,
+	        <include refid="Table"/> h
+	    WHERE @r > 0) T1
+	JOIN <include refid="Table"/> T2
+	ON T1._id = T2.id
+	ORDER BY T1.lvl DESC
+  </select>
+  
+   <!-- 根据栏目查询子栏目信息 -->
+   <select id="findListByFaType" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleTypeLottBO">
+      select TYPE_CODE as typeCode ,TYPE_FULL_NAME as typeName from OPERATE_ARTICLE_TYPE where type_parent in(select id from OPERATE_ARTICLE_TYPE where TYPE_CODE =#{typeCode})
+  </select>
+  <!-- 查询资讯下的所有栏目信息 -->
+   <select id="findNewsTypeList" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleBaseBO">
+      select TYPE_CODE as typeCode ,TYPE_FULL_NAME as typeName from OPERATE_ARTICLE_TYPE 
+      where STATUS =1
+      order by order_id,id
+  </select>
+  <!-- 查询所有栏目关系 -->
+    <select id="findNewTypeRelatList" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateArticleLottVO"  resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateArticleLottBO">   		  		
+		select id,TYPE_CODE as typeCode,TYPE_FULL_NAME as typeName,TYPE_PARENT as parent from 	OPERATE_ARTICLE_TYPE 
+		where  status=1 and substr(TYPE_CODE,1,1) =2 
+		<if test="platform != null and platform!=1">
+			and TYPE_CODE not in ('2.1','2.2')
+  		</if>
+		order by order_id
+	</select> 
+</mapper>

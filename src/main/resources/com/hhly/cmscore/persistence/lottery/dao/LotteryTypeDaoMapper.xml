@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.lottery.dao.LotteryTypeDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.lottery.po.LotteryTypePO">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="LOTTERY_CODE" jdbcType="DECIMAL" property="lotteryCode" />
+    <result column="LOTTERY_NAME" jdbcType="VARCHAR" property="lotteryName" />
+    <result column="CON_ISSUE_NUM" jdbcType="DECIMAL" property="conIssueNum" />
+    <result column="STOP_ADD_ISSUE" jdbcType="DECIMAL" property="stopAddIssue" />
+    <result column="LOTTERY_LOGO_URL" jdbcType="VARCHAR" property="lotteryLogoUrl" />
+    <result column="ADMIN_CATEGORY" jdbcType="DECIMAL" property="adminCategory" />
+    <result column="LOTTERY_CATEGORY" jdbcType="DECIMAL" property="lotteryCategory" />
+    <result column="SALE_STATUS" jdbcType="DECIMAL" property="saleStatus" />
+    <result column="AREA" jdbcType="VARCHAR" property="area" />
+    <result column="AUTO_TYPE" jdbcType="DECIMAL" property="autoType" />
+    <result column="SYN_ISSUE" jdbcType="DECIMAL" property="synIssue" />
+    <result column="SALE_TIME" jdbcType="DECIMAL" property="saleTime" />
+    <result column="BUY_END_TIME" jdbcType="DECIMAL" property="buyEndTime" />
+    <result column="SPLIT_MAX_NUM" jdbcType="DECIMAL" property="splitMaxNum" />
+    <result column="END_CHECK_TIME" jdbcType="DECIMAL" property="endCheckTime" />
+    <result column="SPLIT_MAX_AMOUNT" jdbcType="DECIMAL" property="splitMaxAmount" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="START_SAIL_TIME" jdbcType="VARCHAR" property="startSailTime" />
+    <result column="END_SAIL_TIME" jdbcType="VARCHAR" property="endSailTime" />
+    <result column="SAIL_DAY_CYCLE" jdbcType="VARCHAR" property="sailDayCycle" />
+    <result column="VACATIONS" jdbcType="VARCHAR" property="vacations" />
+    <result column="DRAW_TIME" jdbcType="VARCHAR" property="drawTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="FORMAT" jdbcType="VARCHAR" property="format" />
+    <result column="COME_OUT_TIME" jdbcType="VARCHAR" property="comeOutTime" />
+    <result column="PLATFORM" jdbcType="VARCHAR" property="platform"/>
+    <result column="MIN_BET" jdbcType="INTEGER" property="minBet"/>
+    <result column="MR_MULTIPLE" jdbcType="INTEGER" property="mrMultiple"/>
+    <result column="MIN_MULTIPLE" jdbcType="INTEGER" property="minMultiple"/>
+  </resultMap>
+  <select id="find" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeBO" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryTypeVO">
+	    select 
+		    ID,
+			LOTTERY_CODE  lotteryCode,
+			LOTTERY_NAME  lotteryName,
+			CON_ISSUE_NUM  conIssueNum,
+			STOP_ADD_ISSUE  stopAddIssue,
+			LOTTERY_LOGO_URL  lotteryLogoUrl,
+			LOTTERY_LOGO_MOBILE  lotteryLogoMobile,
+			ADMIN_CATEGORY  adminCategory,
+			LOTTERY_CATEGORY  lotteryCategory,
+			SALE_STATUS  saleStatus,
+			AREA,
+			AUTO_TYPE  autoType,
+			SYN_ISSUE  synIssue,
+			SALE_TIME  saleTime,
+			BUY_END_TIME  buyEndTime,
+			SPLIT_MAX_NUM  splitMaxNum,
+			END_CHECK_TIME  endCheckTime,
+			SPLIT_MAX_AMOUNT  splitMaxAmount,
+			CREATE_BY  createBy,
+			MODIFY_BY  modifyBy,
+			MODIFY_TIME  modifyTime,
+			UPDATE_TIME  updateTime,
+			CREATE_TIME  createTime,
+			REMARK  remark,
+			VACATIONS,
+			SAIL_DAY_CYCLE SAILDAYCYCLE,
+			END_SAIL_TIME ENDSAILTIME,
+			START_SAIL_TIME STARTSAILTIME,
+			DRAW_TIME DRAWTIME,
+			FORMAT,
+			COME_OUT_TIME COMEOUTTIME,
+			order_id orderId,
+			PLATFORM platform,
+			min_bet minBet,
+			mr_multiple mrMultiple,
+			min_multiple minMultiple
+	    from LOTTERY_TYPE
+	    <where>
+	        <if test="lotteryCode!=null">
+	          and LOTTERY_CODE = #{lotteryCode}
+	        </if>
+	        <if test="lotteryCategory !=null">
+	          and LOTTERY_CATEGORY =  #{lotteryCategory}
+	        </if>
+	    </where>
+	 	order by order_id ,id
+  	 <if test="startRow != null and pageSize != null">
+   		 limit #{startRow},#{pageSize} 
+ 	 </if>
+  </select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryTypeVO" resultType="int">
+     select count(*) from LOTTERY_TYPE
+     <where>
+	     <if test="lotteryCode!=null">
+	          and LOTTERY_CODE = #{lotteryCode}
+	     </if>
+	     <if test="lotteryCategory !=null">
+	          and LOTTERY_CATEGORY =  #{lotteryCategory}
+	      </if>
+	  </where>
+  </select>
+  <update id="updLotteryTypeByKey" parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryTypePO">
+	update LOTTERY_TYPE
+    set
+      CON_ISSUE_NUM = #{conIssueNum,jdbcType=DECIMAL},
+      STOP_ADD_ISSUE = #{stopAddIssue,jdbcType=DECIMAL},
+      <if test="lotteryLogoUrl != null and lotteryLogoUrl != ''">
+      LOTTERY_LOGO_URL = #{lotteryLogoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="lotteryLogoMobile != null and lotteryLogoMobile != ''">
+      LOTTERY_LOGO_MOBILE = #{lotteryLogoMobile,jdbcType=VARCHAR},
+      </if>
+      ADMIN_CATEGORY = #{adminCategory,jdbcType=DECIMAL},
+      LOTTERY_CATEGORY = #{lotteryCategory,jdbcType=DECIMAL},
+      SALE_STATUS = #{saleStatus,jdbcType=DECIMAL},
+      AREA = #{area,jdbcType=VARCHAR},
+      AUTO_TYPE = #{autoType,jdbcType=DECIMAL},
+      SYN_ISSUE = #{synIssue,jdbcType=DECIMAL},
+      SALE_TIME = #{saleTime,jdbcType=DECIMAL},
+      BUY_END_TIME = #{buyEndTime,jdbcType=DECIMAL},
+      SPLIT_MAX_NUM = #{splitMaxNum,jdbcType=DECIMAL},
+      END_CHECK_TIME = #{endCheckTime,jdbcType=DECIMAL},
+      SPLIT_MAX_AMOUNT = #{splitMaxAmount,jdbcType=DECIMAL},
+      START_SAIL_TIME = #{startSailTime,jdbcType=VARCHAR},
+      END_SAIL_TIME = #{endSailTime,jdbcType=VARCHAR},
+      SAIL_DAY_CYCLE = #{sailDayCycle,jdbcType=VARCHAR},
+      VACATIONS = #{vacations,jdbcType=VARCHAR},
+      DRAW_TIME = #{drawTime,jdbcType=VARCHAR},
+      MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+      MODIFY_TIME = now(),
+      UPDATE_TIME = now(),
+      REMARK = #{remark,jdbcType=VARCHAR},
+      FORMAT = #{format,jdbcType=VARCHAR},
+      COME_OUT_TIME = #{comeOutTime,jdbcType=VARCHAR},
+      order_id=#{orderId,jdbcType=VARCHAR},
+      PLATFORM=#{platform,jdbcType=VARCHAR},
+      min_bet =#{minBet,jdbcType=INTEGER},
+       mr_multiple =#{mrMultiple,jdbcType=INTEGER},
+        min_multiple =#{minMultiple,jdbcType=INTEGER}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="findLotteryTypeToExcel" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryTypeVO" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeExcelBO">
+ 		select 
+		    @rownum := @rownum + 1 AS id,
+			LOTTERY_CODE  lotteryCode,
+			LOTTERY_NAME  lotteryName,
+			CON_ISSUE_NUM  conIssueNum,
+			STOP_ADD_ISSUE  stopAddIssue,
+			LOTTERY_LOGO_URL  lotteryLogoUrl,
+			ADMIN_CATEGORY  adminCategory,
+			LOTTERY_CATEGORY  lotteryCategory,
+			SALE_STATUS  saleStatus,
+			AREA  area,
+			AUTO_TYPE  autoType,
+			SYN_ISSUE  synIssue,
+			SALE_TIME  saleTime,
+			BUY_END_TIME  buyEndTime,
+			SPLIT_MAX_NUM  splitMaxNum,
+			END_CHECK_TIME  endCheckTime,
+			SPLIT_MAX_AMOUNT  splitMaxAmount,
+			CREATE_BY  createBy,
+			MODIFY_BY  modifyBy,
+			date_format(UPDATE_TIME,'%Y-%m-%d %H:%i:%s')  updateTime,
+			date_format(CREATE_TIME,'%Y-%m-%d %H:%i:%s')  createTime,
+			REMARK  remark
+	    from LOTTERY_TYPE,
+			(SELECT @rownum := 0) r
+	    <where>
+	        <if test="lotteryCode!=null">
+	          and LOTTERY_CODE = #{lotteryCode}
+	        </if>
+	        <if test="lotteryCategory !=null">
+	          and LOTTERY_CATEGORY =  #{lotteryCategory}
+	        </if>
+	    </where>
+	    order by ID
+  </select>
+  
+  <select id="findCountCode" resultType="int">
+    select count(*) from LOTTERY_TYPE where LOTTERY_CODE = #{code}
+  </select>
+  
+  <insert id="add" parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryTypePO">
+   insert into LOTTERY_TYPE (LOTTERY_CODE, LOTTERY_NAME, 
+      CON_ISSUE_NUM, STOP_ADD_ISSUE, LOTTERY_LOGO_URL, LOTTERY_LOGO_MOBILE,
+      ADMIN_CATEGORY, LOTTERY_CATEGORY, SALE_STATUS, 
+      AREA, AUTO_TYPE, SYN_ISSUE, 
+      SALE_TIME, BUY_END_TIME, SPLIT_MAX_NUM, 
+      END_CHECK_TIME, SPLIT_MAX_AMOUNT, CREATE_BY, 
+      MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+      CREATE_TIME, REMARK,FORMAT,COME_OUT_TIME,order_Id,PLATFORM,START_SAIL_TIME,END_SAIL_TIME,SAIL_DAY_CYCLE,VACATIONS,DRAW_TIME,MIN_BET,MR_MULTIPLE,MIN_MULTIPLE)
+    values (#{lotteryCode,jdbcType=VARCHAR}, #{lotteryName,jdbcType=VARCHAR}, 
+      #{conIssueNum,jdbcType=DECIMAL}, #{stopAddIssue,jdbcType=DECIMAL}, #{lotteryLogoUrl,jdbcType=VARCHAR},#{lotteryLogoMobile,jdbcType=VARCHAR},  
+      #{adminCategory,jdbcType=DECIMAL}, #{lotteryCategory,jdbcType=DECIMAL}, #{saleStatus,jdbcType=DECIMAL}, 
+      #{area,jdbcType=VARCHAR}, #{autoType,jdbcType=DECIMAL}, #{synIssue,jdbcType=DECIMAL}, 
+      #{saleTime,jdbcType=DECIMAL}, #{buyEndTime,jdbcType=DECIMAL}, #{splitMaxNum,jdbcType=DECIMAL}, 
+      #{endCheckTime,jdbcType=DECIMAL}, #{splitMaxAmount,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, 
+      #{modifyBy,jdbcType=VARCHAR}, now(),now(), now(), #{remark,jdbcType=VARCHAR},#{format,jdbcType=VARCHAR},
+      #{comeOutTime,jdbcType=VARCHAR},#{orderId,jdbcType=VARCHAR},#{platform,jdbcType=VARCHAR},
+      #{startSailTime,jdbcType=VARCHAR}, #{endSailTime,jdbcType=VARCHAR}, #{sailDayCycle,jdbcType=VARCHAR}, 
+      #{vacations,jdbcType=VARCHAR}, #{drawTime,jdbcType=VARCHAR},#{minBet,jdbcType=INTEGER}),#{mrMultiple,jdbcType=INTEGER},
+      #{minMultiple,jdbcType=INTEGER}
+  </insert>
+  <select id="findLotteryTypeCheck" resultMap="BaseResultMap">
+	  select 
+	     SALE_TIME,
+	     BUY_END_TIME,
+	     END_CHECK_TIME,
+	     CON_ISSUE_NUM
+	  from LOTTERY_TYPE
+	  where ID = #{id}
+  </select>
+  
+  <select id="findLotteryTypeByKey" resultMap="BaseResultMap">
+	  select 
+		  ID, LOTTERY_CODE, LOTTERY_NAME, 
+	      CON_ISSUE_NUM, STOP_ADD_ISSUE, LOTTERY_LOGO_URL, 
+	      ADMIN_CATEGORY, LOTTERY_CATEGORY, SALE_STATUS, 
+	      AREA, AUTO_TYPE, SYN_ISSUE, 
+	      SALE_TIME, BUY_END_TIME, SPLIT_MAX_NUM, 
+	      END_CHECK_TIME, SPLIT_MAX_AMOUNT, CREATE_BY, 
+	      MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+	      CREATE_TIME, REMARK,order_id,MIN_BET
+	  from LOTTERY_TYPE
+	  where ID = #{id}
+  </select>
+  <sql id="sql_statement_all">
+	  	select ID,
+		       LOTTERY_CODE     lotteryCode,
+		       LOTTERY_NAME     lotteryName,
+		       CON_ISSUE_NUM    conIssueNum,
+		       STOP_ADD_ISSUE   stopAddIssue,
+		       LOTTERY_LOGO_URL lotteryLogoUrl,
+		       ADMIN_CATEGORY   adminCategory,
+		       LOTTERY_CATEGORY lotteryCategory,
+		       SALE_STATUS      saleStatus,
+		       AREA             area,
+		       AUTO_TYPE        autoType,
+		       SYN_ISSUE        synIssue,
+		       SALE_TIME        saleTime,
+		       BUY_END_TIME     buyEndTime,
+		       SPLIT_MAX_NUM    splitMaxNum,
+		       END_CHECK_TIME   endCheckTime,
+		       SPLIT_MAX_AMOUNT splitMaxAmount,
+		       COME_OUT_TIME    comeOutTime,
+		       CREATE_BY        createBy,
+		       MODIFY_BY        modifyBy,
+		       MODIFY_TIME      modifyTime,
+		       UPDATE_TIME      updateTime,
+		       CREATE_TIME      createTime,
+		       REMARK           remark,
+		       MIN_BET          minBet,
+		       MR_MULTIPLE      mrMultiple,
+		       MIN_MULTIPLE     mrMultiple
+		  from LOTTERY_TYPE
+  </sql>
+  <sql id="sql_condition_all">
+  		where 1 = 1
+  		<if test="id != null">
+  			and ID = #{id,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryCode != null">
+          	and LOTTERY_CODE = #{lotteryCode}
+        </if>
+        <if test="lotteryCategory != null">
+          	and LOTTERY_CATEGORY =  #{lotteryCategory}
+        </if>
+  </sql>
+  <!-- 查询单条 -->
+  <select id="findSingle" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryTypeVO" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeBO">
+		<include refid="sql_statement_all" />
+		<include refid="sql_condition_all" />
+		LIMIT 1
+  </select>
+  <select id="findLotteryTypeDic" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeBO">
+    select 
+	   LOTTERY_CODE     lotteryCode,
+	   LOTTERY_NAME     lotteryName
+    from LOTTERY_TYPE
+    <where>
+       <if test="lotteryCategory != null and lotteryCategory !=''">
+           and LOTTERY_CATEGORY =  #{lotteryCategory}
+       </if>
+    </where>
+  </select>
+	<select id="findLotteryName" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeBO">
+	   select 
+	   LOTTERY_NAME LOTTERYNAME,
+	   ID 
+	   from LOTTERY_TYPE
+	   where ID in 
+	   <foreach collection="ids" separator="," open="(" close=")" item="item">
+	      #{item}
+	   </foreach>
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	<!--                           Used to LOTTO                           -->
+	<!-- sql结果集：前端接口：彩种  -->
+	<resultMap id="LotteryFrontResultMap" type="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+		<result property="lotteryCode" column="lottery_code" jdbcType="INTEGER"/>
+  	  	<result property="lotteryName" column="lottery_name" jdbcType="VARCHAR"/>
+  	  	<result property="lotteryLogoUrl" column="lottery_logo_url" jdbcType="VARCHAR"/>
+  	  	<result property="saleStatus" column="sale_status" jdbcType="SMALLINT"/>
+  	  	<result property="drawTime" column="draw_time" jdbcType="VARCHAR"/>
+  	  	<result property="vacations" column="vacations" jdbcType="VARCHAR"/>
+  	  	<result property="startSailTime" column="start_sail_time" jdbcType="VARCHAR"/>
+  	  	<result property="endSaleTime" column="end_sail_time" jdbcType="VARCHAR"/>
+  	  	<result property="endCheckTime" column="end_check_time" jdbcType="VARCHAR"/>
+  	  	<result property="sailDayCycle" column="sail_day_cycle" jdbcType="VARCHAR"/>
+        <result property="buyEndTime" column="buy_end_time" jdbcType="DECIMAL"/>
+        <result property="platform" column="platform" jdbcType="VARCHAR"/>
+	</resultMap>
+	<!-- 前端接口：查询单个彩种 -->
+	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="LotteryFrontResultMap">
+		select lottery_code,
+		       lottery_name,
+		       lottery_logo_url,
+		       sale_status,
+		       draw_time,
+		       vacations,
+		       start_sail_time,
+		       end_sail_time,
+		       end_check_time,
+        	   sail_day_cycle,
+        	   buy_end_time,
+       		   platform
+		  from LOTTERY_TYPE lt
+		 where lt.lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+	</select>
+	<!-- 前端接口： 查询所有大彩种 -->
+	<select id="findMultipleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+	     select lottery_code lotteryCode,
+		       lottery_name lotteryName,
+		       lottery_logo_url lotteryLogoUrl,
+		       sale_status saleStatus,
+		       draw_time drawTime,
+		       vacations 
+		  from LOTTERY_TYPE lt
+	</select>
+	<select id="findTypeUseAddIssue" resultType="com.hhly.skeleton.base.issue.entity.NewTypeBO">
+		select
+		ID,
+		ADMIN_CATEGORY  adminCategory,
+		START_SAIL_TIME startSailTime,
+		END_SAIL_TIME endSailTime,
+		SAIL_DAY_CYCLE sailDayCycle,
+		VACATIONS vacations,
+		LOTTERY_CODE lotteryCode,
+		LOTTERY_NAME lotteryName,
+		CON_ISSUE_NUM conIssueNum,
+		STOP_ADD_ISSUE stopAddIssue,
+		LOTTERY_CATEGORY lotteryCategory,
+		SALE_STATUS saleStatus,
+		SYN_ISSUE synIssue,
+		SALE_TIME saleTime,
+		BUY_END_TIME buyEndTime,
+		END_CHECK_TIME endCheckTime,
+		DRAW_TIME DRAWTIME,
+		format
+		from LOTTERY_TYPE
+		where LOTTERY_CODE = #{lotteryCode}
+	</select>
+	<!-- 前端接口： 查询彩种信息-->
+	<select id="findAllLotteryType" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeBO">
+	     select lottery_code lotteryCode,
+		       lottery_name lotteryName,
+		       lottery_logo_url lotteryLogoUrl,
+		       end_sail_time endSailTime,
+		       SAIL_DAY_CYCLE sailDayCycle,
+		       buy_end_time buyEndTime
+		  from LOTTERY_TYPE
+	</select>
+	
+	<!-- 前端接口： 查询数字彩和胜负彩彩种信息-->
+	<select id="findLFLottery" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeBO">
+	     select lottery_code lotteryCode,
+		       lottery_name lotteryName,
+		       lottery_logo_url lotteryLogoUrl,
+		       end_sail_time endSailTime,
+		       SAIL_DAY_CYCLE sailDayCycle,
+		       buy_end_time buyEndTime
+		  from LOTTERY_TYPE where lottery_code <![CDATA[<]]> 200 OR lottery_code = 304
+	</select>
+	
+	<!-- 前端接口: 查询彩种下拉基本信息 -->
+  <select id="queryLotterySelectList" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" 
+   resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+   		select lottery_code lotteryCode, lottery_name lotteryName
+   		from lottery_type
+   		<where>
+   			sale_status in (0, 1)
+   			<if test="drawType != null">
+   				<choose>
+   					<when test="drawType == 1">
+   						and area = 0 and lottery_category in (1, 3)
+   					</when>
+   					<when test="drawType == 2">
+   						and lottery_category = 2
+   					</when>
+   					<when test="drawType == 3">
+   						and area != 0 and lottery_category in (1, 3)
+   					</when>
+   				</choose>
+   			</if>
+   		</where>
+   		order by order_id, lottery_code
+   </select>
+	
+</mapper>

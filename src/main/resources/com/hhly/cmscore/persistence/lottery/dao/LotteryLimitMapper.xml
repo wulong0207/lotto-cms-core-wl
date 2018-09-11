@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.lottery.dao.LotteryLimitMapper">
+
+	<!-- Used to CMS -->
+	<!-- 结果集:限号查询 -->
+	<resultMap id="SimpleLimitResultMap"
+		type="com.hhly.skeleton.cms.lotterymgr.bo.LotteryLimitBO">
+		<id property="id" column="id" jdbcType="INTEGER" />
+		<result property="lotteryCode" column="lottery_code" jdbcType="INTEGER" />
+		<result property="status" column="status" jdbcType="SMALLINT" />
+		<result property="limitType" column="limit_type" jdbcType="SMALLINT" />
+		<result property="issueStart" column="issue_start" jdbcType="VARCHAR" />
+		<result property="issueEnd" column="issue_end" jdbcType="VARCHAR" />
+		<result property="timeStart" column="time_start" jdbcType="TIMESTAMP" />
+		<result property="timeEnd" column="time_end" jdbcType="TIMESTAMP" />
+		<result property="limitWay" column="limit_way" jdbcType="SMALLINT" />
+		<result property="createBy" column="create_by" jdbcType="VARCHAR" />
+		<result property="modifyBy" column="modify_by" jdbcType="VARCHAR" />
+		<result property="modifyTime" column="modify_time" jdbcType="TIMESTAMP" />
+		<result property="updateTime" column="update_time" jdbcType="TIMESTAMP" />
+		<result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+		<result property="remark" column="remark" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="LimitResultMap"
+		type="com.hhly.skeleton.cms.lotterymgr.bo.LotteryLimitBO" extends="SimpleLimitResultMap">
+		<collection property="limitInfoList" column="id"
+			select="findRelationLimitInfo" />
+	</resultMap>
+
+	<!-- sql公共列：限号查询 -->
+	<sql id="sql_statement_columns">
+		ll.id,
+		ll.lottery_code,
+		ll.`status`,
+		ll.limit_type,
+		ll.issue_start,
+		ll.issue_end,
+		ll.time_start,
+		ll.time_end,
+		ll.limit_way,
+		ll.create_by,
+		ll.modify_by,
+		ll.modify_time,
+		ll.update_time,
+		ll.create_time
+	</sql>
+	<!-- sql语句块：限号查询 -->
+	<sql id="sql_statement_limit">
+		select
+		<include refid="sql_statement_columns" />
+		from LOTTERY_LIMIT ll
+	</sql>
+	<!-- sql语句块：限号详情查询 -->
+	<sql id="sql_statement_limitdetail">
+		select
+		<include refid="sql_statement_columns" />
+		,ll.remark
+		from LOTTERY_LIMIT ll
+	</sql>
+	<!-- sql查询条件：限号查询 -->
+	<sql id="sql_condition_limit">
+		where 1 = 1
+		<if test="id != null">
+			and ll.id = #{id,jdbcType=INTEGER}
+		</if>
+		<if test="lotteryCode != null">
+			and ll.lottery_code = #{lotteryCode,jdbcType=INTEGER}
+		</if>
+		<if test="status != null">
+			and ll.`status` = #{status,jdbcType=SMALLINT}
+		</if>
+		<if test="limitType != null">
+			and ll.limit_type = #{limitType,jdbcType=SMALLINT}
+		</if>
+		<if test="issueStart != null and issueStart != ''">
+			and ll.issue_end >= #{issueStart,jdbcType=VARCHAR}
+		</if>
+		<if test="issueEnd != null and issueEnd != ''">
+			and ll.issue_start <![CDATA[ <= ]]>
+			#{issueEnd,jdbcType=VARCHAR}
+		</if>
+		<if test="timeStart != null">
+			and ll.time_end >= #{timeStart,jdbcType=TIMESTAMP}
+		</if>
+		<if test="timeEnd != null">
+			and ll.time_start <![CDATA[ <= ]]>
+			#{timeEnd,jdbcType=TIMESTAMP}
+		</if>
+		<if test="qryStartTime != null">
+			and ll.update_time >= #{qryStartTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="qryEndTime != null">
+			and ll.update_time <![CDATA[ <= ]]>
+			#{qryEndTime,jdbcType=TIMESTAMP}
+		</if>
+	</sql>
+	<!-- sql排序：限号查询 -->
+	<sql id="sql_orderby_limit">
+		<choose>
+			<when test="sortField != null and sortField != ''">
+				order by ${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				order by ll.id desc
+			</otherwise>
+		</choose>
+	</sql>
+	<!-- 查询单条 ：限号查询 -->
+	<select id="findSingleLimit" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryLimitVO"
+		resultMap="SimpleLimitResultMap">
+		<include refid="sql_statement_limitdetail" />
+		<include refid="sql_condition_limit" />
+		LIMIT 1
+	</select>
+	<!-- 查询分页 ：限号查询 -->
+	<select id="findPagingLimit" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryLimitVO"
+		resultMap="LimitResultMap">
+		<include refid="sql_statement_limit" />
+		<include refid="sql_condition_limit" />
+		<include refid="sql_orderby_limit" />
+		LIMIT #{startRow, jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+	</select>
+	<!-- 查询记录数 ：限号查询 -->
+	<select id="findCountLimit" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryLimitVO"
+		resultType="int">
+		select count(*) count from LOTTERY_LIMIT ll
+		<include refid="sql_condition_limit" />
+	</select>
+	<!-- 新增 -->
+	<insert id="addLimit"
+		parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryLimitPO">
+		insert into LOTTERY_LIMIT
+		(lottery_code,
+		`status`,
+		limit_type,
+		issue_start,
+		issue_end,
+		time_start,
+		time_end,
+		limit_way,
+		create_by,
+		modify_by,
+		modify_time,
+		update_time,
+		create_time,
+		remark)
+		values
+		(
+		#{lotteryCode,jdbcType=INTEGER},
+		#{status,jdbcType=SMALLINT},
+		#{limitType,jdbcType=SMALLINT},
+		#{issueStart,jdbcType=VARCHAR},
+		#{issueEnd,jdbcType=VARCHAR},
+		#{timeStart,jdbcType=TIMESTAMP},
+		#{timeEnd,jdbcType=TIMESTAMP},
+		#{limitWay,jdbcType=SMALLINT},
+		#{createBy,jdbcType=VARCHAR},
+		#{modifyBy,jdbcType=VARCHAR},
+		now(),
+		now(),
+		now(),
+		#{remark,jdbcType=VARCHAR}
+		)
+	</insert>
+	<!-- 修改 -->
+	<update id="updLimit"
+		parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryLimitPO">
+		update LOTTERY_LIMIT ll
+		set ll.lottery_code = #{lotteryCode,jdbcType=INTEGER},
+		ll.`status` = #{status,jdbcType=SMALLINT},
+		ll.limit_type = #{limitType,jdbcType=SMALLINT},
+		ll.issue_start = #{issueStart,jdbcType=VARCHAR},
+		ll.issue_end = #{issueEnd,jdbcType=VARCHAR},
+		ll.time_start = #{timeStart,jdbcType=TIMESTAMP},
+		ll.time_end = #{timeEnd,jdbcType=TIMESTAMP},
+		ll.limit_way = #{limitWay,jdbcType=SMALLINT},
+		ll.modify_by = #{modifyBy,jdbcType=VARCHAR},
+		ll.modify_time = now(),
+		ll.update_time = now(),
+		ll.remark = #{remark,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<!-- 下面是限号内容相关操作 -->
+	<!-- 结果集:限号内容查询 -->
+	<resultMap id="LimitInfoResultMap"
+		type="com.hhly.skeleton.cms.lotterymgr.bo.LotteryLimitInfoBO">
+		<id property="id" column="id" jdbcType="INTEGER" />
+		<result property="limitId" column="limit_id" jdbcType="INTEGER" />
+		<result property="limitContent" column="limit_content"
+			jdbcType="VARCHAR" />
+		<result property="status" column="status" jdbcType="SMALLINT" />
+		<result property="lotteryChildCode" column="lottery_child_code"
+			jdbcType="INTEGER" />
+		<result property="updateTime" column="update_time" jdbcType="TIMESTAMP" />
+		<result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+		<association property="lotteryChild"
+			javaType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryChildBO">
+			<id property="id" column="lc_id" jdbcType="INTEGER" />
+			<result property="childName" column="child_name" jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+
+	<!-- sql语句块：限号内容查询 -->
+	<sql id="sql_statement_limit_info">
+		select lli.id,
+		lli.limit_id,
+		lli.limit_content,
+		lli.`status`,
+		lli.lottery_child_code,
+		lli.update_time,
+		lli.create_time,
+		lc.id lc_id,
+		lc.child_name
+		from LOTTERY_LIMIT_INFO lli left join LOTTERY_CHILD lc on lli.lottery_child_code = lc.lottery_child_code
+	</sql>
+	<!-- sql查询条件：限号内容查询 -->
+	<sql id="sql_condition_limit_info">
+		where 1 = 1
+		<if test="limitId != null">
+			and lli.limit_id = #{limitId,jdbcType=INTEGER}
+		</if>
+		<if test="limitContent != null and limitContent !=''">
+			and lli.limit_content like CONCAT('%',#{limitContent,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="status != null">
+			and lli.`status` = #{status,jdbcType=SMALLINT}
+		</if>
+		<if test="lotteryChildCode != null">
+			and lli.lottery_child_code = #{lotteryChildCode,jdbcType=INTEGER}
+		</if>
+	</sql>
+	<!-- sql排序：限号内容查询 -->
+	<sql id="sql_orderby_limit_info">
+		<choose>
+			<when test="sortField != null and sortField != ''">
+				order by ${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				order by lli.id desc
+			</otherwise>
+		</choose>
+	</sql>
+	<!-- 查询单条 ：限号内容查询 -->
+	<select id="findSingleLimitInfo"
+		parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryLimitInfoVO"
+		resultMap="LimitInfoResultMap">
+		<include refid="sql_statement_limit_info" />
+		<include refid="sql_condition_limit_info" />
+		LIMIT 1
+	</select>
+	<!-- 查询限号记录关联的内容列表 -->
+	<select id="findRelationLimitInfo" parameterType="int"
+		resultMap="LimitInfoResultMap">
+		<include refid="sql_statement_limit_info" />
+		where lli.limit_id = #{limitId,jdbcType=INTEGER}
+		order by lli.lottery_child_code,lli.id desc
+	</select>
+	<!-- 查询分页 ：限号内容查询 -->
+	<select id="findPagingLimitInfo"
+		parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryLimitInfoVO"
+		resultMap="LimitInfoResultMap">
+		<include refid="sql_statement_limit_info" />
+		<include refid="sql_condition_limit_info" />
+		<include refid="sql_orderby_limit_info" />
+		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+	<!-- 查询记录数 ：限号内容查询 -->
+	<select id="findCountLimitInfo"
+		parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryLimitInfoVO"
+		resultType="int">
+		select count(*) count from LOTTERY_LIMIT_INFO lli left join LOTTERY_CHILD lc on lli.lottery_child_code = lc.lottery_child_code
+		<include refid="sql_condition_limit_info" />
+	</select>
+	<!-- 新增 ：限号内容 -->
+	<insert id="addLimitInfo"
+		parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryLimitInfoPO">
+		insert into LOTTERY_LIMIT_INFO
+		(limit_id,
+		limit_content,
+		`status`,
+		lottery_child_code,
+		update_time,
+		create_time)
+		values
+		(#{limitId,jdbcType=INTEGER},
+		#{limitContent,jdbcType=VARCHAR},
+		#{status,jdbcType=SMALLINT},
+		#{lotteryChildCode,jdbcType=INTEGER},
+		now(),
+		now())
+	</insert>
+	<!-- 修改：限号内容 -->
+	<update id="updLimitInfo"
+		parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryLimitInfoPO">
+		update LOTTERY_LIMIT_INFO lli
+		set lli.limit_content = #{limitContent,jdbcType=VARCHAR},
+		lli.`status` = #{status,jdbcType=SMALLINT},
+		lli.lottery_child_code = #{lotteryChildCode,jdbcType=INTEGER},
+		lli.update_time = now()
+		where id = #{id, jdbcType=INTEGER}
+	</update>
+	<!-- 批量新增/修改：限号内容 -->
+	<insert id="saveLimitInfo" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="idx">
+			<choose>
+				<when test="item.id != null">
+					update LOTTERY_LIMIT_INFO lli
+					set lli.limit_content = #{item.limitContent,jdbcType=VARCHAR},
+					lli.`status` = #{item.status,jdbcType=SMALLINT},
+					lli.lottery_child_code = #{item.lotteryChildCode,jdbcType=INTEGER},
+					lli.update_time = now()
+					where id = #{item.id, jdbcType=INTEGER} ;
+				</when>
+				<otherwise>
+					insert into LOTTERY_LIMIT_INFO
+					(limit_id,
+					limit_content,
+					`status`,
+					lottery_child_code,
+					update_time,
+					create_time)
+					values
+					(#{item.limitId,jdbcType=INTEGER},
+					#{item.limitContent,jdbcType=VARCHAR},
+					#{item.status,jdbcType=SMALLINT},
+					#{item.lotteryChildCode,jdbcType=INTEGER},
+					now(),
+					now());
+				</otherwise>
+			</choose>
+		</foreach>
+	</insert>
+
+
+
+
+
+
+
+
+	<!--                                Used to LOTTO                    -->
+	
+	<!-- sql结果集：前端接口：彩种限号 -->
+	<resultMap id="LotteryLimitFrontResultMap"
+		type="com.hhly.skeleton.lotto.base.lottery.bo.LimitNumberInfoBO">
+		<result property="lotteryCode" column="lottery_code" jdbcType="INTEGER" />
+		<result property="status" column="status" jdbcType="SMALLINT" />
+		<result property="limitType" column="limit_type" jdbcType="SMALLINT" />
+		<result property="issueStart" column="issue_start" jdbcType="VARCHAR" />
+		<result property="issueEnd" column="issue_end" jdbcType="VARCHAR" />
+		<result property="timeStart" column="time_start" jdbcType="TIMESTAMP" />
+		<result property="timeEnd" column="time_end" jdbcType="TIMESTAMP" />
+		<result property="limitWay" column="limit_way" jdbcType="SMALLINT" />
+		<collection property="limitNumberList" column="id"
+			select="findRelationLimitInfoFront" />
+	</resultMap>
+
+	<!-- 前端接口：彩种限号，删除status,增加childName   join两张表映射有问题
+	<resultMap id="LotteryLimitFrontResultMap2"
+		type="com.hhly.skeleton.lotto.base.lottery.bo.LimitNumberInfoBO">
+		<id property="id" column="ID" jdbcType="DECIMAL"/>
+		<result property="lotteryCode" column="lottery_code" jdbcType="INTEGER" />
+		<result property="limitType" column="limit_type" jdbcType="SMALLINT" />
+		<result property="issueStart" column="issue_start" jdbcType="VARCHAR" />
+		<result property="issueEnd" column="issue_end" jdbcType="VARCHAR" />
+		<result property="timeStart" column="time_start" jdbcType="TIMESTAMP" />
+		<result property="timeEnd" column="time_end" jdbcType="TIMESTAMP" />
+		<result property="limitWay" column="limit_way" jdbcType="SMALLINT" />
+		<collection property="limitNumberList"
+			ofType="com.hhly.skeleton.lotto.base.lottery.bo.LimitNumberDetailBO">
+			<id property="limitId" column="LIMIT_ID" />
+			<result property="childName" column="child_name" jdbcType="VARCHAR" />
+			<result property="limitContent" column="limit_content"
+				jdbcType="VARCHAR" />
+			<result property="lotteryChildCode" column="lottery_child_code"
+				jdbcType="INTEGER" />
+		</collection>
+	</resultMap>
+	 -->
+
+	<resultMap id="LimitNumberDetailMap"
+		type="com.hhly.skeleton.lotto.base.lottery.bo.LimitNumberDetailBO">
+		<result property="lotteryChildName" column="child_name" jdbcType="VARCHAR" />
+		<result property="limitContent" column="limit_content"
+			jdbcType="VARCHAR" />
+		<result property="lotteryChildCode" column="lottery_child_code"
+			jdbcType="INTEGER" />
+		<result property="timeStart" column="time_start" jdbcType="TIMESTAMP" />
+		<result property="timeEnd" column="time_end" jdbcType="TIMESTAMP" />
+		<result property="issueStart" column="issue_start" jdbcType="VARCHAR" />
+		<result property="issueEnd" column="issue_end" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 前端接口：sql语句块：限号信息查询 -->
+	<sql id="front_sql_statement_limit">
+		select ll.id id,
+		ll.lottery_code,
+		ll.limit_type,
+		ll.issue_start,
+		ll.issue_end,
+		ll.time_start,
+		ll.time_end,
+		ll.limit_way
+		from LOTTERY_LIMIT ll
+	</sql>
+	<!-- sql结果集：前端接口：彩种限号内容 -->
+	<resultMap id="LotteryLimitContentFrontResultMap" type="com.hhly.skeleton.lotto.base.lottery.bo.LimitNumberDetailBO">
+		<result property="limitContent" column="limit_content" jdbcType="VARCHAR" />
+		<result property="lotteryChildCode" column="lottery_child_code" jdbcType="INTEGER" />
+		<result property="lotteryChildName" column="child_name" jdbcType="VARCHAR" />
+	</resultMap>
+	<!-- 前端接口：sql语句块：限号内容查询 -->
+	<sql id="front_sql_statement_limit_content">
+		select lli.limit_content,
+		lli.status,
+		lli.lottery_child_code
+		from LOTTERY_LIMIT_INFO lli
+	</sql>
+	<!-- 前端接口：查询单条限号信息 -->
+	<select id="findSingleLimitFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO"
+		resultMap="LotteryLimitFrontResultMap">
+		<include refid="front_sql_statement_limit" />
+		where ll.lottery_code = #{lotteryCode,jdbcType=INTEGER}
+		and ll.`status` = 1
+		LIMIT 1
+	</select>
+	<!-- 前端接口：查询关联限号内容 -->
+	<select id="findRelationLimitInfoFront" parameterType="int" resultMap="LotteryLimitContentFrontResultMap">
+		select lli.limit_content,
+			lli.lottery_child_code,
+			lc.child_name
+			from LOTTERY_LIMIT_INFO lli
+			left outer join LOTTERY_CHILD lc on lli.lottery_child_code = lc.lottery_child_code
+			where lli.limit_id = #{limitId,jdbcType=INTEGER}
+			and lli.`status` = 1
+			order by lli.lottery_child_code,lli.id desc
+	</select>
+	<!-- 前端接口：查询多条限号信息 -->
+  	<select id="findMultipleLimitFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="LotteryLimitFrontResultMap">
+	<include refid="front_sql_statement_limit" />
+	 where ll.lottery_code = #{lotteryCode,jdbcType=INTEGER}
+	   <if test="status != null">
+			and ll.`status` = #{status,jdbcType=SMALLINT}
+	   </if>
+	   <if test="limitDate != null">
+	   		<![CDATA[ and ll.time_start <= #{limitDate} and ll.time_end >= #{limitDate}]]>
+	   </if>
+  	</select>
+  	<!-- join两张表映射有问题
+	<select id="findMultipleLimitFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO"
+		resultMap="LotteryLimitFrontResultMap2">
+		SELECT LL.ID,
+		LL.LOTTERY_CODE,
+		LL.LIMIT_TYPE,
+		LL.ISSUE_START,
+		LL.ISSUE_END,
+		LL.TIME_START,
+		LL.TIME_END,
+		LL.LIMIT_WAY,
+		LLI.LIMIT_CONTENT,
+		LLI.LIMIT_ID,
+		LC.CHILD_NAME,
+		LC.LOTTERY_CHILD_CODE
+		FROM LOTTERY_LIMIT LL
+		LEFT OUTER JOIN LOTTERY_LIMIT_INFO LLI ON LL.ID = LLI.LIMIT_ID
+		LEFT OUTER JOIN LOTTERY_CHILD LC ON LLI.LOTTERY_CHILD_CODE = LC.LOTTERY_CHILD_CODE
+		WHERE LL.LOTTERY_CODE = #{lotteryCode,jdbcType=INTEGER}
+		lottery_limit_info表 0：禁用；1：启用
+		and lli.status = 1
+		<if test="status != null">
+			and ll.status = #{status,jdbcType=SMALLINT}
+		</if>
+		<if test="limitDate != null">
+  		   		<![CDATA[ and ll.time_start <= #{limitDate} and ll.time_end >= #{limitDate}]]>
+		</if>
+	</select>
+	 -->
+
+	<!-- 根据参数只查询特定子玩法的限号 -->
+	<select id="findMultipleLimitFrontByChild" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO"
+		resultMap="LimitNumberDetailMap">
+		select
+		ll.TIME_START,ll.TIME_END,ll.ISSUE_START,ll.ISSUE_END,lli.limit_content,lc.child_name,lc.lottery_child_code
+		from LOTTERY_LIMIT ll
+		left outer join LOTTERY_LIMIT_INFO lli on ll.id = lli.limit_id
+		left outer join LOTTERY_CHILD lc on lli.lottery_child_code = lc.lottery_child_code
+		where ll.lottery_code = #{lotteryCode,jdbcType=INTEGER}
+		<!-- lottery_limit_info表 0：禁用；1：启用 -->
+		and lli.`status` = 1
+		<if test="status != null">
+			and ll.`status` = #{status,jdbcType=SMALLINT}
+		</if>
+		<if test="limitDate != null">
+  		   		<![CDATA[ and ll.time_start <= #{limitDate} and ll.time_end >= #{limitDate}]]>
+		</if>
+		<if test="subPlays != null">
+			and lli.lottery_child_code in
+			<foreach collection="subPlays" item="subPlay" open="(" close=")"
+				separator=",">
+				#{subPlay}
+			</foreach>
+		</if>
+	</select>
+</mapper>

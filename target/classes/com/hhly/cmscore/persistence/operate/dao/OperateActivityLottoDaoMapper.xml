@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityLottoDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityLottoBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_config_id" jdbcType="DECIMAL" property="activityConfigId" />
+    <result column="lottery_code" jdbcType="INTEGER" property="lotteryCode" />
+    <result column="lottery_child_code" jdbcType="INTEGER" property="lotteryChildCode" />
+    <result column="lottery_child_name" jdbcType="VARCHAR" property="lotteryChildName" />
+    <result column="pick_type" jdbcType="TINYINT" property="pickType" />
+    <result column="buy_type" jdbcType="TINYINT" property="buyType" />
+    <result column="content_type" jdbcType="TINYINT" property="contentType" />
+  </resultMap>
+  
+<sql id="sql_condition_OperateActivityLottoVO">
+		<where>
+		     <if test="id != null">
+		       and id = #{id,jdbcType=INTEGER}
+		      </if>
+		      <if test="activityConfigId != null">
+		        and activity_config_id = #{activityConfigId,jdbcType=INTEGER}
+		      </if>	  
+		</where>
+	</sql> 
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityLottoPO" useGeneratedKeys="true" keyProperty="id">
+    insert into operate_activity_lotto ( activity_config_id, lottery_code, lottery_child_code, pick_type, buy_type, content_type,
+ 		modify_time, create_time, update_time, modify_by, create_by
+      )
+    values ( #{activityConfigId,jdbcType=DECIMAL}, #{lotteryCode,jdbcType=INTEGER}, #{lotteryChildCode,jdbcType=INTEGER},
+    	#{pickType,jdbcType=TINYINT},#{buyType,jdbcType=TINYINT},#{contentType,jdbcType=TINYINT},
+    	#{modifyTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}
+      )
+  </insert>
+
+<insert id="mergeBatch" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityConfigPO">
+    insert into operate_activity_lotto (id,activity_config_id, lottery_code, lottery_child_code, pick_type, buy_type, content_type,
+     	modify_time, create_time, update_time, modify_by, create_by )
+    	values
+		<foreach collection="operateActivityLottoRulePOList" item="po" separator=",">
+			(
+          	#{po.id,jdbcType=INTEGER}, #{id,jdbcType=DECIMAL}, #{po.lotteryCode,jdbcType=INTEGER}, #{po.lotteryChildCode,jdbcType=INTEGER},
+    	#{po.pickType,jdbcType=TINYINT},#{po.buyType,jdbcType=TINYINT},#{po.contentType,jdbcType=TINYINT},
+    	now(), now(), now(), #{modifyBy,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}
+			)
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+			activity_config_id	= values(activity_config_id), 
+	       	lottery_code = values(lottery_code),
+		      lottery_child_code = values(lottery_child_code),
+		      pick_type = values(pick_type),
+		      buy_type = values(buy_type),
+		      content_type = values(content_type),
+		      modify_time = now()	,
+		      create_time = now()	,
+		      update_time = now()	,
+		      modify_by = values(modify_by),
+		      create_by = values(create_by) 
+  </insert>
+  
+  <delete id="deleteBatch" parameterType="java.util.List">
+    delete from operate_activity_lotto
+    where id in 
+    <foreach collection="list" item="id" open="(" close=")" separator=",">
+    	#{id,jdbcType=INTEGER}
+    </foreach>
+  </delete>
+  
+     <select id="findList" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateCouponTempVO" resultMap="BaseResultMap">
+  		select 
+  		oal.id, oal.activity_config_id, oal.lottery_code, oal.lottery_child_code, oal.pick_type, oal.buy_type, oal.content_type ,
+  		lc.child_name lottery_child_name
+  		from 
+  		operate_activity_lotto oal
+  		join lottery_child lc on oal.lottery_code = oal.lottery_code and oal.lottery_child_code = lc.lottery_child_code
+  		<include refid="sql_condition_OperateActivityLottoVO" />
+  </select>
+  
+</mapper>

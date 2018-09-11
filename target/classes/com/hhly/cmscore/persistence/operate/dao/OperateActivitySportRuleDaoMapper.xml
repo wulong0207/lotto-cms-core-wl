@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivitySportRuleDaoMapper">
+
+	<resultMap id="BoResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityConfigBO">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="activity_code" jdbcType="VARCHAR" property="activityCode" />
+		<result column="lottery_code" jdbcType="INTEGER" property="lotteryCode" />
+		<result column="single_order_money" jdbcType="DECIMAL" property="singleOrderMoney" />
+		<result column="single_user_red_money" jdbcType="DECIMAL" property="singleUserRedMoney" />
+		<result column="single_user_money" jdbcType="DECIMAL" property="singleUserMoney" />
+		<result column="single_user_day_money" jdbcType="DECIMAL" property="singleUserDayMoney" />
+		<result column="real_user_num" jdbcType="SMALLINT" property="realUserNum" />
+		<result column="user_type" jdbcType="TINYINT" property="userType" />
+		<result column="is_follow_order" jdbcType="BIT" property="isFollowOrder" />
+		<result column="is_care_order" jdbcType="BIT" property="isCareOrder" />
+		<result column="is_mobile" jdbcType="BIT" property="isMobile" />
+		<result column="Is_real_user" jdbcType="BIT" property="isRealUser" />
+		<result column="installment" jdbcType="TINYINT" property="installment" />
+		<result column="installment_money" jdbcType="VARCHAR" property="installmentMoney" />
+		<result column="offer_num" jdbcType="SMALLINT" property="offerNum" />
+		<result column="offer_money" jdbcType="DECIMAL" property="offerMoney" />
+		<result column="platfrom" jdbcType="VARCHAR" property="platfrom" />
+		<result column="status" jdbcType="BIT" property="status" />
+		<result column="create_by" jdbcType="VARCHAR" property="createBy" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+		<result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="url" jdbcType="VARCHAR" property="url" />
+		<collection property="operateActivitySportRuleBOList" column="id"  javaType="java.util.ArrayList" resultMap="SportRuleResultMap"/>
+	</resultMap>
+
+	<resultMap id="SportRuleResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivitySportRuleBO">
+		<id column="sport_id" jdbcType="INTEGER" property="id" />
+		<result column="activity_config_id" jdbcType="INTEGER" property="activityConfigId" />
+		<result column="lottery_child_code" jdbcType="VARCHAR" property="lotteryChildCode" />
+		<result column="lottery_pass_type" jdbcType="VARCHAR" property="lotteryPassType" />
+		<result column="match_status" javaType="INTEGER" property="matchStatus" />
+		<result column="rule_type" jdbcType="BIT" property="ruleType" />
+		<result column="rule_start" jdbcType="VARCHAR" property="ruleStart" />
+		<result column="rule_end" jdbcType="VARCHAR" property="ruleEnd" />
+		<result column="pass_add" jdbcType="VARCHAR" property="passAdd" />
+		<result column="openStatus" jdbcType="BIT" property="openStatus" />
+		<result column="match_name" jdbcType="VARCHAR" property="matchName" />
+		<result column="official_match_code" jdbcType="VARCHAR" property="officialMatchCode" />
+		<result column="system_code" jdbcType="VARCHAR" property="systemCode" />
+		<result column="home_name" jdbcType="VARCHAR" property="homeName" />
+		<result column="visiti_name" jdbcType="VARCHAR" property="visitiName" />
+		<result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+		<result column="sale_end_time" jdbcType="TIMESTAMP" property="saleEndTime" />
+		<!--<result column="create_by" jdbcType="VARCHAR" property="createBy" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+		<result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
+	</resultMap>
+
+
+	<select id="findSportAgainstInfo" resultType="com.hhly.skeleton.lotto.base.operate.bo.SportAgainstBO"  parameterType="com.hhly.skeleton.cms.operatemgr.vo.SportAgainstVO">
+		SELECT
+			sai.official_match_code officialMatchCode,
+			sai.system_code systemCode,
+			sai.match_name matchName,
+			sai.home_name homeName,
+			sai.visiti_name visitiName,
+			sai.sale_end_time saleEndTime,
+			sai.start_time startTime,
+			sai.match_status matchStatus
+		FROM
+			sport_against_info sai LEFT JOIN sport_status_fb ssf ON sai.id = ssf.sport_against_info_id
+		WHERE 1 = 1
+		AND sai.match_status = 9
+		<choose>
+			<when test="lotteryCode != null">
+				AND sai.lottery_code = #{lotteryCode}
+			</when>
+			<otherwise>
+				AND sai.lottery_code = 300
+				AND (ssf.status_wdf = 1 OR ssf.status_let_wdf = 1)
+			</otherwise>
+		</choose>
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow}, #{pageSize}
+		</if>
+	</select>
+
+	<!--查询当前彩种总记录总数-->
+	<select id="findTotal" resultType="int" parameterType="com.hhly.skeleton.cms.operatemgr.vo.SportAgainstVO">
+		select
+			count(*) total
+		FROM
+			sport_against_info sai LEFT JOIN sport_status_fb ssf ON sai.id = ssf.sport_against_info_id
+		WHERE 1 =1
+		AND sai.match_status = 9
+		<choose>
+			<when test="lotteryCode != null">
+				AND sai.lottery_code = #{lotteryCode}
+			</when>
+			<otherwise>
+				AND sai.lottery_code = 300
+				AND (ssf.status_wdf = 1 OR ssf.status_let_wdf = 1)
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findSportRule"
+			parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityConfigVO" resultMap="BoResultMap">
+		SELECT
+			oac.id, oac.activity_code, oac.lottery_code, oac.single_order_money,
+			oac.single_user_red_money, oac.single_user_money,
+			oac.single_user_day_money, oac.real_user_num, oac.user_type,
+			oac.is_follow_order, oac.is_care_order,
+			oac.is_mobile, oac.Is_real_user, oac.installment, oac.installment_money,
+			oac.offer_num, oac.offer_money,
+			oac.platfrom, oac.status, oac.create_by, oac.create_time, oac.modify_by,
+			oac.modify_time, oac.update_time, oac.url,
+			oasr.id sport_id,
+			oasr.activity_config_id,
+			oasr.lottery_child_code,
+			oasr.lottery_pass_type,
+			oasr.system_code,
+			oasr.rule_type,
+			oasr.rule_start,
+			oasr.rule_end,
+			oasr.pass_add,
+			oasr.status openStatus,
+			sai.match_status,
+			sai.match_name,
+			sai.official_match_code,
+			sai.system_code,
+			sai.home_name,
+			sai.visiti_name,
+			sai.start_time,
+			sai.sale_end_time
+		FROM operate_activity_config oac
+		LEFT JOIN operate_activity_sport_rule oasr  ON oac.id = oasr.activity_config_id
+		LEFT JOIN sport_against_info sai  ON oasr.system_code = sai.system_code
+		<where>
+			<if test="id != null">
+				AND oac.id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="activityCode != null">
+				AND oac.activity_code = #{activityCode,jdbcType=VARCHAR}
+			</if>
+		</where>
+		GROUP BY oasr.system_code
+		ORDER BY oasr.modify_time DESC
+	</select>
+
+	<insert id="mergeBatch" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityConfigPO">
+		insert into operate_activity_sport_rule
+		(
+			id,
+			activity_config_id,
+			lottery_child_code,
+			lottery_pass_type,
+			system_code,
+			rule_type,
+			rule_start,
+			rule_end,
+			pass_add,
+			status,
+			create_by,
+			create_time,
+			modify_by,
+			modify_time
+		)
+		values
+		<foreach collection="operateActivitySportRulePOList" item="po" separator=",">
+			(
+				#{po.id, jdbcType=INTEGER},
+				#{id, jdbcType=INTEGER},
+				#{po.lotteryChildCode, jdbcType=VARCHAR},
+				#{po.lotteryPassType, jdbcType=VARCHAR},
+				#{po.systemCode, jdbcType=VARCHAR},
+				#{po.ruleType, jdbcType=BIT},
+				#{po.ruleStart, jdbcType=VARCHAR},
+				#{po.ruleEnd, jdbcType=VARCHAR},
+				#{po.passAdd, jdbcType=VARCHAR},
+				#{po.openStatus, jdbcType=INTEGER},
+				#{po.createBy, jdbcType=VARCHAR},
+				now(),
+				#{po.modifyBy, jdbcType=VARCHAR},
+				#{po.modifyTime, jdbcType=TIMESTAMP}
+			)
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+			activity_config_id = values(activity_config_id),
+			lottery_child_code	= values(lottery_child_code),
+			lottery_pass_type = values(lottery_pass_type),
+			system_code = values(system_code),
+			rule_type	= values(rule_type),
+			rule_start	= values(rule_start),
+			rule_end	= values(rule_end),
+			pass_add = values(pass_add),
+			status = values(status),
+			modify_by = values(modify_by),
+			modify_time = now()
+	</insert>
+
+	<insert id="insertSportRule" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivitySportRulePO" useGeneratedKeys="true" keyProperty="id">
+		insert into operate_activity_sport_rule
+		(
+			activity_config_id,
+			lottery_child_code,
+			lottery_pass_type,
+			system_code,
+			rule_type,
+			rule_start,
+			rule_end,
+			pass_add,
+			status,
+			create_by,
+			create_time,
+			modify_by,
+			modify_time
+		)
+		values
+		(
+			#{activityConfigId, jdbcType=INTEGER},
+			#{lotteryChildCode, jdbcType=VARCHAR},
+			#{lotteryPassType, jdbcType=VARCHAR},
+			#{systemCode, jdbcType=VARCHAR},
+			#{ruleType, jdbcType=BIT},
+			#{ruleStart, jdbcType=VARCHAR},
+			#{ruleEnd, jdbcType=VARCHAR},
+			#{passAdd, jdbcType=VARCHAR},
+			#{openStatus, jdbcType=INTEGER},
+			#{createBy, jdbcType=VARCHAR},
+			now(),
+			#{modifyBy, jdbcType=VARCHAR},
+			#{modifyTime, jdbcType=TIMESTAMP}
+		)
+	</insert>
+
+	<update id="updateSportRule" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivitySportRulePO">
+		UPDATE
+			operate_activity_sport_rule
+		SET
+			pass_add = #{passAdd, jdbcType=VARCHAR},
+			status = #{openStatus, jdbcType=INTEGER},
+			modify_time = now()
+		WHERE
+			id = #{id, jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteBatch" parameterType="java.util.List">
+		delete from operate_activity_sport_rule
+		where id in
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id,jdbcType=INTEGER}
+		</foreach>
+	</delete>
+
+	<select id="findSportRuleList" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivitySportRuleBO">
+		SELECT
+			oasr.id sport_id,
+			oasr.activity_config_id,
+			oasr.lottery_child_code,
+			oasr.lottery_pass_type,
+			oasr.system_code,
+			oasr.rule_type,
+			oasr.rule_start,
+			oasr.rule_end,
+			oasr.pass_add,
+			oasr.status openStatus,
+			oasr.modify_time
+		FROM  operate_activity_sport_rule oasr WHERE oasr.activity_config_id = #{activityConfigId}
+	</select>
+
+</mapper>

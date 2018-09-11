@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.customer.dao.UserIssueDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.customermgr.bo.UserIssueBO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="account_name" property="accountName" jdbcType="VARCHAR" />
+    <result column="levle" property="levle" jdbcType="INTEGER" />
+    <result column="recent_record" property="recentRecord" jdbcType="VARCHAR" />
+    <result column="hit_rate" property="hitRate" jdbcType="DECIMAL" />
+    <result column="profit_rate" property="profitRate" jdbcType="DECIMAL" />
+    <result column="focus_num" property="focusNum" jdbcType="INTEGER" />
+    <result column="issue_num" property="issueNum" jdbcType="INTEGER" />
+    <result column="issue_amount" property="issueAmount" jdbcType="DECIMAL" />
+    <result column="hit_num" property="hitNum" jdbcType="INTEGER" />
+    <result column="hit_money" property="hitMoney" jdbcType="DECIMAL" />
+    <result column="commission_amount" property="commissionAmount" jdbcType="DECIMAL" />
+    <result column="follow_num" property="followNum" jdbcType="INTEGER" />
+    <result column="follow_amount" property="followAmount" jdbcType="INTEGER" />
+    <result column="win_amount" property="winAmount" jdbcType="DECIMAL" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="continue_hit" property="continueHit" jdbcType="BIT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="ExcelResultMap" type="com.hhly.skeleton.cms.customermgr.bo.UserIssueExcelBO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="account_name" property="accountName" jdbcType="VARCHAR" />
+    <result column="levle" property="levle" jdbcType="VARCHAR" />
+    <result column="recent_record" property="recentRecord" typeHandler="com.hhly.cmscore.persistence.customer.typehandler.UserIssueExcelTypeHandler" />
+    <result column="hit_rate" property="hitRate" jdbcType="DECIMAL" />
+    <result column="profit_rate" property="profitRate" jdbcType="DECIMAL" />
+    <result column="issue_num" property="issueNum" jdbcType="INTEGER" />
+    <result column="issue_amount" property="issueAmount" jdbcType="DECIMAL" />
+    <result column="hit_num" property="hitNum" jdbcType="INTEGER" />
+    <result column="hit_money" property="hitMoney" jdbcType="DECIMAL" />
+    <result column="commission_amount" property="commissionAmount" jdbcType="DECIMAL" />
+    <result column="follow_num" property="followNum" jdbcType="INTEGER" />
+    <result column="follow_amount" property="followAmount" jdbcType="INTEGER" />
+    <result column="win_amount" property="winAmount" jdbcType="DECIMAL" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+  </resultMap>
+     
+	<select id="count" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserIssueVO"
+		resultType="int">
+		select count(1) from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+	
+	<select id="find" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserIssueVO" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+		<include refid="Limit_Condition" />
+	</select>
+	
+	<select id="excel" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserIssueVO" resultMap="ExcelResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+
+	<update id="update" parameterType="com.hhly.cmscore.persistence.customer.po.UserIssuePO" >
+	    update 
+	    m_user_issue_info
+	    <set >
+	      <if test="status != null" >
+	        status = #{status},
+	      </if>
+	    </set>
+		<where>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+		</where>
+	  </update>
+
+	<sql id="Table">
+		m_user_issue_info issue
+		<if test="joinUser" >
+		left join m_user_info userInfo on issue.user_id = userInfo.id
+		</if>
+		<if test="joinIssueLevel" >
+		left join m_user_issue_level level on issue.id = level.user_issue_info_id
+		</if>
+		<if test="joinOrderIssue" >
+		left join order_issue_info orderIssue on issue.id = orderIssue.user_issue_id
+		</if>
+	</sql>
+
+  <sql id="Base_Column_List" >
+    issue.id,
+    issue.status, 
+    issue.recent_record,
+    issue.hit_rate, 
+    issue.profit_rate,
+    issue.focus_num,
+    issue.issue_num,
+    issue.issue_amount, 
+    issue.hit_num, 
+    issue.hit_money, 
+    issue.commission_amount, 
+    issue.follow_num, 
+    issue.follow_amount, 
+    issue.win_amount, 
+    issue.create_time,
+    <if test="joinUser">
+    	userInfo.account_name,
+    </if> 
+    issue.continue_hit,
+    issue.remark
+  </sql>
+  
+	<sql id="Where_Clause">
+		<where>
+			<if test="id != null">
+				and issue.id = #{id}
+			</if>
+			<if test="ids != null and ids.size>0">
+				and issue.id in
+				<foreach collection="ids" open="(" item="id" separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="negativeIds != null and negativeIds.size>0">
+				and issue.id not in
+				<foreach collection="negativeIds" open="(" item="nid" separator="," close=")">
+					#{nid}
+				</foreach>
+			</if>
+			<if test="status != null">
+				and issue.status = #{status}
+			</if>
+			<if test="joinIssueLevel and lotteryCode!= null">
+				and level.lottery_code = #{lotteryCode}
+			</if>
+			<if test="joinIssueLevel and level!= null">
+				and level.level = #{level}
+			</if>
+			<if test="userType != null and userTypeValue != null and userTypeValue != ''">
+				<choose>
+					<when test="userType == 0">
+						and userInfo.NICK_NAME like CONCAT('%',#{userTypeValue},'%')
+					</when>
+					<when test="userType == 1">
+						and userInfo.ACCOUNT_NAME like CONCAT('%',#{userTypeValue},'%')
+					</when>
+					<when test="userType == 2">
+						and userInfo.CUS_MOBILE = #{userTypeValue}
+					</when>
+					<when test="userType == 3">
+						and issue.user_id = #{userTypeValue}
+					</when>
+				</choose>
+			</if>
+			<if test="timeType != null and startTime != null and endTime != null">
+				<choose>
+					<when test="timeType == 1">
+						<![CDATA[ and issue.create_time >= #{startTime} and issue.create_time <= #{endTime}]]>
+					</when>
+					<when test="timeType == 2">
+						<![CDATA[ and orderIssue.create_time >= #{startTime} and orderIssue.create_time <= #{endTime}]]>
+					</when>
+				</choose>
+			</if>
+		</where>
+	</sql>
+
+	<sql id="Limit_Condition">
+		<if test="startRow != null and endRow !=null">
+			limit #{startRow},#{endRow}
+		</if>
+	</sql>
+</mapper>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateImgDaoMapper">
+	<resultMap id="BaseResultMap"
+		type="com.hhly.cmscore.persistence.operate.po.OperateImgPO">
+		<result column="ID" jdbcType="DECIMAL" property="id" />
+		<result column="NAME" jdbcType="VARCHAR" property="name" />
+		<result column="GROUPID" jdbcType="DECIMAL" property="groupid" />
+		<result column="DIR" jdbcType="VARCHAR" property="dir" />
+		<result column="RESOLUTION" jdbcType="VARCHAR" property="resolution" />
+		<result column="SIZES" jdbcType="VARCHAR" property="sizes" />
+		<result column="MODIFY_BY" jdbcType="OTHER" property="modifyBy" />
+		<result column="MODIFY_TIME" jdbcType="DATE" property="modifyTime" />
+		<result column="CREATE_BY" jdbcType="OTHER" property="createBy" />
+		<result column="UPDATE_TIME" jdbcType="DATE" property="updateTime" />
+		<result column="CREATE_TIME" jdbcType="DATE" property="createTime" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, NAME, GROUPID, DIR, RESOLUTION, SIZES, MODIFY_BY, MODIFY_TIME,
+		CREATE_BY, UPDATE_TIME,
+		CREATE_TIME
+	</sql>
+
+	<sql id="Column_List">
+		ID,NAME,DIR,RESOLUTION,SIZES,
+		CREATE_BY CREATEBY,
+		CREATE_TIME CREATETIME
+	</sql>
+	<sql id="sql_condition_OperateImgVO">
+		<where>
+			<if test="name != null and name != ''">
+				and NAME  like '%${name}%'
+			</if>
+			<if test="groupid != null">
+				and GROUPID = #{groupid,jdbcType=DECIMAL}
+			</if>
+			<if test="dir != null and dir !=''">
+				and DIR = #{dir}
+			</if>
+			<if test="id != null">
+				and id = #{id,jdbcType=DECIMAL}
+			</if>
+		</where>
+	</sql>
+	<select id="findList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateImgVO"
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateImgBO">
+		select t.* from (
+		select
+		<include refid="Column_List" />
+		from OPERATE_IMG
+		<include refid="sql_condition_OperateImgVO" />
+		order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				id
+			</otherwise>
+		</choose>
+		) as t
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow} ,#{pageSize}
+		</if>		
+	</select>
+	<select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateImgVO"
+		resultType="int">
+		select count(*)
+		from OPERATE_IMG
+		<include refid="sql_condition_OperateImgVO" />
+	</select>
+	<insert id="addOperateImg">
+			insert into OPERATE_IMG (NAME, GROUPID,
+			DIR, RESOLUTION, SIZES,
+			MODIFY_BY, MODIFY_TIME, CREATE_BY,
+			UPDATE_TIME, CREATE_TIME)
+			values
+		<foreach collection="images" item="item" separator="," >			
+			 (#{item.name,jdbcType=VARCHAR},
+			#{item.groupid,jdbcType=DECIMAL},
+			#{item.url,jdbcType=VARCHAR}, #{item.resolution,jdbcType=VARCHAR}, #{item.sizes,jdbcType=VARCHAR},
+			#{item.createBy,jdbcType=OTHER}, now(),
+			#{item.createBy,jdbcType=OTHER},
+			now(), now())
+		</foreach>
+	</insert>
+	<update id ="updOperateImg" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateImgVO"> 
+		update OPERATE_IMG
+	    set 
+	      NAME = #{name,jdbcType=VARCHAR},
+	      MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+	      MODIFY_TIME = now(),
+	      UPDATE_TIME = now()
+	  	where ID = #{id,jdbcType=DECIMAL}
+	</update>
+	<select id ="listOperateImgInfo" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateImgBO">
+	    select
+		<include refid="Column_List" />
+		from OPERATE_IMG
+		where id in (
+		  <foreach collection="ids" item="item" separator=",">
+		  	 #{item}
+		  </foreach>
+		)
+	</select> 
+	<delete id="delOperateImg"> 
+	   delete from OPERATE_IMG 
+	   where id in (
+	      <foreach collection="ids" item="item" separator=",">
+		  	 #{item}
+		  </foreach>
+	   )
+	</delete>
+	<update id ="updOperateImgMove"> 
+		update OPERATE_IMG
+	    set 
+	      GROUPID = #{groupid},
+	      MODIFY_BY = #{modifyBy},
+	      MODIFY_TIME = now(),
+	      UPDATE_TIME = now()
+	  	where id in (
+	      <foreach collection="ids" item="item" separator=",">
+		  	 #{item}
+		  </foreach>
+	   )
+	</update>
+	<select id ="getOperateImg" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateImgVO" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateImgBO">
+	  select
+		<include refid="Column_List" />
+	  from OPERATE_IMG
+		<include refid="sql_condition_OperateImgVO" />
+	</select>
+	<select id="findImageByName" resultType="String">
+	  SELECT
+		NAME
+	  FROM
+		operate_img
+	  WHERE
+		NAME in (
+		   <foreach collection="images" separator="," item="item">
+		      #{item}
+		   </foreach>
+		)
+	</select>
+</mapper>

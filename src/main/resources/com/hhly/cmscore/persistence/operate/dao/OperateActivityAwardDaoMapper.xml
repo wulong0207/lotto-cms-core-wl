@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityAwardDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityAwardBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="award_color" jdbcType="VARCHAR" property="awardColor" />
+      <result column="award_img" jdbcType="VARCHAR" property="awardImg" />
+    <result column="award_text" jdbcType="VARCHAR" property="awardText" />
+    <result column="probability" jdbcType="DECIMAL" property="probability" />
+    <result column="order_id" jdbcType="SMALLINT" property="orderId" />
+    <result column="type" jdbcType="BIT" property="type" />
+    <result column="type_code" jdbcType="VARCHAR" property="typeCode" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List">
+    id, award_color, award_img, award_text, probability, order_id, type, type_code, modify_time,
+    modify_by, create_time, create_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from operate_activity_award
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from operate_activity_award
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityAwardPO">
+    insert into operate_activity_award (id, award_color, award_img, award_text,
+      probability, order_id, type, 
+      type_code, modify_time, modify_by, 
+      create_time, create_by, update_time,activity_config_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{awardColor,jdbcType=VARCHAR}, #{awardImg,jdbcType=VARCHAR}, #{awardText,jdbcType=VARCHAR},
+      #{probability,jdbcType=DECIMAL}, #{orderId,jdbcType=SMALLINT}, #{type,jdbcType=BIT}, 
+      #{typeCode,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, 
+      now(), #{createBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{activityConfigId}
+      )
+  </insert>
+  <insert id="merge"
+		parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityAwardPO" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO operate_activity_award 
+		 (
+		 	  id, award_color, award_img, award_text,
+		      probability, order_id, type,
+		      type_code, modify_time, modify_by, 
+		      create_time, create_by, update_time,activity_config_id
+		)
+		VALUES(
+			#{id,jdbcType=INTEGER}, #{awardColor,jdbcType=VARCHAR}, #{awardImg,jdbcType=VARCHAR}, #{awardText,jdbcType=VARCHAR},
+      #{probability,jdbcType=DECIMAL}, #{orderId,jdbcType=SMALLINT}, #{type,jdbcType=BIT}, 
+      #{typeCode,jdbcType=VARCHAR}, now(), #{modifyBy,jdbcType=VARCHAR}, 
+     	now(), #{createBy,jdbcType=VARCHAR}, now(), #{activityConfigId}
+		)
+		ON DUPLICATE KEY
+		UPDATE
+		award_color=#{awardColor,jdbcType=VARCHAR},
+		award_img=#{awardImg,jdbcType=VARCHAR},
+		award_text= #{awardText,jdbcType=VARCHAR}, 
+		probability= #{probability,jdbcType=DECIMAL}, 
+		order_id=#{orderId,jdbcType=SMALLINT}, 
+		type=#{type,jdbcType=BIT}, 
+		type_code=#{typeCode,jdbcType=VARCHAR},
+		modify_time=now(),
+		modify_by=#{modifyBy,jdbcType=VARCHAR}
+	</insert>
+  <update id="updateByPrimaryKey" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityAwardVO">
+    update operate_activity_award
+    set award_color = #{awardColor,jdbcType=VARCHAR},
+      award_img=#{awardImg,jdbcType=VARCHAR},
+      award_text = #{awardText,jdbcType=VARCHAR},
+      probability = #{probability,jdbcType=DECIMAL},
+      order_id = #{orderId,jdbcType=SMALLINT},
+      type = #{type,jdbcType=BIT},
+      type_code = #{typeCode,jdbcType=VARCHAR},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_by = #{modifyBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateOrderIds" parameterType="java.util.List">   
+	    <foreach collection="list" item="item" index="index" open="" close="" separator=";">  
+	        update operate_activity_award
+	    	set order_id = #{item.orderId,jdbcType=SMALLINT}    
+	    	where id = #{item.id,jdbcType=INTEGER}
+	    </foreach>  
+  </update>
+</mapper>

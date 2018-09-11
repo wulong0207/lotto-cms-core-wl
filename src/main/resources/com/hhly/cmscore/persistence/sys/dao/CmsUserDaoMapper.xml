@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.sys.dao.CmsUserDaoMapper">
+
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sysmgr.bo.CMSUserBO" >
+        <id column="USER_ID" property="userId" jdbcType="INTEGER" />
+        <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
+        <result column="DEPART" property="depart" jdbcType="INTEGER" />
+        <result column="USER_MOBILE" property="userMobile" jdbcType="INTEGER" />
+        <result column="USER_STATUS" property="userStatus" jdbcType="INTEGER" />
+        <result column="USER_PASSWORD" property="userPassword" jdbcType="VARCHAR" />
+        <result column="USER_REAL_NAME" property="userRealName" jdbcType="VARCHAR" />
+        <result column="USER_EMAIL" property="userEmail" jdbcType="VARCHAR" />
+        <result column="CMS_ROLE_ID" property="cmsRoleId" jdbcType="INTEGER" />
+        <result column="LAST_LOGIN_TIME" property="lastLoginTime" jdbcType="TIMESTAMP" />
+        <result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+        <result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR" />
+        <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+        <result column="USER_CNAME" property="userCname" jdbcType="VARCHAR" />
+        <result column="HEAD_URL" property="headUrl" jdbcType="VARCHAR" />
+        
+        <result column="MONTH_LOGIN_COUNT" property="monthLoginCount" jdbcType="INTEGER" />
+        <result column="LAST_LOGIN_IP" property="lastLoginIp" jdbcType="VARCHAR" />
+        <result column="THIS_LOGIN_TIME" property="thisLoginTime" jdbcType="TIMESTAMP" />
+        <result column="THIS_LOGIN_IP" property="thisLoginIP" jdbcType="VARCHAR" />
+        
+    </resultMap>
+
+    <resultMap id="LoginResultMap" type="com.hhly.skeleton.cms.sysmgr.bo.CMSUserLoginBO" extends="BaseResultMap">
+        <collection property="userMenus" ofType="com.hhly.skeleton.cms.sysmgr.bo.CMSUserMenuBO" column="userId">
+            <id column="USER_MENU_ID" property="userMenuId"/>
+            <result column="UID" property="userId"/>
+            <result column="MENU_ID" property="menuId"/>
+            <result column="USER_AUTH" property="userAuth"/>
+            <result column="MENU_URL" property="url"/>
+            <result column="MENU_BUTTON" property="menuButton"/>
+            <result column="PARENT_MENU_ID" property="parentMenuId"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        ID as USER_ID, USER_NAME, DEPART, USER_MOBILE, USER_STATUS, USER_PASSWORD, USER_REAL_NAME,
+        USER_EMAIL, CMS_ROLE_ID, LAST_LOGIN_TIME, MODIFY_TIME, MODIFY_BY, CREATE_BY, UPDATE_TIME,
+        CREATE_TIME, REMARK,USER_CNAME,HEAD_URL
+    </sql>
+
+    <sql id="selectParamSql">
+        <if test="roleId != null">
+            AND CMS_ROLE_ID = #{roleId,jdbcType=INTEGER}
+        </if>
+        <if test="depart != null">
+            AND DEPART = #{depart,jdbcType=INTEGER}
+        </if>
+        <if test="userStatus != null">
+            AND USER_STATUS = #{userStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="userMobile != null and userMobile!= ''">
+            AND USER_MOBILE LIKE CONCAT('%',#{userMobile,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="userName != null">
+            AND USER_NAME LIKE CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="userEmail != null">
+            AND USER_EMAIL LIKE CONCAT('%',#{userEmail,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="userRealName != null">
+            AND USER_REAL_NAME LIKE CONCAT('%',#{userRealName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="userCname != null and userCname!=''">
+            AND USER_CNAME = #{userCname,jdbcType=VARCHAR}
+        </if>
+    </sql>
+
+    <!-- 查询记录条数 -->
+    <select id="findTotalBySelective" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSUserVO" resultType="int">
+        SELECT COUNT(1)
+        FROM CMS_USER
+        WHERE 1=1
+        <include refid="selectParamSql"></include>
+    </select>
+
+    <!-- 查询用户 -->
+    <select id="findDataBySelective" resultMap="BaseResultMap" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSUserVO">
+            SELECT
+            <include refid="Base_Column_List"/>
+            FROM CMS_USER
+            WHERE 1=1
+            <include refid="selectParamSql"></include>
+            <if test="startRow != null and pageSize != null">
+       			limit #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+            </if>
+    </select>
+
+    <!-- 查询USER_NAME -->
+    <select id="findUserName" resultType="java.lang.String" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSUserVO">
+        SELECT USER_NAME FROM CMS_USER WHERE USER_NAME = #{userName}
+    </select>
+
+    <!-- 查询用户 -->
+    <select id="findUser" resultMap="LoginResultMap" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSUserVO">
+		SELECT
+			A.ID AS USER_ID,
+			USER_NAME,
+			DEPART,
+			USER_MOBILE,
+			USER_STATUS,
+			USER_PASSWORD,
+			USER_REAL_NAME,
+			USER_CNAME,
+			USER_EMAIL,
+			CMS_ROLE_ID,
+			LAST_LOGIN_TIME,
+			A.MODIFY_TIME,
+			A.MODIFY_BY,
+			A.CREATE_BY,
+			A.UPDATE_TIME,
+			A.CREATE_TIME,
+			A.MONTH_LOGIN_COUNT,
+			A.LAST_LOGIN_IP,
+			A.THIS_LOGIN_TIME,
+			A.THIS_LOGIN_IP,
+			REMARK,
+			B.ID AS USER_MENU_ID,
+			B.USER_ID USID,
+			B.MENU_ID MID,
+			USER_AUTH,
+			C.MENU_URL,
+			C.MENU_BUTTON,
+			C.ID AS MENU_ID,
+			C.PARENT_MENU_ID
+		FROM
+			CMS_USER A
+		INNER JOIN CMS_USER_MENU B ON B.USER_ID = A.ID
+		INNER JOIN CMS_MENU C ON C.ID = B.MENU_ID
+		WHERE
+			USER_NAME =#{userName}
+		AND USER_PASSWORD =#{userPassword}
+		AND USER_STATUS = 1
+		AND (
+			SELECT
+				COUNT(1)
+			FROM
+				CMS_ROLE WHERE ID = A.CMS_ROLE_ID
+			AND ROLE_STATUS = 1
+		) > 0
+    </select>
+
+    <!-- 查询用户是否存在 -->
+    <select id="findCount" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSUserVO" resultType="int">
+        SELECT COUNT(1)
+        FROM CMS_USER
+        WHERE USER_MOBILE = #{userMobile,jdbcType=INTEGER}
+        AND USER_NAME =#{userName,jdbcType=VARCHAR}
+        AND USER_EMAIL =#{userEmail,jdbcType=VARCHAR}
+        AND USER_REAL_NAME =#{userRealName,jdbcType=VARCHAR}
+        AND USER_STATUS = 1
+    </select>
+
+    <!-- 新增用户 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId" parameterType="com.hhly.cmscore.persistence.sys.po.CmsUserPO" >
+        INSERT INTO CMS_USER (USER_NAME, DEPART,
+        USER_MOBILE, USER_STATUS, USER_PASSWORD,
+        USER_REAL_NAME, USER_EMAIL, CMS_ROLE_ID,
+        CREATE_BY, UPDATE_TIME, CREATE_TIME,
+        REMARK,USER_CNAME,HEAD_URL)
+        VALUES (#{userName,jdbcType=VARCHAR}, #{depart,jdbcType=INTEGER},
+        #{userMobile,jdbcType=INTEGER}, #{userStatus,jdbcType=INTEGER}, #{userPassword,jdbcType=VARCHAR},
+        #{userRealName,jdbcType=VARCHAR}, #{userEmail,jdbcType=VARCHAR}, #{cmsRoleId,jdbcType=INTEGER},
+        #{createBy,jdbcType=VARCHAR}, now(), now(),
+        #{remark,jdbcType=VARCHAR},#{userCname,jdbcType=VARCHAR},#{headUrl,jdbcType=VARCHAR})
+    </insert>
+
+    <!-- 更新用户 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.hhly.cmscore.persistence.sys.po.CmsRolePO" >
+        UPDATE CMS_USER
+        <set >
+        	<!--
+        	用户账号不让修改
+            <if test="userName != null" >
+                USER_NAME = #{userName,jdbcType=VARCHAR},
+            </if>
+              -->
+            <if test="depart != null" >
+                DEPART = #{depart,jdbcType=INTEGER},
+            </if>
+            <if test="userMobile != null" >
+                USER_MOBILE = #{userMobile,jdbcType=INTEGER},
+            </if>
+            <if test="userStatus != null" >
+                USER_STATUS = #{userStatus,jdbcType=INTEGER},
+            </if>
+            <if test="userPassword != null" >
+                USER_PASSWORD = #{userPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="userRealName != null" >
+                USER_REAL_NAME = #{userRealName,jdbcType=VARCHAR},
+            </if>
+            <if test="userEmail != null" >
+                USER_EMAIL = #{userEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="cmsRoleId != null" >
+                CMS_ROLE_ID = #{cmsRoleId,jdbcType=INTEGER},
+            </if>
+            <if test="modifyBy != null" >
+                MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="userCname != null" >
+                USER_CNAME = #{userCname,jdbcType=VARCHAR},
+            </if>
+            <if test="headUrl != null and headUrl != ''" >
+                HEAD_URL = #{headUrl,jdbcType=VARCHAR},
+            </if>
+        </set>
+        ,MODIFY_TIME = now(),
+        UPDATE_TIME = now()
+        WHERE ID = #{userId,jdbcType=INTEGER}
+    </update>
+
+    <!-- 更新最后登录时间 -->
+    <update id="updateUserLastLoginTime" parameterType="com.hhly.cmscore.persistence.sys.po.CmsUserPO">
+         UPDATE CMS_USER 
+         	SET 
+         LAST_LOGIN_IP=THIS_LOGIN_IP,
+         LAST_LOGIN_TIME=THIS_LOGIN_TIME,
+         THIS_LOGIN_IP=#{thisLoginIP},
+         THIS_LOGIN_TIME=now(),
+         MONTH_LOGIN_COUNT=#{monthLoginCount}
+         WHERE ID = #{userId}
+    </update>
+
+    <!-- 更新密码 -->
+    <update id="updatePwd" parameterType="com.hhly.cmscore.persistence.sys.po.CmsRolePO">
+        UPDATE CMS_USER SET USER_PASSWORD=#{userPassword} WHERE ID = #{userId}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="int">
+        DELETE FROM CMS_USER
+        WHERE ID = #{userId,jdbcType=INTEGER}
+    </delete>
+</mapper>

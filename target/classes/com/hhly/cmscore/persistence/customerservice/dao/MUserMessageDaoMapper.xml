@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.customerservice.dao.MUserMessageDaoMapper">
+
+	
+	<sql id="sql_condition_mUserMessageVO">
+		<where>
+			<if test="userId != null">
+				and a.USER_ID = #{userId,jdbcType=DECIMAL}
+			</if>
+			<if test="status != null">
+				and a.`status` = #{status,jdbcType=DECIMAL}
+			</if>
+			<if test="account != null and account !=''">
+				and a.ACCOUNT = #{account,jdbcType=VARCHAR}
+			</if>
+			<if test="beginTime!=null and beginTime !=''">
+				and a.CREATE_TIME <![CDATA[>=]]> str_to_date('${beginTime}','%Y-%m-%d %H:%i:%s')
+			</if>
+			<if test="endTime!=null  and endTime !=''">
+				and a.CREATE_TIME <![CDATA[<=]]> str_to_date('${endTime}','%Y-%m-%d %H:%i:%s')
+			</if>
+		</where>
+	</sql>
+
+	<select id="find" resultType="com.hhly.skeleton.cms.customerservice.bo.MUserMessageBO" parameterType="com.hhly.skeleton.cms.customerservice.vo.MUserMessageVO">
+				select
+					a.ID id,
+					a.USER_ID userId,
+					b.NICK_NAME nickName,
+					a.TYPE type,
+					a.ACCOUNT account,
+					a.MESSAGE_TYPE messageType,
+					a.MESSAGE message,
+					a.`STATUS` `status`,
+					a.CREATE_TIME createTime,
+					a.code
+				from M_USER_MESSAGE a left join M_USER_INFO b on a.USER_ID=b.id
+				<include refid="sql_condition_mUserMessageVO" />
+				order by a.ID desc
+	  	 <if test="startRow != null and pageSize != null">
+	  	 	limit #{startRow},#{pageSize}
+	 	 </if>
+	</select>
+	
+	<select id="findTotal" parameterType="com.hhly.skeleton.cms.customerservice.vo.MUserMessageVO" resultType="int">
+        select count(1) 
+        from M_USER_MESSAGE a left join M_USER_INFO b on a.USER_ID=b.id
+	    <include refid="sql_condition_mUserMessageVO" />
+  	</select>
+  	
+  	<update id="updateStatus">
+  		update M_USER_MESSAGE as um set um.status=#{sendStatus} where um.id=#{id}
+  	</update>
+    <update id="updateCleanMessage">
+        UPDATE m_user_message
+		SET valid = 0
+		, update_time = now()
+		WHERE
+		  account = #{account}
+		and  create_time >= date_format(now(),'%Y-%m-%d')
+    </update>
+    <select id="findSendCount" resultType="int">
+        SELECT
+			count(*)
+		FROM
+			m_user_message
+		WHERE
+			account = #{account}
+		AND create_time >= #{startDate}
+		AND create_time <![CDATA[<=]]> #{endDate}
+		AND valid = 1
+    </select>
+</mapper>

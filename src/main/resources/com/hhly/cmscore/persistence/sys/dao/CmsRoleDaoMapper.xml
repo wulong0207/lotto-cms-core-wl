@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.sys.dao.CmsRoleDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sysmgr.bo.CMSRoleBO">
+        <id column="ID" jdbcType="INTEGER" property="roleId" />
+        <result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName" />
+        <result column="DEPART" jdbcType="INTEGER" property="depart" />
+        <result column="ROLE_DESC" jdbcType="VARCHAR" property="roleDesc" />
+        <result column="ROLE_STATUS" jdbcType="INTEGER" property="roleStatus" />
+        <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+        <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+        <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+        <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        ID, ROLE_NAME, DEPART, ROLE_DESC, ROLE_STATUS,  MODIFY_TIME, MODIFY_BY,
+        CREATE_BY, UPDATE_TIME, CREATE_TIME, REMARK
+    </sql>
+
+    <!-- 查询记录条数 -->
+    <select id="findTotalBySelective" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSRoleVO" resultType="int">
+        SELECT COUNT(1)
+        FROM CMS_ROLE
+        WHERE 1=1
+        <if test="roleId != null">
+            AND ID = #{roleId,jdbcType=INTEGER}
+        </if>
+        <if test="roleName != null">
+            AND ROLE_NAME = #{roleName,jdbcType=VARCHAR}
+        </if>
+        <if test="depart != null">
+            AND DEPART = #{depart,jdbcType=INTEGER}
+        </if>
+        <if test="roleStatus != null">
+            AND ROLE_STATUS = #{roleStatus,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <!-- 查询数据 -->
+    <select id="findDataBySelective" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSRoleVO" resultMap="BaseResultMap">
+                SELECT
+                <include refid="Base_Column_List" />
+                FROM CMS_ROLE
+                WHERE 1=1
+                <if test="roleId != null">
+                    AND ID = #{roleId,jdbcType=INTEGER}
+                </if>
+                <if test="roleName != null">
+                    AND ROLE_NAME = #{roleName,jdbcType=VARCHAR}
+                </if>
+                <if test="depart != null">
+                    AND DEPART = #{depart,jdbcType=INTEGER}
+                </if>
+                <if test="roleStatus != null">
+                    AND ROLE_STATUS = #{roleStatus,jdbcType=INTEGER}
+                </if>
+            <![CDATA[
+            	limit #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+            ]]>
+    </select>
+
+    <!-- 查询角色名称-->
+    <select id="findRoleName"  resultMap="BaseResultMap">
+        SELECT
+        ID,ROLE_NAME
+        FROM CMS_ROLE WHERE ROLE_STATUS=1
+    </select>
+
+    <!-- 新增角色 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="roleId" parameterType="com.hhly.cmscore.persistence.sys.po.CmsRolePO">
+        insert into CMS_ROLE (ROLE_NAME, DEPART,
+        ROLE_DESC, ROLE_STATUS,
+        CREATE_BY,
+        UPDATE_TIME, CREATE_TIME, REMARK
+        )
+        values (#{roleName,jdbcType=VARCHAR}, #{depart,jdbcType=INTEGER},
+        #{roleDesc,jdbcType=VARCHAR}, #{roleStatus,jdbcType=INTEGER},
+        #{createBy,jdbcType=VARCHAR},
+        now(),now(), #{remark,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 更新角色 -->
+    <update id="updateByPrimaryKey" parameterType="com.hhly.cmscore.persistence.sys.po.CmsRolePO">
+        update CMS_ROLE
+        <set>
+            <if test="roleName != null">
+                ROLE_NAME = #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="depart != null">
+                DEPART = #{depart,jdbcType=INTEGER},
+            </if>
+            <if test="roleDesc != null">
+                ROLE_DESC = #{roleDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="roleStatus != null">
+                ROLE_STATUS = #{roleStatus,jdbcType=INTEGER},
+            </if>
+            <if test="modifyBy != null">
+                MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        ,MODIFY_TIME = now(),
+        UPDATE_TIME = now()
+        where ID = #{roleId,jdbcType=INTEGER}
+    </update>
+
+    <!-- 删除角色 -->
+    <delete id="deleteByPrimaryKey" parameterType="int">
+        DELETE FROM CMS_ROLE
+        where ID = #{roleId,jdbcType=INTEGER}
+    </delete>
+</mapper>

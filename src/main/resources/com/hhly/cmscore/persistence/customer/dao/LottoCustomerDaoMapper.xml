@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.customer.dao.LottoCustomerDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.customer.po.LottoCustomerPO" >
+    <id column="id" property="id" jdbcType="DECIMAL" />
+    <result column="ACCOUNT_ID" property="accountId" jdbcType="VARCHAR" />
+    <result column="ACCOUNT_NAME" property="accountName" jdbcType="VARCHAR" />
+    <result column="CUS_MOBILE" property="cusMobile" jdbcType="DECIMAL" />
+    <result column="CUS_MAIL" property="cusMail" jdbcType="VARCHAR" />
+    <result column="MOBILE_LOGIN" jdbcType="DECIMAL" property="mobileLogin" />
+    <result column="EMAIL_LOGIN" jdbcType="DECIMAL" property="emailLogin" />
+    <result column="NICK_NAME" property="nickName" jdbcType="OTHER" />
+    <result column="ACCOUNT_PASSWORD" property="accountPassword" jdbcType="VARCHAR" />
+     <result column="PASSWORD_GRADE" jdbcType="DECIMAL" property="passwordGrade" />
+    <result column="SEX" property="sex" jdbcType="DECIMAL" />
+    <result column="ACTUAL_NAME" property="actualName" jdbcType="VARCHAR" />
+    <result column="ID_NUM" property="idNum" jdbcType="VARCHAR" />
+    <result column="HEAD_URL" property="headUrl" jdbcType="VARCHAR" />
+    <result column="HEAD_STATUS" property="headStatus" jdbcType="DECIMAL" />
+    <result column="ADDRESS" property="address" jdbcType="OTHER" />
+    <result column="CHANNEL_ID" property="channelId" jdbcType="VARCHAR" />
+    <result column="REGIST_TIME" property="registTime" jdbcType="TIMESTAMP" />
+    <result column="LAST_LOGIN_TIME" property="lastLoginTime" jdbcType="TIMESTAMP" />
+    <result column="ACCOUNT_STATUS" property="accountStatus" jdbcType="DECIMAL" />
+    <result column="QQ_OPEN_ID" property="qqOpenId" jdbcType="VARCHAR" />
+    <result column="SINA_BLOG_OPEN_ID" property="sinaBlogOpenId" jdbcType="VARCHAR" />
+    <result column="BAIDU_OPEN_ID" property="baiduOpenId" jdbcType="VARCHAR" />
+    <result column="WECHAT_OPEN_ID" property="wechatOpenId" jdbcType="VARCHAR" />
+    <result column="ALIPAY_OPEN_ID" property="alipayOpenId" jdbcType="VARCHAR" />
+    <result column="JD_OPEN_ID" property="jdOpenId" jdbcType="VARCHAR" />
+    <result column="MOBILE_CHECK" property="mobileCheck" jdbcType="DECIMAL" />
+    <result column="EMAIL_CHECK" property="emailCheck" jdbcType="DECIMAL" />
+    <result column="ACCOUNT_MODIFY" property="accountModify" jdbcType="DECIMAL" />
+    <result column="HEAD_CHECK" property="headCheck" jdbcType="DECIMAL" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="OTHER" />
+    <result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="OTHER" />
+    <result column="PLATFORM" property="platform" jdbcType="DECIMAL"/>
+    <result column="agent_code" property="agentCode" jdbcType="VARCHAR" />
+    <result column="user_type" property="userType" jdbcType="DECIMAL"/>
+  </resultMap>
+  
+  <resultMap id="ResultMapBO" type="com.hhly.skeleton.cms.customermgr.bo.LottoCustomerBO" >
+    <id column="id" property="id" jdbcType="DECIMAL" />
+    <result column="ACCOUNT_ID" property="accountId" jdbcType="VARCHAR" />
+    <result column="ACCOUNT_NAME" property="accountName" jdbcType="VARCHAR" />
+    <result column="CUS_MOBILE" property="cusMobile" jdbcType="DECIMAL" />
+    <result column="CUS_MAIL" property="cusMail" jdbcType="VARCHAR" />
+    <result column="MOBILE_LOGIN" jdbcType="DECIMAL" property="mobileLogin" />
+    <result column="EMAIL_LOGIN" jdbcType="DECIMAL" property="emailLogin" />
+    <result column="NICK_NAME" property="nickName" jdbcType="OTHER" />
+    <result column="ACCOUNT_PASSWORD" property="accountPassword" jdbcType="VARCHAR" />
+     <result column="PASSWORD_GRADE" jdbcType="DECIMAL" property="passwordGrade" />
+    <result column="SEX" property="sex" jdbcType="DECIMAL" />
+    <result column="ACTUAL_NAME" property="actualName" jdbcType="VARCHAR" />
+    <result column="ID_NUM" property="idNum" jdbcType="VARCHAR" />
+    <result column="HEAD_URL" property="headUrl" jdbcType="VARCHAR" />
+    <result column="HEAD_STATUS" property="headStatus" jdbcType="DECIMAL" />
+    <result column="ADDRESS" property="address" jdbcType="OTHER" />
+    <result column="CHANNEL_ID" property="channelId" jdbcType="VARCHAR" />
+    <result column="REGIST_TIME" property="registTime" jdbcType="TIMESTAMP" />
+    <result column="LAST_LOGIN_TIME" property="lastLoginTime" jdbcType="TIMESTAMP" />
+    <result column="ACCOUNT_STATUS" property="accountStatus" jdbcType="DECIMAL" />
+    <result column="QQ_OPEN_ID" property="qqOpenId" jdbcType="VARCHAR" />
+    <result column="SINA_BLOG_OPEN_ID" property="sinaBlogOpenId" jdbcType="VARCHAR" />
+    <result column="BAIDU_OPEN_ID" property="baiduOpenId" jdbcType="VARCHAR" />
+    <result column="WECHAT_OPEN_ID" property="wechatOpenId" jdbcType="VARCHAR" />
+    <result column="ALIPAY_OPEN_ID" property="alipayOpenId" jdbcType="VARCHAR" />
+    <result column="JD_OPEN_ID" property="jdOpenId" jdbcType="VARCHAR" />
+    <result column="MOBILE_CHECK" property="mobileCheck" jdbcType="DECIMAL" />
+    <result column="EMAIL_CHECK" property="emailCheck" jdbcType="DECIMAL" />
+    <result column="ACCOUNT_MODIFY" property="accountModify" jdbcType="DECIMAL" />
+    <result column="HEAD_CHECK" property="headCheck" jdbcType="DECIMAL" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="OTHER" />
+    <result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="OTHER" />
+    <result column="PLATFORM" property="platform" jdbcType="DECIMAL"/>
+    <result column="agent_code" property="agentCode" jdbcType="VARCHAR" />
+    <result column="user_type" property="userType" jdbcType="DECIMAL"/>
+    <result column="rcode" property="rcode" jdbcType="VARCHAR" />
+    <result column="account_password" property="accountPassword" jdbcType="VARCHAR" />
+    <result column="forbit_end_time" property="forbitEndTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+    <sql id="sql_condition_lottoCustomerVO">
+        <where>
+	   <if test="nickName!=null and nickName!=''">
+	     and NICK_NAME LIKE concat('%',#{nickName},'%')
+	   </if>
+	   <if test="accountName!=null and accountName!=''">
+	     and ACCOUNT_NAME LIKE  concat('%',#{accountName},'%')
+	   </if>
+	   <if test="cusMobile!=null and cusMobile!=''">
+	     and CUS_MOBILE = #{cusMobile}
+	   </if>
+	   <if test="actualName !=null and actualName !=''">
+	     and ACTUAL_NAME = #{actualName}
+	   </if>
+	   <if test="idNum != null and idNum != ''">
+	     and ID_NUM = #{idNum}
+	   </if>
+	   <if test="accountStatus != null">
+	     and ACCOUNT_STATUS = #{accountStatus}
+	   </if>
+	   <if test="channelId !=null and channelId!=''">
+	     and CHANNEL_ID = #{channelId}
+	   </if>
+	   <if test="startRegistTime != null">
+	     and REGIST_TIME >= #{startRegistTime}
+	   </if>
+	   <if test="endRegistTime !=null">
+	     and REGIST_TIME <![CDATA[<=]]> #{endRegistTime}
+	   </if>
+	   <if test="startLastLoginTime !=null">
+	     and i.LAST_LOGIN_TIME >= #{startLastLoginTime}
+	   </if>
+	   <if test="endLastLoginTime !=null">
+	     and i.LAST_LOGIN_TIME <![CDATA[<=]]> #{endLastLoginTime}
+	   </if>
+	   <if test="platform !=null">
+	     and PLATFORM = #{platform}
+	   </if>	   
+	   <if test="type !=null and type !=''">
+	     and ${type} in 
+	         <foreach collection="values" open="(" close=")" separator="," item="item">
+	             #{item}
+	         </foreach>
+	   </if>
+	  </where>
+  </sql>
+  <select id="find" parameterType="com.hhly.skeleton.cms.customermgr.vo.LottoCustomerVO" resultType="com.hhly.skeleton.cms.customermgr.bo.LottoCustomerBO">
+	  select 
+	       u.id id,
+	       u.ACCOUNT_NAME accountName,
+	       u.CUS_MOBILE cusMobile,
+	       u.NICK_NAME nickName,
+	       u.ACTUAL_NAME actualName,
+	       u.ID_NUM idNum,
+	       u.ACCOUNT_STATUS accountStatus,
+	       i.LAST_LOGIN_TIME lastLoginTime,
+	       u.REGIST_TIME registTime,
+	       u.CREATE_TIME createTime,
+	       u.UPDATE_TIME updateTime,
+	       u.CHANNEL_ID channelId,
+	       u.PLATFORM platform,
+	       u.MSG_MOB msgMob,
+	       u.MSG_SITE msgSite,
+	       u.MSG_APP msgApp,
+	       u.MSG_WECHAT msgWechat,
+	       u.MOB_NOT_DISTURB mobNotDisturb,
+           u.forbit_end_time forbitEndTime,
+	       u.APP_NOT_DISTURB appNotDisturb
+    		from M_USER_INFO u left join m_user_info_last_log i
+    		on u.id = i.user_id 
+	    <include refid="sql_condition_lottoCustomerVO" /> 
+   		order by
+  		<choose>  
+        <when test="sortField !=null and sortField!=''">  
+            ${sortField} ${sortOrder}
+        </when>   
+        <otherwise>  
+             id desc
+        </otherwise>  
+      </choose> 
+  	 <if test="startRow != null and pageSize != null">
+   		 limit #{startRow},#{pageSize} 
+ 	 </if>
+   
+  </select>
+  
+  <select id="findIds" parameterType="com.hhly.skeleton.cms.customermgr.vo.LottoCustomerVO" resultType="int">
+	  select id from M_USER_INFO <include refid="sql_condition_lottoCustomerVO" />
+  </select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.customermgr.vo.LottoCustomerVO" resultType="int">
+        select count(1) 
+        from M_USER_INFO u
+      <if test="startLastLoginTime !=null or endLastLoginTime !=null">
+          left join m_user_info_last_log i
+          on u.id = i.user_id
+      </if>
+	    <include refid="sql_condition_lottoCustomerVO"/>
+  </select>
+  
+  <select id="findLottoCustomerExcel" parameterType="com.hhly.skeleton.cms.customermgr.vo.LottoCustomerVO" resultType="com.hhly.skeleton.cms.customermgr.bo.LottoCustomerExcelBO">
+       select   
+           @rownum:=@rownum+1 AS id,
+	       ACCOUNT_NAME accountName,
+	       CUS_MOBILE cusMobile,
+	       NICK_NAME nickName,
+	       ACTUAL_NAME actualName,
+	       ID_NUM idNum,
+	       ACCOUNT_STATUS accountStatus,
+	       date_format(i.LAST_LOGIN_TIME,'%Y-%m-%d %H:%i:%s') lastLoginTime,
+	       date_format(REGIST_TIME,'%Y-%m-%d %H:%i:%s') registTime,
+	       date_format(CREATE_TIME,'%Y-%m-%d %H:%i:%s') createTime,
+	       date_format(UPDATE_TIME,'%Y-%m-%d %H:%i:%s') updateTime,
+	       CHANNEL_ID channelId,
+	       PLATFORM platform
+    		from M_USER_INFO u left join m_user_info_last_log i
+    		on u.id = i.user_id , (SELECT @rownum:=0) r
+	     <include refid="sql_condition_lottoCustomerVO" />
+	     	order by id
+  </select>
+  
+  <select id="findLottoCustomerDetail" resultMap="ResultMapBO">
+     select
+	    u.id, 
+	    u.ACCOUNT_NAME, 
+	    u.CUS_MOBILE, 
+	    u.CUS_MAIL,
+	    u.MOBILE_LOGIN,
+	    u.EMAIL_LOGIN,
+	    u.NICK_NAME, 
+	    u.SEX, 
+	    u.ACTUAL_NAME, 
+	    u.ID_NUM, 
+	    u.HEAD_URL, 
+	    u.HEAD_STATUS, 
+	    u.ADDRESS, 
+	    u.CHANNEL_ID, 
+	    u.PLATFORM,
+	    u.REGIST_TIME, 
+	    i.LAST_LOGIN_TIME,
+	    u.ACCOUNT_STATUS, 
+	    u.QQ_OPEN_ID, 
+	    u.SINA_BLOG_OPEN_ID, 
+	    u.BAIDU_OPEN_ID, 
+	    u.WECHAT_OPEN_ID, 
+	    u.ALIPAY_OPEN_ID, 
+	    u.JD_OPEN_ID, 
+	    u.MODIFY_BY, 
+	    u.MODIFY_TIME,
+	    u.REMARK,
+	    u.head_Check,
+	    u.MOBILE_CHECK,
+    	u.EMAIL_CHECK,
+    	u.ACCOUNT_MODIFY,
+    	u.agent_code,
+	    u.user_type,
+	    u.rcode,
+	    u.rcode,
+	    u.forbit_end_time,
+	    u.account_password
+    from M_USER_INFO u left join m_user_info_last_log i
+    	on u.id = i.user_id 
+    where u.id  = #{id}
+  </select>
+  
+	<select id="findUserByAccountName" parameterType="List" resultType="Integer">
+		select id from M_USER_INFO where 1 = 1 and ACCOUNT_NAME in
+         <foreach collection="list" open="(" close=")" separator="," item="item">
+	             #{item}
+	         </foreach>		
+	</select>  
+   <update id="updateByCms" parameterType="com.hhly.cmscore.persistence.customer.po.LottoCustomerPO">
+     update M_USER_INFO
+    set 
+      ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
+      CUS_MOBILE = #{cusMobile,jdbcType=DECIMAL},
+      CUS_MAIL = #{cusMail,jdbcType=VARCHAR},
+      NICK_NAME = #{nickName,jdbcType=OTHER},
+      SEX = #{sex,jdbcType=DECIMAL},
+      ACTUAL_NAME = #{actualName,jdbcType=VARCHAR},
+      ID_NUM = #{idNum,jdbcType=VARCHAR},
+      <if test="headUrl != null and headUrl != ''" >
+          HEAD_URL = #{headUrl,jdbcType=VARCHAR},
+      </if>
+      HEAD_STATUS = #{headStatus,jdbcType=DECIMAL},
+      ADDRESS = #{address,jdbcType=OTHER},
+      <if test="channelId != null">
+      CHANNEL_ID = #{channelId,jdbcType=DECIMAL},
+      </if>
+      <if test="platform != null">
+      PLATFORM = #{platform,jdbcType=DECIMAL},
+      </if>
+      ACCOUNT_STATUS = #{accountStatus,jdbcType=DECIMAL},
+      MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+      MOBILE_LOGIN = #{mobileLogin,jdbcType=DECIMAL},
+	  EMAIL_LOGIN = #{emailLogin,jdbcType=DECIMAL},
+      MODIFY_TIME = now(),
+       <if test="agentCode != null and agentCode != ''" >
+         agent_code = #{agentCode,jdbcType=VARCHAR},
+       </if>      
+       <if test="userType != null and userType != ''" >
+	    user_type = #{userType,jdbcType=DECIMAL},
+       </if>
+       forbit_end_time = #{forbitEndTime},
+      REMARK = #{remark,jdbcType=OTHER}
+      where id = #{id,jdbcType=DECIMAL}
+   </update>
+   
+   <update id="updateMsgConfig" parameterType="com.hhly.cmscore.persistence.customer.po.LottoCustomerPO">
+    update 
+    	M_USER_INFO
+    set 
+	    MSG_MOB = #{msgMob,jdbcType=DECIMAL},
+	    MSG_SITE = #{msgSite,jdbcType=DECIMAL},
+	    MSG_APP = #{msgApp,jdbcType=DECIMAL},
+	    MSG_WECHAT = #{msgWechat,jdbcType=DECIMAL},
+	    MOB_NOT_DISTURB = #{mobNotDisturb,jdbcType=VARCHAR},
+	    APP_NOT_DISTURB = #{appNotDisturb,jdbcType=VARCHAR}
+     where
+     	id = #{id,jdbcType=DECIMAL}
+   </update>
+   <update id="updLottoCustomerPassword" parameterType="com.hhly.cmscore.persistence.customer.po.LottoCustomerPO">
+   update M_USER_INFO 
+   set 
+  	  MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+      MODIFY_TIME = now(),
+      ACCOUNT_PASSWORD = #{accountPassword}
+    where id = #{id}
+   </update>
+</mapper>

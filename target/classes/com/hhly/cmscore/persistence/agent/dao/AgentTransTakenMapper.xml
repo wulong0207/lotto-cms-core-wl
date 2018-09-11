@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.agent.dao.AgentTransTakenMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.agent.vo.AgentTransTakenVO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="trans_taken_code" jdbcType="VARCHAR" property="transTakenCode" />
+        <result column="agent_id" jdbcType="INTEGER" property="agentId" />
+        <result column="pay_channel" jdbcType="INTEGER" property="payChannel" />
+        <result column="taken_bank" jdbcType="INTEGER" property="takenBank" />
+        <result column="bank_card_num" jdbcType="VARCHAR" property="bankCardNum" />
+        <result column="review_time" jdbcType="TIMESTAMP" property="reviewTime" />
+        <result column="remit_time" jdbcType="TIMESTAMP" property="remitTime" />
+        <result column="arrival_time" jdbcType="TIMESTAMP" property="arrivalTime" />
+        <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
+        <result column="send_down_time" jdbcType="TIMESTAMP" property="sendDownTime" />
+        <result column="bank_info" jdbcType="VARCHAR" property="bankInfo" />
+        <result column="extract_amount" jdbcType="DECIMAL" property="extractAmount" />
+        <result column="service_charge" jdbcType="DECIMAL" property="serviceCharge" />
+        <result column="tax_charge" jdbcType="DECIMAL" property="taxCharge" />
+        <result column="review_by" jdbcType="VARCHAR" property="reviewBy" />
+        <result column="trans_cert" jdbcType="VARCHAR" property="transCert" />
+        <result column="trans_fail_info" jdbcType="VARCHAR" property="transFailInfo" />
+        <result column="trans_status" jdbcType="INTEGER" property="transStatus" />
+        <result column="taken_platform" jdbcType="INTEGER" property="takenPlatform" />
+        <result column="channel_id" jdbcType="VARCHAR" property="channelId" />
+        <result column="third_trans_num" jdbcType="VARCHAR" property="thirdTransNum" />
+        <result column="batch_num" jdbcType="VARCHAR" property="batchNum" />
+        <result column="batch_status" jdbcType="INTEGER" property="batchStatus" />
+        <result column="bank_return_info" jdbcType="VARCHAR" property="bankReturnInfo" />
+        <result column="real_amount" jdbcType="DECIMAL" property="realAmount" />
+        <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="account_name" property="accountName" jdbcType="VARCHAR" />
+        <result column="actual_name" property="actualName" jdbcType="VARCHAR" />
+        <result column="userId" property="userId" jdbcType="VARCHAR" />
+        <result column="cus_mobile" property="cusMobile" jdbcType="VARCHAR" />
+        <result column="channel_name" property="channelName" jdbcType="VARCHAR" />
+    </resultMap>
+
+  <sql id="Table">
+    agent_trans_taken tt
+     join agent_info ai on ai.id = tt.agent_id
+    left outer join M_USER_INFO ui on ai.user_id=ui.id
+    left outer join operate_market_channel omc on tt.channel_id=omc.channel_id
+  </sql>
+
+    <sql id="Base_Column_List">
+        tt.id, tt.trans_taken_code, tt.agent_id, tt.pay_channel, tt.taken_bank, tt.bank_card_num, tt.review_time,
+        tt.remit_time, tt.arrival_time, tt.deal_time, tt.send_down_time, tt.bank_info, tt.extract_amount, tt.service_charge,
+        tt.tax_charge, tt.review_by, tt.trans_cert, tt.trans_fail_info, tt.trans_status, tt.taken_platform,
+        tt.channel_id, tt.third_trans_num, tt.batch_num, tt.batch_status, tt.bank_return_info, tt.real_amount,
+        tt.create_by,tt.create_time, tt.update_by, tt.update_time,tt.remark,
+        account_name,actual_name,ui.id userId,cus_mobile,
+        channel_name
+    </sql>
+
+    <sql id="Where_Clause">
+        <where>
+            <if test="transTakenCode != null and transTakenCode !=''">
+                and TRANS_TAKEN_code = #{transTakenCode}
+            </if>
+            <if test="thirdTransNum != null and thirdTransNum !=''">
+                and third_trans_num = #{thirdTransNum}
+            </if>
+            <if test="batchNum != null and batchNum !=''">
+                and batch_num = #{batchNum}
+            </if>
+            <if test="payChannel != null">
+                and pay_channel = #{payChannel}
+            </if>
+            <if test="takenBank != null">
+                and taken_bank = #{takenBank}
+            </if>
+            <if test="searchUserType != null and searchUserValue != null and searchUserValue != ''">
+                <choose>
+                    <when test="searchUserType == 1">
+                        and NICK_NAME like CONCAT('%',#{searchUserValue},'%')
+                    </when>
+                    <when test="searchUserType == 2">
+                        and ACCOUNT_NAME like CONCAT('%',#{searchUserValue},'%')
+                    </when>
+                    <when test="searchUserType == 3">
+                        and CUS_MOBILE = #{searchUserValue}
+                    </when>
+                    <when test="searchUserType == 4">
+                        and ACTUAL_NAME like CONCAT('%',#{searchUserValue},'%')
+                    </when>
+                    <when test="searchUserType == 5">
+                        and ID_NUM like CONCAT('%',#{searchUserValue},'%')
+                    </when>
+                </choose>
+            </if>
+            <if test="searchTimeType != null and startTime != null and endTime != null">
+                <choose>
+                    <when test="searchTimeType == 1">
+                        <![CDATA[ and tt.create_time >= #{startTime} and tt.create_time <= #{endTime}]]>
+                    </when>
+                    <when test="searchTimeType == 2">
+                        <![CDATA[ and trans_end_time >= #{startTime} and trans_end_time <= #{endTime}]]>
+                    </when>
+                    <when test="searchTimeType == 3">
+                        <![CDATA[ and arrival_time >= #{startTime} and arrival_time <= #{endTime}]]>
+                    </when>
+                </choose>
+            </if>
+            <if test="transStatus != null">
+                and tt.trans_status = #{transStatus}
+            </if>
+            <if test="batchStatus != null">
+                and batch_status = #{batchStatus}
+            </if>
+            <if test="ids != null">
+                and tt.id in
+                <foreach collection="ids" open="(" close=")" separator="," item="id">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="extractAmountLt != null">
+                <![CDATA[and extract_amount < #{extractAmountLt}]]>
+            </if>
+            <if test="realAmount != null">
+                and real_amount = #{realAmount}
+            </if>
+            <if test="createBy != null">
+                and tt.create_by = #{createBy}
+            </if>
+            <if test="bankCardNum != null">
+                and bank_card_num = #{bankCardNum}
+            </if>
+        </where>
+    </sql>
+
+  <sql id="Page_Clause">
+    <if test="startRow != null and endRow !=null">
+      limit #{startRow},#{pageSize}
+    </if>
+  </sql>
+
+    <select id="find" parameterType="com.hhly.skeleton.cms.agent.vo.AgentTransTakenVO" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List"/> from
+      <include refid="Table"/>
+        <include refid="Where_Clause"/>
+        <include refid="Page_Clause"/>
+  </select>
+
+    <select id="findStatis" parameterType="com.hhly.skeleton.cms.agent.vo.AgentTransTakenVO"
+            resultType="Map">
+        select count(*) total,
+        sum(EXTRACT_AMOUNT) queryExtractAmount,
+        sum(SERVICE_CHARGE) queryServiceCharge,
+        sum(TAX_CHARGE) queryTaxCharge
+        from
+        <include refid="Table" />
+        <include refid="Where_Clause" />
+    </select>
+
+    <select id="count" parameterType="com.hhly.skeleton.cms.agent.vo.AgentTransTakenVO" resultType="int">
+        SELECT count(tt.id) from <include refid="Table"/> <include refid="Where_Clause"/>
+    </select>
+
+    <select id="excel" parameterType="com.hhly.skeleton.cms.agent.vo.AgentTransTakenVO"
+            resultType="com.hhly.skeleton.cms.agent.bo.AgentTransTakenExcelBO">
+        select
+        tt.id id,
+        NICK_NAME nickName,
+        TRANS_TAKEN_CODE transTakenCode,
+        TRANS_STATUS transStatus,
+        EXTRACT_AMOUNT extractAmount,
+        SERVICE_CHARGE serviceCharge,
+        TAX_CHARGE taxCharge,
+        ACTUAL_NAME
+        actualName,
+        PAY_CHANNEL payChannel,
+        TAKEN_BANK takenBank,
+        BANK_CARD_NUM
+        bankCardNum,
+        BANK_INFO bankInfo,
+        date_format(tt.CREATE_TIME, '%Y-%m-%d %H:%i:%s') createTime,
+        date_format(ARRIVAL_TIME, '%Y-%m-%d %H:%i:%s') arrivalTime,
+        THIRD_TRANS_NUM thirdTransNum,
+        BATCH_NUM batchNum,
+        BATCH_STATUS batchStatus,
+        REAL_AMOUNT realAmount
+        from
+        <include refid="Table" />
+        <include refid="Where_Clause" />
+        order by tt.id desc
+    </select>
+
+    <resultMap id="BankExcelMap" type="com.hhly.skeleton.base.bo.BaseBO">
+        <discriminator javaType="int" column="excelBank">
+            <case value="1"
+                  resultType="com.hhly.skeleton.cms.agent.bo.AgentTakenCMBCBankExcelBO" />
+        </discriminator>
+    </resultMap>
+
+    <select id="findBankExcel" parameterType="com.hhly.skeleton.cms.agent.vo.AgentTransTakenVO"
+            resultMap="BankExcelMap">
+        select
+        BANK_CARD_NUM bankCardNum,
+        ACTUAL_NAME actualName,
+        EXTRACT_AMOUNT extractAmount,
+        real_amount realAmount,
+        TAKEN_BANK takenBank,
+        BANK_INFO bankInfo,
+        BATCH_NUM batchNum,
+        TRANS_TAKEN_CODE transTakenCode,
+        '' as comment,
+        #{excelBank} as excelBank
+        from
+        agent_trans_taken tt
+        join agent_info ai on tt.agent_id = ai.id
+        join M_USER_INFO lc on ai.user_id=lc.id
+        <include refid="Where_Clause" />
+        order by tt.id desc
+    </select>
+</mapper>

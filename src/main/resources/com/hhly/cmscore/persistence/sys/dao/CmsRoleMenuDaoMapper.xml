@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.sys.dao.CmsRoleMenuDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.sys.po.CmsRoleMenuPO">
+    <id column="ID" jdbcType="INTEGER" property="roleMenuId" />
+    <result column="ROLE_ID" jdbcType="INTEGER" property="roleId" />
+    <result column="MENU_ID" jdbcType="INTEGER" property="menuId" />
+    <result column="MENU_BUTTON" jdbcType="VARCHAR" property="menuButton" />
+    <result column="UPDATE_TIME" jdbcType="DATE" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="DATE" property="createTime" />
+  </resultMap>
+
+  <!-- 根据角色查询菜单 -->
+  <select id="findAuthorityByRoleId" parameterType="int" resultType="com.hhly.skeleton.cms.sysmgr.bo.CMSRoleMenuBO">
+    SELECT
+      A.ID menuId,
+      A.MENU_TITLE menuTitle,
+      A.PARENT_MENU_ID parentMenuId,
+      A.MENU_BUTTON menuButton,
+      B.ID roleMenuId,
+      B.MENU_BUTTON authority,
+      B.ROLE_ID roleId,
+      CASE
+        WHEN B.ROLE_ID IS NOT NULL THEN 'true'
+        ELSE 'false'
+      END checked
+    FROM CMS_MENU A
+    LEFT OUTER JOIN CMS_ROLE_MENU B ON A.ID=B.MENU_ID AND B.ROLE_ID = #{roleId}
+    ORDER BY A.ORDER_ID
+  </select>
+
+
+  <!-- 删除角色绑定菜单 -->
+  <delete id="deleteByPrimaryKey" parameterType="com.hhly.cmscore.persistence.sys.po.CmsRoleMenuPO">
+    delete from CMS_ROLE_MENU
+    <where>
+      <if test="roleMenuId != null">
+        ID = #{roleMenuId,jdbcType=INTEGER}
+      </if>
+      <if test="menuId != null">
+        MENU_ID = #{menuId,jdbcType=INTEGER}
+      </if>
+      <if test="roleId != null">
+        ROLE_ID = #{roleId,jdbcType=INTEGER}
+      </if>
+    </where>
+  </delete>
+
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="roleMenuId" parameterType="com.hhly.cmscore.persistence.sys.po.CmsRoleMenuPO">
+    insert into CMS_ROLE_MENU (ROLE_ID, MENU_ID,
+    MENU_BUTTON, UPDATE_TIME, CREATE_TIME
+    )
+    values (#{roleId,jdbcType=DECIMAL}, #{menuId,jdbcType=DECIMAL},
+    #{menuButton,jdbcType=VARCHAR}, now(),now()
+    )
+  </insert>
+
+
+</mapper>

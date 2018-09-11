@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateArticleTopDaoMapper">
+  <!-- 
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.operate.po.OperateArticleTopPO">
+    <result column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="TYPE_ID" jdbcType="DECIMAL" property="typeId" />
+    <result column="ARTICLE_ID" jdbcType="DECIMAL" property="articleId" />
+    <result column="TITLE" jdbcType="VARCHAR" property="title" />
+    <result column="COLOR" jdbcType="VARCHAR" property="color" />
+    <result column="UPTIME" jdbcType="TIMESTAMP" property="uptime" />
+    <result column="DOWNTIME" jdbcType="TIMESTAMP" property="downtime" />
+    <result column="ISTOP" jdbcType="TINYINT" property="istop" />
+  </resultMap>
+  -->
+  
+   <sql id="Base_Column_List">
+    ID, TYPE_ID, ARTICLE_ID, TITLE, COLOR, UPTIME, DOWNTIME, ISTOP
+  </sql>
+  
+  <insert id="add" parameterType="java.util.List">
+ 	insert into OPERATE_ARTICLE_TOP (TYPE_ID, ARTICLE_ID, TITLE, COLOR, UPTIME, DOWNTIME, ISTOP)
+ 	values
+  	<foreach collection="list" item="item" separator="," >
+     ( #{item.typeId,jdbcType=DECIMAL}, #{item.articleId,jdbcType=DECIMAL}, 
+      #{item.title,jdbcType=VARCHAR}, #{item.color,jdbcType=VARCHAR}, #{item.uptime,jdbcType=TIMESTAMP}, 
+      #{item.downtime,jdbcType=TIMESTAMP},#{item.isTop,jdbcType=TINYINT}
+      )
+  	</foreach>
+  	
+  </insert>
+  
+  <update id="update" parameterType="java.util.List">
+   	<foreach collection="list" item="item" index="index" separator=";" open="" close="">
+ 	  update OPERATE_ARTICLE_TOP
+	    set
+	      TYPE_ID = #{item.typeId,jdbcType=DECIMAL},
+	      TITLE = #{item.title,jdbcType=VARCHAR},
+	      COLOR = #{item.color,jdbcType=VARCHAR},
+	      UPTIME = #{item.uptime,jdbcType=TIMESTAMP},
+	      DOWNTIME = #{item.downtime,jdbcType=TIMESTAMP},
+	      ISTOP = #{item.isTop,jdbcType=TINYINT}
+	    where ID = #{item.id,jdbcType=DECIMAL}
+  	</foreach>
+  </update>
+  
+  <delete id="delete">
+  	delete from OPERATE_ARTICLE_TOP  where ARTICLE_ID = #{articleId}
+  </delete>
+</mapper>

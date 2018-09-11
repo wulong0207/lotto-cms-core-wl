@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.payment.dao.PayBankDaoMapper">
+
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.payment.po.PayBankPO">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="CNAME" jdbcType="VARCHAR" property="cname" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="PAYTYPE" jdbcType="DECIMAL" property="paytype" />
+    <result column="BLOGO" jdbcType="VARCHAR" property="blogo" />
+    <result column="SLOGO" jdbcType="VARCHAR" property="slogo" />
+    <result column="ORDER_PC" jdbcType="DECIMAL" property="orderPc" />
+    <result column="ORDER_H5" jdbcType="DECIMAL" property="orderH5" />
+    <result column="ORDER_ANDROID" jdbcType="DECIMAL" property="orderAndroid" />
+    <result column="ORDER_IOS" jdbcType="DECIMAL" property="orderIos" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  
+  <select id="find" resultType="com.hhly.skeleton.cms.payment.bo.PayBankBO" parameterType="com.hhly.skeleton.cms.payment.vo.PayBankVO">
+	    select 
+		    ID id,
+		    `NAME` `name`,
+		    CNAME cname,
+		    `STATUS` `status`,
+		    PAYTYPE paytype,
+		    BLOGO blogo,
+		    SLOGO slogo,
+		   	REMARK remark,
+		   	ORDER_PC orderPc,
+		   	ORDER_H5 orderH5,
+		   	ORDER_ANDROID orderAndroid,
+		   	ORDER_IOS orderIos,
+	  		Code code
+	    from PAY_BANK
+	    <include refid="Query_Condition"/>
+	   <if test="sortType!=null">
+	   		order by ${sortType}
+	   </if>
+  </select>
+  
+  <sql id="Query_Condition">
+  	<where>
+  		<if test="excludeId != null">
+  			and id != #{excludeId}
+  		</if>
+  		<if test="name != null or cname != null">
+  			<choose>
+  				<when test="name != null and name != '' and cname != null and cname != ''">
+  					and (name = #{name} or cname = #{cname})
+  				</when>
+  				<when test="name != null and name != ''">
+  					and name = #{name}
+  				</when>
+  				<when test="cname != null and cname != ''">
+  					and cname = #{cname}
+  				</when>
+  			</choose>
+  		</if>
+  	</where>
+  </sql>
+  
+  <insert id="add" useGeneratedKeys="true" keyProperty="id"  parameterType="com.hhly.cmscore.persistence.payment.po.PayBankPO">
+   insert into PAY_BANK
+   		(`NAME`, CNAME,`STATUS`, PAYTYPE, BLOGO, SLOGO, REMARK, CREATE_BY,MODIFY_BY, MODIFY_TIME, UPDATE_TIME,CREATE_TIME,ORDER_PC,ORDER_H5,ORDER_ANDROID,ORDER_IOS,CODE)
+   select 
+   		#{name,jdbcType=VARCHAR}, #{cname,jdbcType=VARCHAR},#{status,jdbcType=DECIMAL},
+   			#{paytype,jdbcType=DECIMAL}, #{blogo,jdbcType=VARCHAR}, #{slogo,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+   			#{createBy,jdbcType=VARCHAR}, #{modifyBy,jdbcType=VARCHAR}, now(),now(), now(),(select if(max(ORDER_PC) is null, 1, max(ORDER_PC) + 1) from pay_bank),
+   			(select if(max(ORDER_H5) is null, 1, max(order_h5) + 1) from pay_bank),(select if(max(ORDER_ANDROID) is null, 1, max(ORDER_ANDROID) + 1) from pay_bank),
+   			(select if(max(ORDER_IOS) is null, 1, max(ORDER_IOS) + 1) from pay_bank),
+   			#{code,jdbcType=VARCHAR};
+   		
+  </insert>
+  
+  <select id="findById" resultType="com.hhly.skeleton.cms.payment.bo.PayBankBO" >
+	    select 
+		    ID id,
+		    `NAME` `name`,
+		    CNAME cname,
+		    `STATUS` `status`,
+		    PAYTYPE paytype,
+		    BLOGO blogo,
+		    SLOGO slogo,
+		   	REMARK remark,
+		   	code code
+	    from PAY_BANK
+	    where id=#{id}
+  </select>
+  
+  <update id="updateById" parameterType="com.hhly.cmscore.persistence.payment.po.PayBankPO">
+  	update 
+  		PAY_BANK
+  	set 
+  		<if test="name!=null">`NAME`=#{name,jdbcType=VARCHAR},</if>
+  		<if test="cname!=null">CNAME=#{cname,jdbcType=VARCHAR},</if>
+  		<if test="status!=null">`STATUS`=#{status,jdbcType=DECIMAL},</if>
+  		<if test="paytype!=null">PAYTYPE=#{paytype,jdbcType=DECIMAL},</if>
+  		<if test="blogo!=null and blogo!=''">BLOGO=#{blogo,jdbcType=VARCHAR},</if>
+  		<if test="slogo!=null and slogo!=''">SLOGO=#{slogo,jdbcType=VARCHAR},</if>
+  		<if test="remark!=null">REMARK=#{remark,jdbcType=VARCHAR},</if>
+  		<if test="modifyBy!=null">MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},</if>
+  		<if test="orderPc!=null">ORDER_PC=#{orderPc,jdbcType=DECIMAL},</if>
+  		<if test="orderH5!=null">ORDER_H5=#{orderH5,jdbcType=DECIMAL},</if>
+  		<if test="orderAndroid!=null">ORDER_ANDROID=#{orderAndroid,jdbcType=DECIMAL},</if>
+  		<if test="orderIos!=null">ORDER_IOS=#{orderIos,jdbcType=DECIMAL},</if>
+	  	<if test="code!=null and code!=''">code=#{code,jdbcType=VARCHAR},</if>
+    	MODIFY_TIME = now(),
+    	UPDATE_TIME = now()
+    where ID=#{id,jdbcType=DECIMAL}
+  </update>
+  
+  
+  <update id="updateList" >
+  	<foreach collection="po" item="item" >
+	  	update 
+	  		PAY_BANK
+	  	<set>
+	  		<if test="item.name!=null">`NAME`=#{item.name,jdbcType=VARCHAR},</if>
+	  		<if test="item.cname!=null">CNAME=#{item.cname,jdbcType=VARCHAR},</if>
+	  		<if test="item.status!=null">`STATUS`=#{item.status,jdbcType=DECIMAL},</if>
+	  		<if test="item.paytype!=null">PAYTYPE=#{item.paytype,jdbcType=DECIMAL},</if>
+	  		<if test="item.blogo!=null and item.blogo!=''">BLOGO=#{item.blogo,jdbcType=VARCHAR},</if>
+	  		<if test="item.slogo!=null and item.slogo!=''">SLOGO=#{item.slogo,jdbcType=VARCHAR},</if>
+	  		<if test="item.remark!=null">REMARK=#{item.remark,jdbcType=VARCHAR},</if>
+	  		<if test="item.modifyBy!=null">MODIFY_BY = #{item.modifyBy,jdbcType=VARCHAR},</if>
+	  		<if test="item.orderPc!=null">ORDER_PC=#{item.orderPc,jdbcType=DECIMAL},</if>
+	  		<if test="item.orderH5!=null">ORDER_H5=#{item.orderH5,jdbcType=DECIMAL},</if>
+	  		<if test="item.orderAndroid!=null">ORDER_ANDROID=#{item.orderAndroid,jdbcType=DECIMAL},</if>
+	  		<if test="item.orderIos!=null">ORDER_IOS=#{item.orderIos,jdbcType=DECIMAL},</if>
+	    	MODIFY_TIME = now(),
+	    	UPDATE_TIME = now()
+	  	</set>
+  		where ID=#{item.id,jdbcType=DECIMAL};
+  	</foreach>
+  </update>
+  
+
+</mapper>

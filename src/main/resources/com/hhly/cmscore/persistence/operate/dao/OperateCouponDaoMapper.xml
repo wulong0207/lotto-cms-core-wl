@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.hhly.cmscore.persistence.operate.dao.OperateCouponDaoMapper">
+	<resultMap id="BaseResultMap"
+		type="com.hhly.cmscore.persistence.operate.po.OperateCouponPO">
+		<id column="ID" property="id" jdbcType="INTEGER" />
+		<result column="RED_CODE" property="redCode" jdbcType="VARCHAR" />
+		<result column="RED_CATEGORY" property="redCategory" jdbcType="INTEGER" />
+		<result column="ACTIVITY_CODE" property="activityCode" jdbcType="VARCHAR" />
+		<result column="OPERATE_LOTTERY_ID" property="operateLotteryId" jdbcType="VARCHAR" />
+		<result column="ACTIVE_END_TIME" property="activeEndTime" jdbcType="TIMESTAMP" />
+		<result column="OBTAIN_TIME" property="obtainTime" jdbcType="TIMESTAMP" />
+		<result column="RED_OVERDUE_TIME" property="redOverdueTime" jdbcType="TIMESTAMP" />
+		<result column="USE_TIME" property="useTime" jdbcType="TIMESTAMP" />
+		<result column="RED_TYPE" property="redType" jdbcType="INTEGER" />
+		<result column="RED_NAME" property="redName" jdbcType="VARCHAR" />
+		<result column="RED_VALUE" property="redValue" jdbcType="NUMERIC" />
+		<result column="RED_BALANCE" property="redBalance" jdbcType="NUMERIC" />
+		<result column="MIN_SPEND_AMOUNT" property="minSpendAmount" jdbcType="INTEGER" />
+		<result column="USER_ID" property="userId" jdbcType="INTEGER" />
+		<result column="ECTIVITY_DAY" property="ectivityDay" jdbcType="INTEGER" />
+		<result column="CHANNEL_ID" property="channelId" jdbcType="VARCHAR" />
+		<result column="RED_LABEL" property="redLabel" jdbcType="VARCHAR" />
+		<result column="RED_STATUS" property="redStatus" jdbcType="INTEGER" />
+		<result column="LIMIT_PLATFORM" property="limitPlatform" jdbcType="VARCHAR" />
+		<result column="LIMIT_LOTTERY" property="limitLottery" jdbcType="VARCHAR" />
+		<result column="USE_RULE" property="useRule" jdbcType="VARCHAR" />
+		<result column="RED_REMARK" property="redRemark" jdbcType="VARCHAR" />
+		<result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+		<result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR" />
+		<result column="CREATE_BY" property="createBy" jdbcType="TIMESTAMP" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="REMARK" property="remark" jdbcType="VARCHAR" />
+		<result column="RED_SOURCE" property="redSource" jdbcType="INTEGER" />
+ 		<result column="LIMIT_LOTTERY_CHILD" property="limitLotteryChild" jdbcType="VARCHAR" />
+   	    <result column="LIMIT_LOTTERY_CHILD_TYPE" property="limitLotteryChildType" jdbcType="VARCHAR" />				
+		<result column="RANDOM_RED_TYPE" property="randomRedType" jdbcType="INTEGER"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, RED_CODE, RED_CATEGORY, ACTIVITY_CODE,
+		OPERATE_LOTTERY_ID, ACTIVE_END_TIME, OBTAIN_TIME,
+		RED_OVERDUE_TIME, USE_TIME, RED_TYPE, RED_NAME, RED_VALUE, RED_BALANCE,
+		MIN_SPEND_AMOUNT,
+		USER_ID, ECTIVITY_DAY, CHANNEL_ID, RED_LABEL, RED_STATUS, LIMIT_PLATFORM,
+		LIMIT_LOTTERY,
+		USE_RULE, RED_REMARK, MODIFY_TIME, MODIFY_BY, CREATE_BY, UPDATE_TIME,
+		CREATE_TIME,
+		REMARK,RED_SOURCE, LIMIT_LOTTERY_CHILD, LIMIT_LOTTERY_CHILD_TYPE,RANDOM_RED_TYPE
+	</sql>
+	<sql id="Column_List">
+		oc.ID,
+		oc.RED_CODE REDCODE,
+		oc.RED_CATEGORY REDCATEGORY,
+		oc.RED_TYPE REDTYPE,
+		oc.ACTIVITY_CODE ACTIVITYCODE,
+		oc.RED_NAME REDNAME,
+		oc.RED_VALUE REDVALUE,
+		oc.RED_BALANCE REDBALANCE,
+		oc.RED_STATUS REDSTATUS,
+		oc.USE_TIME USETIME,
+		oc.ACTIVE_END_TIME ACTIVEENDTIME,
+		oc.RED_OVERDUE_TIME REDOVERDUETIME,
+		oc.OBTAIN_TIME OBTAINTIME,
+		oc.RED_REMARK REDREMARK,
+		oc.UPDATE_TIME UPDATETIME,
+		oc.CREATE_TIME CREATETIME,
+		oc.RED_SOURCE REDSOURCE,
+		oc.LIMIT_LOTTERY_CHILD LIMITLOTTERYCHILD,
+		oc.LIMIT_LOTTERY_CHILD_TYPE LIMITLOTTERYCHILDTYPE,
+		oc.RANDOM_RED_TYPE RANDOMREDTYPE,
+		oc.USER_ID USERID
+	</sql>
+	<sql id="sql_condition_OperateCouponVO">
+		<where>
+			<if test="redCode != null and redCode!=''">
+				and oc.RED_CODE = #{redCode,jdbcType=VARCHAR}
+			</if>
+			<if test="activityCode != null and activityCode!=''">
+				and oc.ACTIVITY_CODE = #{activityCode,jdbcType=VARCHAR}
+			</if>
+			<if test="redName != null and redName != ''">
+			   and oc.red_Name = #{redName}
+			</if>
+			<if test="redCategory != null">
+				and oc.RED_CATEGORY = #{redCategory,jdbcType=INTEGER}
+			</if>
+			<if test="redType != null">
+				and oc.RED_TYPE = #{redType,jdbcType=INTEGER}
+			</if>
+			<if test="accountName !=null and accountName !=''">
+				and lc.account_name = #{accountName}
+			</if>
+			<if test="redStatus != null">
+				and oc.RED_STATUS = #{redStatus,jdbcType=INTEGER}
+			</if>
+			<if test="activityName != null and activityName != ''">
+				and oa.ACTIVITY_NAME = #{activityName,jdbcType=OTHER}
+			</if>
+			<if test="useTimeStart!=null">
+				and oc.USE_TIME >= #{useTimeStart}
+			</if>
+			<if test="useTimeEnd!=null">
+				and oc.USE_TIME  <![CDATA[<=]]>
+				#{useTimeEnd}
+			</if>
+			<if test="obtainTimeStart!=null">
+				and oc.OBTAIN_TIME >= #{obtainTimeStart}
+			</if>
+			<if test="obtainTimeEnd!=null">
+				and oc.OBTAIN_TIME  <![CDATA[<=]]>
+				#{obtainTimeEnd}
+			</if>
+			<if test="redOverdueTimeStart!=null">
+				and oc.red_overdue_time >= #{redOverdueTimeStart}
+			</if>
+			<if test="redOverdueTimeEnd!=null">
+				and oc.red_overdue_time  <![CDATA[<=]]>
+				#{redOverdueTimeEnd}
+			</if>
+			<if test="activeEndTimeStart!=null">
+				and oc.active_end_time >= #{activeEndTimeStart}
+			</if>
+			<if test="activeEndTimeEnd!=null">
+				and oc.active_end_time <![CDATA[<=]]>
+				#{activeEndTimeEnd}
+			</if>
+			<if test="createStartTime !=null">
+				and oc.CREATE_TIME >= #{createStartTime}
+			</if>
+			<if test="createEndTime!=null">
+				and oc.CREATE_TIME <![CDATA[<=]]>#{createEndTime}
+			</if>
+			<if test="updateStartTime !=null">
+				and oc.UPDATE_TIME >= #{updateStartTime}
+			</if>
+			<if test="updateEndTime!=null">
+				and oc.UPDATE_TIME <![CDATA[<=]]>#{updateEndTime}
+			</if>
+			<if test="orderCode!=null and orderCode!=''">
+				and oi.order_code = #{orderCode}
+			</if>
+		</where>
+	</sql>
+	<select id="findList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateCouponVO"
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateCouponBO">
+		select
+		<include refid="Column_List" />
+		,lc.ACCOUNT_NAME ACCOUNTNAME
+		,oa.ACTIVITY_NAME ACTIVITYNAME
+		from OPERATE_COUPON oc
+		left join M_USER_INFO lc on lc.id = oc.user_id
+		left join OPERATE_ACTIVITY oa on oa.activity_code = oc.activity_code
+		<if test="orderCode!=null and orderCode!=''">
+			left join ORDER_INFO oi on (oi.red_code_used = oc.red_code or oi.red_code_get = oc.red_code)
+		</if>
+		<include refid="sql_condition_OperateCouponVO" />
+		order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				oc.id
+			</otherwise>
+		</choose>
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow} ,#{pageSize}
+		</if>	
+	</select>
+	<select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateCouponVO" resultType="int">
+	    select count(1)
+		from OPERATE_COUPON oc
+		left join M_USER_INFO lc on lc.id = oc.user_id
+		left join OPERATE_ACTIVITY oa on oa.activity_code = oc.activity_code
+		<if test="orderCode!=null and orderCode!=''">
+			left join ORDER_INFO oi on (oi.red_code_used = oc.red_code or oi.red_code_get = oc.red_code)
+		</if>
+		<include refid="sql_condition_OperateCouponVO" />
+	</select>
+	
+	<select id="findCouponDetail" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateCouponBO">
+	    select 
+	      <include refid="Column_List" />
+	      ,oc.ACTIVITY_CODE  ACTIVITYCODE
+	      ,oc.LIMIT_PLATFORM LIMITPLATFORM
+	      ,oc.OPERATE_LOTTERY_ID OPERATELOTTERYID
+	      ,oc.LIMIT_LOTTERY LIMITLOTTERY
+	      ,oc.RED_BALANCE REDBALANCE
+	      ,oc.MIN_SPEND_AMOUNT MINSPENDAMOUNT
+	      ,oc.USE_RULE USERULE
+	      ,lc.ACCOUNT_NAME ACCOUNTNAME
+	      ,oc.ECTIVITY_DAY ECTIVITYDAY
+	      ,omc.CHANNEL_NAME CHANNELNAME
+	      ,omc.TERMINAL_PLATFORM TERMINALPLATFORM
+	      ,oc.RED_LABEL REDLABEL
+	      ,oc.MODIFY_BY MODIFYBY
+	      ,oc.MODIFY_TIME MODIFYTIME
+	      ,oc.REMARK
+	    from  OPERATE_COUPON oc
+	    left join M_USER_INFO lc on lc.id = oc.user_id
+	    left join OPERATE_MARKET_CHANNEL omc on omc.channel_id = oc.channel_id
+	    where oc.RED_CODE = #{redCode}
+	</select>
+	<select id="findExcelCoupon" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateCouponVO"
+	 resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateCouponExcelBO">
+	    select
+			@rownum:=@rownum+1 as ID,
+			oc.RED_CODE REDCODE,
+			oc.RED_CATEGORY REDCATEGORY,
+			oc.RED_TYPE REDTYPE,
+			oc.RED_NAME REDNAME,
+			oc.RED_VALUE REDVALUE,
+			oc.RED_STATUS REDSTATUS,
+			oc.RED_SOURCE REDSOURCE,
+			date_format(oc.USE_TIME,'%Y-%m-%d %T') USETIME,
+			date_format(oc.ACTIVE_END_TIME,'%Y-%m-%d %T') ACTIVEENDTIME,
+			date_format(oc.RED_OVERDUE_TIME,'%Y-%m-%d %T') REDOVERDUETIME,
+			date_format(oc.OBTAIN_TIME,'%Y-%m-%d %T') OBTAINTIME,
+			oc.RED_REMARK REDREMARK,
+			date_format(oc.UPDATE_TIME,'%Y-%m-%d %T') UPDATETIME,
+			date_format(oc.CREATE_TIME,'%Y-%m-%d %T') CREATETIME,
+			lc.account_name accountname,
+			oc.activity_code activityCode,
+			oa.ACTIVITY_NAME ACTIVITYNAME
+			from (SELECT @rownum:=0) r, OPERATE_COUPON oc
+			left join M_USER_INFO lc on lc.id = oc.user_id
+			left join OPERATE_ACTIVITY oa on oa.activity_code = oc.activity_code
+		<include refid="sql_condition_OperateCouponVO" />
+	</select>
+		
+	<update id="updCouponStatus" parameterType="com.hhly.cmscore.persistence.operate.po.OperateCouponPO">
+	 update OPERATE_COUPON
+     set
+       RED_STATUS = #{redStatus,jdbcType=INTEGER}
+     where  ID = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

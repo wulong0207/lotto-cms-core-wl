@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateRebateUserDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateRebateUserBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="match_rule" jdbcType="VARCHAR" property="matchRule" />
+    <result column="sport_rule" jdbcType="VARCHAR" property="sportRule" />
+    <result column="high_rule" jdbcType="VARCHAR" property="highRule" />
+    <result column="num_rule" jdbcType="VARCHAR" property="numRule" />
+    <result column="order_type" jdbcType="BIT" property="orderType" />
+    <result column="rebate_type" jdbcType="BIT" property="rebateType" />
+    <result column="send_amount" jdbcType="DECIMAL" property="sendAmount" />
+    <result column="cooperate_time" jdbcType="TIMESTAMP" property="cooperateTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="type" jdbcType="BIT" property="type" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List">
+    id, user_id, status, match_rule, sport_rule, high_rule, num_rule, order_type, rebate_type, 
+    send_amount, cooperate_time, create_time, create_by, update_time, type
+  </sql>
+   <sql id="Union_User_Column_List">
+     i.id, i.user_id userId, i.status, i.match_rule matchRule, i.sport_rule sportRule, i.high_rule highRule,
+	      i.num_rule numRule, i.order_type orderType, i.rebate_type rebateType, i.send_amount sendAmount, i.cooperate_time cooperateTime,
+	      i.create_time createTime, i.create_by createBy, i.update_time updateTime, i.type ,
+	      m.account_name accountName ,m.actual_name actualName ,m.cus_mobile mobile
+  </sql>
+  <sql id="Table">
+  	operate_rebate_user
+  </sql>
+   <sql id="UnionUserTable">
+  	from operate_rebate_user i left join m_user_info m on i.user_id = m.id 
+  </sql>
+  <sql id="Query_Condition">
+  	<where>
+		<if test="accountName != null and accountName != '' ">
+			and account_name = #{accountName}
+		</if>
+		<if test="mobile != null and mobile != ''">
+			and cus_mobile = #{mobile}
+		</if>
+		<if test="startTime != null">
+			and cooperate_time >= #{startTime}
+		</if>
+		<if test="endTime != null">
+			and  #{endTime} >=cooperate_time
+		</if>
+		<if test="type != null">
+			and  type =#{type}
+		</if>
+		<if test="status != null">
+			and  status =#{status}
+		</if>				
+	</where>
+  </sql>
+  
+  <sql id="Page_Condition">
+  	<if test="startRow != null and pageSize != null">
+		limit #{startRow} ,#{pageSize}
+	</if>
+  </sql>
+  <select id="findList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateRebateUserVO" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateRebateUserBO">
+     select t.* from (
+	     select 
+	      <include refid="Union_User_Column_List"/>
+			<include refid="UnionUserTable"/>	
+				<include refid="Query_Condition"/>
+				order by 
+			     <choose>  
+			       <when test="sortField !=null and sortField!=''">  
+			           i.${sortField} ${sortOrder}
+			       </when>   
+			       <otherwise>  
+			           i.ID
+			       </otherwise>  
+			     </choose>  
+     )as t
+     <include refid="Page_Condition"/>
+  </select>
+  <!--  查询时间最近的大客户信息 -->
+  <select id="findByUser" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateRebateUserVO" resultMap="BaseResultMap">
+	      select 
+	      <include refid="Union_User_Column_List"/>
+		  <include refid="UnionUserTable"/>	  		
+		 where user_id=#{userId}
+		 order by i.create_time desc 
+		 limit  1
+  </select>
+   <!--  查询时间最近的大客户信息 -->
+  <select id="findUserHisList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateRebateUserVO" resultMap="BaseResultMap">
+	      select 
+	      <include refid="Union_User_Column_List"/>
+		  <include refid="UnionUserTable"/>	  		
+		 where user_id=#{userId}
+		 order by i.create_time desc
+  </select>
+  <update id="updateOldUserType" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateRebateUserVO">
+    update operate_rebate_user
+    set 
+    update_time = now(),
+    type = 0
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateRebateUserVO" resultType="int">
+	    select count(*) total
+	    from operate_rebate_user i left join m_user_info m on i.user_id = m.id 
+				<include refid="Query_Condition"/>
+	</select>
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.OperateRebateUserPO">
+    insert into operate_rebate_user (id, user_id, status, 
+      match_rule, sport_rule, high_rule, 
+      num_rule, order_type, rebate_type, 
+      send_amount, cooperate_time, create_time, 
+      create_by, update_time, type
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{status,jdbcType=BIT}, 
+      #{matchRule,jdbcType=VARCHAR}, #{sportRule,jdbcType=VARCHAR}, #{highRule,jdbcType=VARCHAR}, 
+      #{numRule,jdbcType=VARCHAR}, #{orderType,jdbcType=BIT}, #{rebateType,jdbcType=BIT}, 
+      #{sendAmount,jdbcType=DECIMAL}, #{cooperateTime,jdbcType=TIMESTAMP}, now(), 
+      #{createBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{type,jdbcType=BIT}
+      )
+  </insert>
+ 
+  <update id="updateByPrimaryKey" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateRebateUserVO">
+    update operate_rebate_user
+    set user_id = #{userId,jdbcType=INTEGER},
+      status = #{status,jdbcType=BIT},
+      match_rule = #{matchRule,jdbcType=VARCHAR},
+      sport_rule = #{sportRule,jdbcType=VARCHAR},
+      high_rule = #{highRule,jdbcType=VARCHAR},
+      num_rule = #{numRule,jdbcType=VARCHAR},
+      order_type = #{orderType,jdbcType=BIT},
+      rebate_type = #{rebateType,jdbcType=BIT},
+      send_amount = #{sendAmount,jdbcType=DECIMAL},
+      cooperate_time = #{cooperateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=BIT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

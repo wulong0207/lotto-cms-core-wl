@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateHelpCorrectDaoMapper">
+
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.operate.po.OperateHelpCorrectPO">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="USER_ID" jdbcType="INTEGER" property="userId" />
+    <result column="HELP_ID" jdbcType="INTEGER" property="helpId" />
+    <result column="SOURCES" jdbcType="OTHER" property="sources" />
+    <result column="CORRECT" jdbcType="VARCHAR" property="correct" />
+    <result column="STATUS" jdbcType="SMALLINT" property="status" />
+    <result column="TYPE" jdbcType="SMALLINT" property="type" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="OTHER" property="modifyBy" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  
+  <resultMap id="BoResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateHelpCorrectBO">
+  	 <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="USER_ID" jdbcType="INTEGER" property="userId" />
+    <result column="HELP_ID" jdbcType="INTEGER" property="helpId" />
+    <result column="ARTICLE_TITLE" jdbcType="OTHER" property="articleTitle" />    
+    <result column="SOURCES" jdbcType="OTHER" property="sources" />
+    <result column="CORRECT" jdbcType="VARCHAR" property="correct" />
+    <result column="STATUS" jdbcType="SMALLINT" property="status" />
+ 	<result column="TYPE" jdbcType="SMALLINT" property="type" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />    
+    <result column="MODIFY_BY" jdbcType="OTHER" property="modifyBy" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  
+
+  <sql id="Base_Column_List">
+    ID, USER_ID, HELP_ID, SOURCES, CORRECT, STATUS, REMARK,CREATE_BY, MODIFY_BY, UPDATE_TIME, CREATE_TIME, 
+    MODIFY_TIME
+  </sql>
+  
+  <sql id="Base_Where_Clause">
+     1 = 1
+      <if test="id != null">
+        AND USER_ID = #{userId,jdbcType=INTEGER}
+      </if>
+      <if test="helpId != null">
+        AND HELP_ID = #{helpId,jdbcType=INTEGER}
+      </if>
+      <if test="sources != null">
+        AND SOURCES = #{sources,jdbcType=OTHER}
+      </if>
+      <if test="correct != null and correct != ''">
+        AND CORRECT = #{correct,jdbcType=VARCHAR}
+      </if>
+      <if test="status != null">
+        AND STATUS = #{status,jdbcType=SMALLINT}
+      </if>
+      <if test="remark != null and remark != ''">
+        AND REMARK = #{remark,jdbcType=VARCHAR}
+      </if>
+      <if test="createBy != null">
+        AND CREATE_BY = #{createBy,jdbcType=OTHER}
+      </if>      
+      <if test="modifyBy != null">
+        AND MODIFY_BY = #{modifyBy,jdbcType=OTHER}
+      </if>
+      <if test="updateTime != null">
+        AND UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="createTime != null">
+        AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="modifyTime != null">
+        AND MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP}
+      </if>  
+  </sql>
+  
+   <sql id="SQL_STATEMENT_ALL">
+	SELECT C.ID id, C.USER_ID userId, C.HELP_ID helpId, A.ARTICLE_TITLE articleTitle, 
+	C.SOURCES sources, C.CORRECT correct, C.STATUS status, C.TYPE type, C.REMARK remark,
+	C.CREATE_BY createBy, C.MODIFY_BY modifyBy, C.UPDATE_TIME updateTime,
+	C.CREATE_TIME createTime,
+	C.MODIFY_TIME modifyTime
+	FROM OPERATE_HELP_CORRECT C
+	LEFT JOIN OPERATE_ARTICLE A on C.HELP_ID = A.ID
+   </sql>
+	   
+  <sql id="SQL_CONDITION_ALL">
+  	where 1 = 1
+      <if test="id != null">
+        AND C.ID = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="sources != null and sources != ''">
+        AND C.SOURCES = #{sources,jdbcType=OTHER}
+      </if>
+      <if test="status != null">
+        AND C.STATUS = #{status,jdbcType=SMALLINT}
+      </if>
+      <if test="createBy != null and createBy != ''">
+        AND C.CREATE_BY = #{createBy,jdbcType=VARCHAR}
+      </if>      
+      <if test="beginTime != null">
+        AND C.CREATE_TIME >= #{beginTime,jdbcType=TIMESTAMP} 
+      </if>
+      <if test="endTime != null">
+        AND C.CREATE_TIME <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+      </if>      
+  </sql>
+
+
+  <select id="find" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateHelpCorrectVO" resultMap="BoResultMap">
+  select * from (
+  	<include refid="SQL_STATEMENT_ALL" /> 
+  	
+  	<include refid="SQL_CONDITION_ALL" /> 
+  	order by 
+    <choose>  
+        <when test="sortField !=null and sortField!=''">  
+            ${sortField} ${sortOrder}
+        </when>   
+        <otherwise>  
+             C.ID
+        </otherwise>  
+      </choose>
+  	) t
+  	 <if test="startRow != null and pageSize != null">
+   		limit #{startRow},#{pageSize}
+ 	 </if> 	
+  </select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateHelpCorrectVO" resultType="java.lang.Integer">
+    SELECT count(1) FROM OPERATE_HELP_CORRECT C
+	LEFT JOIN OPERATE_ARTICLE A on C.HELP_ID = A.ID
+    <include refid="SQL_CONDITION_ALL" />
+  </select>
+
+  <update id="updateById" parameterType="com.hhly.cmscore.persistence.operate.po.OperateHelpCorrectPO">
+    update OPERATE_HELP_CORRECT
+    <set>
+      <if test="userId != null">
+        USER_ID = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="helpId != null">
+        HELP_ID = #{helpId,jdbcType=INTEGER},
+      </if>
+      <if test="sources != null and sources != ''">
+        SOURCES = #{sources,jdbcType=OTHER},
+      </if>
+      <if test="correct != null and correct != ''">
+        CORRECT = #{correct,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=SMALLINT},
+      </if>
+      <if test="remark != null and correct != ''">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyBy != null and modifyBy != ''">
+        MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null">
+        MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

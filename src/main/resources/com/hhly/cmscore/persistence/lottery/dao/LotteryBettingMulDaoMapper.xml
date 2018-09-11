@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.lottery.dao.LotteryBettingMulDaoMapper">
+   
+   <!--                           Used to CMS                           -->
+   
+   <select id="findByCode" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryBettingMulBO">
+	    select 
+		    ID, 
+		    LOTTERY_CODE lotteryCode, 
+		    BETTIND_NUM bettindNum,
+		    MULTIPLE_NUM multipleNum,
+		    END_TIME endTime, 
+		    UPDATE_TIME updateTime, 
+		    CREATE_TIME createTime
+	    from LOTTERY_BETTING_MUL
+	    where LOTTERY_CODE = #{code}
+	    order by bettindNum desc
+   </select>
+   <insert id="add" parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryBettingMulPO">
+	insert into LOTTERY_BETTING_MUL (LOTTERY_CODE, 
+      BETTIND_NUM, MULTIPLE_NUM, END_TIME, 
+      UPDATE_TIME, CREATE_TIME)
+    values (#{lotteryCode,jdbcType=VARCHAR}, 
+      #{bettindNum,jdbcType=DECIMAL}, #{multipleNum,jdbcType=DECIMAL}, #{endTime,jdbcType=DECIMAL}, 
+      now(),now())
+   </insert>
+   <update id="updByPrimaryKey" parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryBettingMulPO">
+	   update LOTTERY_BETTING_MUL
+	    set 
+	      BETTIND_NUM = #{bettindNum,jdbcType=DECIMAL},
+	      MULTIPLE_NUM = #{multipleNum,jdbcType=DECIMAL},
+	      END_TIME = #{endTime,jdbcType=DECIMAL},
+	      UPDATE_TIME = now()
+	    where ID = #{id,jdbcType=DECIMAL}
+   </update>
+   <delete id="delByPrimaryKeyList">
+	    delete from LOTTERY_BETTING_MUL
+	    where ID in 
+	    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+	       #{item}
+	    </foreach>
+   </delete>
+   
+   <sql id="sql_statement_all">
+	  	select ID,
+		       LOTTERY_CODE           lotteryCode,
+		       BETTIND_NUM            bettindNum,
+		       MULTIPLE_NUM           multipleNum,
+		       END_TIME               endTime,
+		       UPDATE_TIME            updateTime,
+		       CREATE_TIME            createTime
+		  from LOTTERY_BETTING_MUL
+  </sql>
+  <sql id="sql_condition_all">
+  		where 1 = 1
+  		<if test="id != null">
+  			and ID = #{id,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryCode != null">
+  			and LOTTERY_CODE = #{lotteryCode,jdbcType=DECIMAL}
+  		</if>
+  		<if test="countdown != null">
+  			and END_TIME &lt;= #{countdown,jdbcType=INTEGER}
+  		</if>
+  </sql>
+  
+  <!-- 查询单条 -->
+  <select id="findSingle" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryBettingMulVO" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryBettingMulBO">
+	  	SELECT
+			BETTIND_NUM bettindNum,
+			MULTIPLE_NUM multipleNum
+		FROM
+			LOTTERY_BETTING_MUL
+		<include refid="sql_condition_all"/>
+		ORDER BY
+			END_TIME DESC
+		LIMIT 1
+  </select>
+  
+  <!-- 根据彩种和倒计时，查询注数和倍数截配置中最小截止时间 -->
+  <select id="findMinEndTime" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryBettingMulVO" resultType="long">
+	  	SELECT
+			END_TIME
+		FROM
+			LOTTERY_BETTING_MUL
+		<include refid="sql_condition_all"/>
+		ORDER BY
+			END_TIME ASC
+		LIMIT 0,
+		 1
+  </select>
+  
+  
+  
+  <!--                           Used to LOTTO                           -->
+  
+  	<!-- 前端接口：sql语句块：注、倍数配置查询 -->
+	<sql id="front_sql_statement_betting_mul">
+	  	select lottery_code lotteryCode,
+		       bettind_num  bettindNum,
+		       multiple_num multipleNum,
+		       end_time     endTime
+		  from LOTTERY_BETTING_MUL
+	</sql>
+	<!-- 前端接口：sql查询条件：注、倍数配置查询 -->
+	<sql id="front_sql_condition_betting_mul">
+  		where 1 = 1
+  		<if test="lotteryCode != null">
+  			and lottery_code = #{lotteryCode,jdbcType=INTEGER}
+  		</if>
+	</sql>
+	<!-- 前端接口：查询多条注、倍数配置 -->
+	<select id="findMultipleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotBettingMulBO">
+  		<include refid="front_sql_statement_betting_mul" />
+  		<include refid="front_sql_condition_betting_mul" />
+  		order by end_time desc
+	</select>
+</mapper>

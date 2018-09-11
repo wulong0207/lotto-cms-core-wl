@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.cooperate.dao.CooperateAgencyDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.cooperate.bo.CooperateAgencyBO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="channel_id" jdbcType="VARCHAR" property="channelId"/>
+        <result column="market_channel_id" jdbcType="VARCHAR" property="cooperateChannelId"/>
+        <result column="return_rate" jdbcType="DECIMAL" property="returnRate"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_by" jdbcType="VARCHAR" property="modifyBy"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, channel_id, market_channel_id, return_rate, create_by, create_time, modify_by,
+        modify_time
+    </sql>
+
+
+    <select id="count" resultType="int" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateAgencyVO">
+        select
+        count(1)
+        from cooperate_agency
+        where market_channel_id = #{cooperateChannelId,jdbcType=VARCHAR}
+        <if test="channelId != null and channelId != ''">
+            and channel_id=#{channelId,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+
+    <select id="findListByChannelId" resultMap="BaseResultMap"
+            parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateAgencyVO">
+        select
+        <include refid="Base_Column_List"/>
+        from cooperate_agency
+        where market_channel_id = #{cooperateChannelId,jdbcType=VARCHAR}
+        <if test="startRow != null and pageSize != null">
+            limit #{startRow},#{pageSize}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cooperate_agency
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM cooperate_agency
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateAgencyPO">
+        INSERT INTO cooperate_agency (channel_id, market_channel_id,
+                                      return_rate, create_by, create_time,
+                                      modify_by, modify_time)
+        VALUES (#{channelId,jdbcType=VARCHAR}, #{cooperateChannelId,jdbcType=VARCHAR},
+                #{returnRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, now(),
+                #{modifyBy,jdbcType=VARCHAR}, now())
+    </insert>
+    <insert id="insertSelective" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateAgencyPO">
+        insert into cooperate_agency
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="channelId != null">
+                channel_id,
+            </if>
+            <if test="cooperateChannelId != null">
+                market_channel_id,
+            </if>
+            <if test="returnRate != null">
+                return_rate,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="modifyBy != null">
+                modify_by,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="channelId != null">
+                #{channelId,jdbcType=VARCHAR},
+            </if>
+            <if test="cooperateChannelId != null">
+                #{cooperateChannelId,jdbcType=VARCHAR},
+            </if>
+            <if test="returnRate != null">
+                #{returnRate,jdbcType=DECIMAL},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyBy != null">
+                #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateAgencyPO">
+        update cooperate_agency
+        <set>
+            <if test="channelId != null">
+                channel_id = #{channelId,jdbcType=VARCHAR},
+            </if>
+            <if test="cooperateChannelId != null">
+                market_channel_id = #{cooperateChannelId,jdbcType=VARCHAR},
+            </if>
+            <if test="returnRate != null">
+                return_rate = #{returnRate,jdbcType=DECIMAL},
+            </if>
+            <if test="modifyBy != null">
+                modify_by = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            modify_time = now(),
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateAgencyPO">
+        UPDATE cooperate_agency
+        SET channel_id           = #{channelId,jdbcType=VARCHAR},
+        market_channel_id = #{cooperateChannelId,jdbcType=VARCHAR},
+            return_rate          = #{returnRate,jdbcType=DECIMAL},
+            create_by            = #{createBy,jdbcType=VARCHAR},
+            create_time          = #{createTime,jdbcType=TIMESTAMP},
+            modify_by            = #{modifyBy,jdbcType=VARCHAR},
+            modify_time          = #{modifyTime,jdbcType=TIMESTAMP}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

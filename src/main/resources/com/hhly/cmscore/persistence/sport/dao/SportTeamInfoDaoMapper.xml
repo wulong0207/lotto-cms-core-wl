@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.sport.dao.SportTeamInfoDaoMapper">
+
+	  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.sport.po.SportTeamInfoPO">
+	    <id column="id" jdbcType="INTEGER" property="id" />
+	    <result column="team_id" jdbcType="INTEGER" property="teamId" />
+	    <result column="team_type" jdbcType="BIT" property="teamType" />
+	    <result column="team_data_url" jdbcType="VARCHAR" property="teamDataUrl" />
+	    <result column="team_full_name" jdbcType="VARCHAR" property="teamFullName" />
+	    <result column="team_short_name" jdbcType="VARCHAR" property="teamShortName" />
+	    <result column="team_order" jdbcType="VARCHAR" property="teamOrder" />
+	    <result column="logo_url" jdbcType="VARCHAR" property="logoUrl" />
+	    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+	    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+	    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+	    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="remark" jdbcType="VARCHAR" property="remark" />
+	    <result column="md5_value" jdbcType="VARCHAR" property="md5Value" />
+	  </resultMap>	
+	  
+	  <resultMap id="BoResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportTeamInfoBO">
+	    <id column="id" jdbcType="INTEGER" property="id" />
+	    <result column="team_id" jdbcType="INTEGER" property="teamId" />
+	    <result column="team_type" jdbcType="BIT" property="teamType" />
+	    <result column="team_data_url" jdbcType="VARCHAR" property="teamDataUrl" />
+	    <result column="team_full_name" jdbcType="VARCHAR" property="teamFullName" />
+	    <result column="team_short_name" jdbcType="VARCHAR" property="teamShortName" />
+	    <result column="team_order" jdbcType="VARCHAR" property="teamOrder" />
+	    <result column="logo_url" jdbcType="VARCHAR" property="logoUrl" />
+	    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+	    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+	    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+	    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="remark" jdbcType="VARCHAR" property="remark" />
+	    <result column="md5_value" jdbcType="VARCHAR" property="md5Value" />
+	  </resultMap>
+
+	  <sql id="Base_Column_List">
+	    id, team_id, team_type, team_data_url, team_full_name, team_short_name, team_order, 
+	    logo_url, modify_time, modify_by, create_by, update_time, create_time, remark, md5_value
+	  </sql>
+
+	<sql id="Base_Where_Clause">
+		<where>
+			<if test="teamId != null">
+				and team_id = #{teamId,jdbcType=INTEGER}
+			</if>
+			<if test="teamType != null">
+				and team_type = #{teamType,jdbcType=BIT}
+			</if>
+			<if test="teamDataUrl != null and teamDataUrl != ''">
+				and team_data_url = #{teamDataUrl,jdbcType=VARCHAR}
+			</if>
+			<if test="teamFullName != null and teamFullName != ''">			
+				and team_full_name like concat('%',#{teamFullName},'%')
+			</if>
+			<if test="teamShortName != null and teamShortName != ''">
+				and team_short_name like concat('%',#{teamShortName},'%')
+			</if>
+			<if test="teamOrder != null and teamOrder != ''">
+				and team_order = #{teamOrder,jdbcType=VARCHAR}
+			</if>
+			<if test="md5Value != null and md5Value != ''">
+				and md5_value = #{md5Value,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</sql>
+	
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.sport.po.SportTeamInfoPO" 
+  	useGeneratedKeys="true" keyProperty="id">
+    insert into sport_team_info (team_id, team_type, 
+      team_data_url, team_full_name, team_short_name, 
+      team_order, logo_url, modify_time, 
+      modify_by, create_by, update_time, 
+      create_time, remark, md5_value
+      )
+    values (#{teamId,jdbcType=INTEGER}, #{teamType,jdbcType=BIT}, 
+      #{teamDataUrl,jdbcType=VARCHAR}, #{teamFullName,jdbcType=VARCHAR}, #{teamShortName,jdbcType=VARCHAR}, 
+      #{teamOrder,jdbcType=VARCHAR}, #{logoUrl,jdbcType=VARCHAR}, now(), 
+      #{modifyBy,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, now(), 
+      now(), #{remark,jdbcType=VARCHAR}, #{md5Value,jdbcType=VARCHAR}
+      )
+  </insert>	
+
+	<update id="updateById" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SportTeamInfoVO">
+		update SPORT_TEAM_INFO
+	    <set>
+	      <if test="teamType != null">
+	        team_type = #{teamType,jdbcType=BIT},
+	      </if>
+	      <if test="teamDataUrl != null">
+	        team_data_url = #{teamDataUrl,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teamFullName != null">
+	        team_full_name = #{teamFullName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teamShortName != null">
+	        team_short_name = #{teamShortName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teamOrder != null">
+	        team_order = #{teamOrder,jdbcType=VARCHAR},
+	      </if>
+	      <if test="logoUrl != null">
+	        logo_url = #{logoUrl,jdbcType=VARCHAR},
+	      </if>
+	      <if test="modifyBy != null">
+	        modify_by = #{modifyBy,jdbcType=VARCHAR},
+	      </if>
+	      <if test="remark != null">
+	        remark = #{remark,jdbcType=VARCHAR},
+	      </if>
+	      <if test="md5Value != null">
+	        md5_value = #{md5Value,jdbcType=VARCHAR},
+	      </if>
+	      modify_time = now()
+	    </set>
+		where ID = #{id,jdbcType=DECIMAL}
+	</update>
+
+	<select id="findTotal" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SportTeamInfoVO" resultType="java.lang.Integer">
+		select count(1) from SPORT_TEAM_INFO
+		<include refid="Base_Where_Clause" />
+	</select>
+	
+	<select id="findList" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SportTeamInfoVO" 
+		resultMap="BoResultMap">
+		select 
+		<include refid="Base_Column_List" />
+		from SPORT_TEAM_INFO
+		<include refid="Base_Where_Clause"/>
+		order by UPDATE_TIME desc
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow} ,#{pageSize}
+		</if>			
+	</select>
+	
+	<select id="findLikeList" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SportTeamInfoVO" 
+		resultMap="BoResultMap">
+		select ID, TEAM_FULL_NAME, TEAM_SHORT_NAME from SPORT_TEAM_INFO sti
+		where 1=1
+		<if test="teamType != null">
+			and TEAM_TYPE=#{teamType}
+		</if>
+		<if test="teamFullName != null and teamFullName != ''">
+			and TEAM_FULL_NAME like concat('%',#{teamFullName},'%')
+		</if>
+		order by UPDATE_TIME desc
+	</select>
+
+
+	<select id="findSingle" parameterType="java.lang.Integer" resultMap="BoResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM SPORT_TEAM_INFO
+		WHERE 1=1
+		<if test="id != null">
+			AND id = #{id}
+		</if>
+	</select>
+
+	<delete id="deleteBatch">
+		DELETE FROM SPORT_TEAM_INFO
+		WHERE ID in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

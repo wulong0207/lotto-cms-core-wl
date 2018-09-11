@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.customer.dao.UserIssueLevelDaoMapper">
+     
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.customermgr.bo.UserIssueLevelBO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="user_issue_info_id" property="userIssueInfoId" jdbcType="INTEGER" />
+  </resultMap>
+
+<update id="merge" parameterType="com.hhly.cmscore.persistence.customer.po.UserIssueLevelPO" >
+   INSERT INTO <include refid="Table" /> 
+   (		ID,				
+			user_issue_info_id ,			
+			lottery_code ,	
+			level ,
+			create_time ,		
+			modify_by 	,		
+			modify_time ,			
+			update_time 		
+  	)
+  	VALUES(
+  		#{id}, 
+		#{userIssueInfoId} , 
+	    #{lotteryCode} , 
+	    #{level} , 
+	    #{createTime}, 
+	    #{modifyBy} , 
+	    #{modifyTime} , 
+	    #{updateTime}
+	)
+	ON DUPLICATE KEY UPDATE
+	      level  = values(level), 
+	      modify_by = values(modify_by),
+	      modify_time  = values(modify_time),
+	      update_time  = values(update_time)
+  </update>
+  
+  	<select id="findOne" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserIssueLevelVO" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" /> 
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+	
+  	<select id="find" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserIssueLevelVO" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" /> 
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+	
+  	<select id="findDistinctUserId" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserIssueLevelVO" resultType="int">
+		select
+		distinct(user_issue_info_id)
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+  
+	<sql id="Table">
+		m_user_issue_level
+	</sql>
+
+	<sql id="Where_Clause">
+		<where>
+			<if test="userIssueInfoId != null">
+				and user_issue_info_id = #{userIssueInfoId}
+			</if>
+			<if test="lotteryCode != null">
+				and lottery_code = #{lotteryCode}
+			</if>
+			<if test="level != null">
+				and level = #{level}
+			</if>
+			<if test="userIssueInfoIds != null">
+				and user_issue_info_id in
+				<foreach collection="userIssueInfoIds" open="(" close=")" item="userIssueInfoId" separator=",">
+					#{userIssueInfoId}
+				</foreach>
+			</if>
+		</where>
+	</sql>
+	
+	<sql id="Base_Column_List">
+		id,
+		level,
+		user_issue_info_id
+	</sql>
+</mapper>

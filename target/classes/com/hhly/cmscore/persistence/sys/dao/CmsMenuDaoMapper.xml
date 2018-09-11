@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.sys.dao.CmsMenuDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sysmgr.bo.CMSMenuBO">
+        <id column="ID" jdbcType="INTEGER" property="menuId" />
+        <result column="MENU_TITLE" jdbcType="VARCHAR" property="menuTitle" />
+        <result column="PARENT_MENU_ID" jdbcType="INTEGER" property="parentMenuId" />
+        <result column="MENU_URL" jdbcType="VARCHAR" property="menuUrl" />
+        <result column="MENU_BUTTON" jdbcType="VARCHAR" property="menuButton" />
+        <result column="MENU_DESC" jdbcType="VARCHAR" property="menuDesc" />
+        <result column="ORDER_ID" jdbcType="INTEGER" property="orderId" />
+        <result column="MENU_LEVEL" jdbcType="INTEGER" property="menuLevel" />
+        <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+        <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+        <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+        <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+	<sql id="Query_Condition">
+		<where>
+			<if test="menuUrl != null">
+				AND MENU_URL = #{menuUrl}
+			</if>
+			<if test="menuLevel != null">
+				AND MENU_LEVEL = #{menuLevel}
+			</if>
+			<if test="parentMenuId != null">
+				AND PARENT_MENU_ID = #{parentMenuId}
+			</if>
+		</where>
+	</sql>
+	
+    <!-- 查询所有的菜单 -->
+    <select id="selectMenuAll" resultMap="BaseResultMap">
+        SELECT
+        ID, MENU_TITLE, PARENT_MENU_ID, MENU_URL, MENU_BUTTON, MENU_DESC, ORDER_ID,
+        MENU_LEVEL, MODIFY_BY, CREATE_BY, MODIFY_TIME, UPDATE_TIME, CREATE_TIME
+        FROM CMS_MENU
+        ORDER BY ORDER_ID ASC
+    </select>
+
+    <!-- 根据用户查询菜单 -->
+    <select id="findMenuByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        SELECT A.*
+        FROM CMS_MENU A
+        INNER JOIN CMS_USER_MENU B ON A.ID=B.MENU_ID
+        WHERE B.USER_ID=#{userId}
+        ORDER BY A.ORDER_ID ASC
+    </select>
+    
+    <select id="findMenu" resultMap="BaseResultMap" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSMenuVO">
+        SELECT MENU_TITLE
+        FROM CMS_MENU 
+        <include refid="Query_Condition" />
+    </select>
+    
+    <select id="findMenus" resultMap="BaseResultMap" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSMenuVO">
+        SELECT ID, MENU_TITLE
+        FROM CMS_MENU 
+        <include refid="Query_Condition" />
+    </select>
+
+    <!-- 新增菜单 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="menuId" parameterType="com.hhly.cmscore.persistence.sys.po.CmsMenuPO">
+        INSERT INTO CMS_MENU
+          (MENU_TITLE, PARENT_MENU_ID, MENU_URL, MENU_BUTTON, MENU_DESC, ORDER_ID, MENU_LEVEL, CREATE_BY, UPDATE_TIME, CREATE_TIME)
+        VALUES
+           (#{menuTitle,jdbcType=VARCHAR}, #{parentMenuId,jdbcType=INTEGER},
+            #{menuUrl,jdbcType=VARCHAR}, #{menuButton,jdbcType=VARCHAR}, #{menuDesc,jdbcType=VARCHAR},
+            #{orderId,jdbcType=INTEGER}, #{menuLevel,jdbcType=INTEGER},
+            #{createBy,jdbcType=VARCHAR},now(),now())
+    </insert>
+
+    <!-- 更新菜单 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.hhly.cmscore.persistence.sys.po.CmsMenuPO">
+        update CMS_MENU
+        <set>
+            <if test="menuTitle != null">
+                MENU_TITLE = #{menuTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="parentMenuId != null">
+                PARENT_MENU_ID = #{parentMenuId,jdbcType=INTEGER},
+            </if>
+            <if test="menuUrl != null">
+                MENU_URL = #{menuUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="menuButton != null">
+                MENU_BUTTON = #{menuButton,jdbcType=VARCHAR},
+            </if>
+            <if test="menuDesc != null">
+                MENU_DESC = #{menuDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="orderId != null">
+                ORDER_ID = #{orderId,jdbcType=INTEGER},
+            </if>
+            <if test="menuLevel != null">
+                MENU_LEVEL = #{menuLevel,jdbcType=INTEGER},
+            </if>
+            <if test="modifyBy != null">
+                MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                CREATE_BY = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where ID = #{menuId,jdbcType=INTEGER}
+    </update>
+
+    <!-- 删除菜单 -->
+    <delete id="deleteByPrimaryKey" parameterType="int">
+        DELETE FROM CMS_MENU
+        WHERE ID = #{menuId,jdbcType=INTEGER}
+    </delete>
+</mapper>

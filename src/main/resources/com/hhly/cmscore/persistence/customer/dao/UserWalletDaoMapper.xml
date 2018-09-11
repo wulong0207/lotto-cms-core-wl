@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.customer.dao.UserWalletDaoMapper">
+
+	<!--                 COMMON                -->
+  	<!-- 公共结果集 -->
+  	<resultMap id="UserWalletResultMap" type="com.hhly.skeleton.cms.customermgr.bo.UserWalletBO">
+  	  <id property="id" column="id" jdbcType="BIGINT"/>
+  	  <result property="userId" column="user_id" jdbcType="BIGINT"/>
+  	  <result property="totalCashBalance" column="total_cash_balance" jdbcType="DECIMAL"/>
+  	  <result property="winningBalance" column="winning_balance" jdbcType="DECIMAL"/>
+  	  <result property="top80Balance" column="top_80_balance" jdbcType="DECIMAL"/>
+  	  <result property="top20Balance" column="top_20_balance" jdbcType="DECIMAL"/>
+  	  <result property="effRedBalance" column="eff_red_balance" jdbcType="DECIMAL"/>
+  	  <result property="readyRedBalance" column="ready_red_balance" jdbcType="DECIMAL"/>
+  	  <result property="status" column="status" jdbcType="SMALLINT"/>
+  	  <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+  	  <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+  	  <association property="user" javaType="com.hhly.skeleton.cms.customermgr.bo.LottoCustomerBO">
+  	  	  <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+  	  	  <result property="accountName" column="account_name" jdbcType="VARCHAR"/>
+  	  	  <result property="cusMobile" column="cus_mobile" jdbcType="VARCHAR"/>
+  	  	  <result property="actualName" column="actual_name" jdbcType="VARCHAR"/>
+  	  	  <result property="idNum" column="id_num" jdbcType="VARCHAR"/>
+  	  </association>
+  	</resultMap>
+
+
+  	<!--                CMS 后台                                                 -->
+  	<!-- 钱包列表查询sql语句块 -->
+	<sql id="cms_sql_statement_wallet_list">
+  		select muw.id,
+               muw.user_id,
+               muw.total_cash_balance,
+               muw.winning_balance,
+               muw.top_80_balance,
+               muw.top_20_balance,
+               muw.eff_red_balance,
+               muw.ready_red_balance,
+               muw.`status`,
+               muw.update_time,
+               muw.create_time,
+               mui.nick_name,
+               mui.account_name,
+               mui.cus_mobile,
+               mui.actual_name,
+               mui.id_num
+          from m_user_wallet muw
+          left join m_user_info mui on muw.user_id = mui.id
+ 	</sql>
+ 	<!-- 钱包列表查询条件(查询列表) -->
+  	<sql id="cms_sql_condition_wallet_list">
+  		where 1 = 1
+  		<if test="status != null">
+  		and muw.`status` = #{status,jdbcType=SMALLINT}
+  		</if>
+  		<if test="user != null">
+  			<if test="user.nickName != null and user.nickName != ''">
+	  		and mui.nick_name = #{user.nickName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.accountName != null and user.accountName != ''">
+	  		and mui.account_name = #{user.accountName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.cusMobile != null and user.cusMobile != ''">
+	  		and mui.cus_mobile = #{user.cusMobile,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.actualName != null and user.actualName != ''">
+	  		and mui.actual_name = #{user.actualName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.idNum != null and user.idNum != ''">
+	  		and mui.id_num = #{user.idNum,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.cusMail != null and user.cusMail != ''">
+	  		and mui.cus_mail = #{user.cusMail,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.id != null">
+	  		and mui.id = #{user.id,jdbcType=BIGINT}
+	  		</if>
+  		</if>
+		<if test="typeField != null and typeField !=''">
+	     	and ${typeField} in 
+	        <foreach collection="typeValues" open="(" close=")" separator="," item="item">
+				#{item}
+	        </foreach>
+		</if>
+  	</sql>
+  	<sql id="cms_sql_orderby_wallet">
+  		<choose>
+  			<when test="sortField != null and sortField != ''">
+  				order by ${sortField}  ${sortOrder}
+  			</when>
+  			<otherwise>
+  				order by muw.id desc
+  			</otherwise>
+  		</choose>
+  	</sql>
+	<!-- 查询分页 -->
+  	<select id="findPaging" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserWalletVO" resultMap="UserWalletResultMap">
+  		<include refid="cms_sql_statement_wallet_list" />
+  		<include refid="cms_sql_condition_wallet_list" />
+  		<include refid="cms_sql_orderby_wallet" />
+  				
+  		<![CDATA[
+  				limit #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER} 
+		 
+  		]]>
+  	</select>
+  	<!-- 查询记录数及汇总信息 -->
+  	<select id="findCount" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserWalletVO" resultType="map">
+		select count(1) count,
+		       sum(muw.total_cash_balance) totalCash,
+		       sum(muw.winning_balance) totalWinning,
+		       sum(muw.top_80_balance) totalTop80,
+		       sum(muw.top_20_balance) totalTop20,
+		       sum(muw.eff_red_balance) totalEffRed,
+		       sum(muw.ready_red_balance) totalReadyRed
+		  from m_user_wallet muw
+		  <if test="joinUser != null and joinUser == true">
+		  left join m_user_info mui on muw.user_id = mui.id
+		  </if>
+		<include refid="cms_sql_condition_wallet_list" />
+  	</select>
+  	<!--修改钱包状态(如批量启用，批量禁用) -->
+  	<update id="updWalletStatusByIds">
+  		update m_user_wallet muw
+		   set muw.`status` = #{status,jdbcType=SMALLINT}, 
+		       muw.update_time = now()
+		 where 1 = 1
+		   and muw.`status` <![CDATA[ <> ]]> #{status,jdbcType=SMALLINT}
+		   and muw.id in 
+  		<foreach collection="ids" item="item" open="(" close=")" separator=",">
+  			#{item}
+  		</foreach>
+  	</update>
+  	<!-- 查询要导出的钱包数据 -->
+  	<select id="findExcel" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserWalletVO" resultMap="UserWalletResultMap">
+		<include refid="cms_sql_statement_wallet_list" />
+		<include refid="cms_sql_condition_wallet_list" />
+		<include refid="cms_sql_orderby_wallet" />
+  	</select>
+</mapper>

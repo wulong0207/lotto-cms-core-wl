@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.sys.dao.PayBankSegmentDaoMapper">
+	<resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sysmgr.vo.PayBankSegmentVO" >
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="bank_id" jdbcType="INTEGER" property="bankId" />
+		<result column="bank_name" jdbcType="VARCHAR" property="bankName" />
+		<result column="card_name" jdbcType="VARCHAR" property="cardName" />
+		<result column="card_length" jdbcType="SMALLINT" property="cardLength" />
+		<result column="top_cut" jdbcType="BIGINT" property="topCut" />
+		<result column="top_cut_length" jdbcType="BIGINT" property="topCutLength" />
+		<result column="card_type" jdbcType="VARCHAR" property="cardType" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="create_by" property="createBy" jdbcType="VARCHAR" />
+		<result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+		<result column="modify_by" property="modifyBy" jdbcType="VARCHAR" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="top_cut2" jdbcType="BIGINT" property="topCut2" />
+		<result column="top_cut_length2" jdbcType="BIGINT" property="topCutLength2" />
+	</resultMap>
+	
+	<sql id="Table">
+		 pay_bank_segment
+	</sql>
+
+	<select id="count" parameterType="com.hhly.skeleton.cms.sysmgr.vo.PayBankSegmentVO" resultType="int">
+		select count(1) from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+
+	<select id="find" parameterType="com.hhly.skeleton.cms.sysmgr.vo.PayBankSegmentVO" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+		<include refid="Order_Clause" />
+		<include refid="Page_Clause" />
+	</select>
+
+	<update id="merge" parameterType="com.hhly.skeleton.cms.sysmgr.vo.PayBankSegmentVO" >
+		INSERT INTO <include refid="Table" />
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				id,
+			</if>
+			bank_id,
+			card_name,
+			<if test="bankName != null and bankName!=''">
+				bank_name,
+			</if>
+			<if test="cardLength != null">
+				card_length,
+			</if>
+			<if test="topCut != null">
+				top_cut,
+			</if>
+			<if test="topCutLength != null">
+				top_cut_length,
+			</if>
+			<if test="cardType != null">
+				card_type,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="createBy != null and createBy!=''">
+				create_by,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+			<if test="modifyBy != null and modifyBy!=''">
+				modify_by,
+			</if>
+			<if test="topCut2 != null">
+				top_cut2,
+			</if>
+			<if test="topCutLength2 != null">
+				top_cut_length2,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			#{bankId,jdbcType=INTEGER},
+			#{cardName,jdbcType=VARCHAR},
+			<if test="bankName != null and bankName!=''">
+				#{bankName,jdbcType=VARCHAR},
+			</if>
+			<if test="cardLength != null">
+				#{cardLength,jdbcType=SMALLINT},
+			</if>
+			<if test="topCut != null">
+				#{topCut,jdbcType=BIGINT},
+			</if>
+			<if test="topCutLength != null">
+				#{topCutLength,jdbcType=BIGINT},
+			</if>
+			<if test="cardType != null">
+				#{cardType,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createBy != null and createBy!=''">
+				#{createBy,jdbcType=VARCHAR},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyBy != null and modifyBy!=''">
+				#{modifyBy,jdbcType=VARCHAR},
+			</if>
+			<if test="topCut2 != null">
+				#{topCut2,jdbcType=BIGINT},
+			</if>
+			<if test="topCutLength2 != null">
+				#{topCutLength2,jdbcType=BIGINT},
+			</if>
+		</trim>
+		ON DUPLICATE KEY UPDATE
+		<trim suffixOverrides=",">
+
+			bank_id = values(bank_id),
+			card_name = values(card_name),
+			<if test="bankName != null and bankName!=''">
+				bank_name = values(bank_name),
+			</if>
+			<if test="cardLength != null">
+				card_length = values(card_length),
+			</if>
+			<if test="topCut != null">
+				top_cut = values(top_cut),
+			</if>
+			<if test="topCutLength != null">
+				top_cut_length = values(top_cut_length),
+			</if>
+			<if test="cardType != null">
+				card_type = values(card_type),
+			</if>
+			<if test="modifyTime != null">
+				modify_time = values(modify_time),
+			</if>
+			<if test="modifyBy != null and modifyBy!=''">
+				modify_by = values(modify_by),
+			</if>
+			<if test="topCut2 != null">
+				top_cut2 = values(top_cut2),
+			</if>
+			<if test="topCutLength2 != null">
+				top_cut_length2 = values(top_cut_length2),
+			</if>
+		</trim>
+	</update>
+
+	<sql id="Base_Column_List" >
+		id, bank_id, bank_name, card_name, card_length, top_cut, top_cut_length, card_type,
+    	create_time, create_by,modify_time,modify_by, update_time, top_cut2, top_cut_length2
+	</sql>
+  	
+  	<sql id="Where_Clause">
+		<where>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="topCutLike != null">
+				and top_cut like  concat('%', #{topCutLike}, '%')
+			</if>
+		</where>
+	</sql>
+  	
+  	<sql id="Order_Clause">
+   		<if test="sortField != null and sortField != '' and sortOrder !=null">
+   			order by ${sortField} ${sortOrder}
+   		</if>
+	</sql>
+  	
+  	<sql id="Page_Clause">
+		<if test="startRow != null and endRow !=null">
+			limit #{startRow},#{pageSize}
+		</if>
+	</sql>
+	
+
+
+
+
+</mapper>

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateHelpDaoMapper"> 
+   <!-- 列表信息-->
+   <sql id="Lott_Base_Column_List" >
+	   ID, AUDIO, TITLE,CASE (ABLE+UNABLE) when 0 then '0' else round(ABLE/(ABLE+UNABLE)*100) End as satisfaction ,SUMMARY,ICO
+   </sql>
+   <!-- 连接基本表,类型表,置顶表-->
+   <sql id="JoinTableSql">
+  		(select  OPERATE_HELP.ID,OPERATE_HELP_TYPE.CODE as typeTopCode, OPERATE_HELP_TOP.TITLE,OPERATE_HELP.SUMMARY,OPERATE_HELP.ORDER_ID,OPERATE_HELP_TOP.ISTOP,OPERATE_HELP.RELEASE_TIME,
+  	   		 OPERATE_HELP.AUDIO,OPERATE_HELP.ABLE,OPERATE_HELP.UNABLE,OPERATE_HELP.ICO  	   		 
+  	   		 from   OPERATE_HELP_TOP 
+           left join OPERATE_HELP   on    OPERATE_HELP.ID =OPERATE_HELP_TOP.HELP_ID 
+           left join OPERATE_HELP_TYPE on OPERATE_HELP_TYPE.id = OPERATE_HELP_TOP.type_id
+		 where OPERATE_HELP.status=4  and DISPLAY = 1 and now() between OPERATE_HELP_TOP.UPTIME and OPERATE_HELP_TOP.DOWNTIME)
+   </sql>
+
+   <sql id="Base_Query_Condition">
+  	<where>
+		<if test="id != null">
+		    and	id = #{id}
+  		</if>
+  		<if test="typeCode != null">
+			and typeTopCode = #{typeCode}
+  		</if> 		 		
+	</where>
+   </sql>
+  
+	<sql id="Rownum_Query_Condition">
+		<if test="rownum != null">
+			limit 0,#{rownum}
+  		</if>	
+  		<if test="startRow != null and pageSize != null">
+  			limit #{startRow},#{pageSize}
+	 	</if>	
+    </sql>
+    
+ 	  	<!-- *********************use to CMS start*********************** -->
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateHelpBO">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="CODE" jdbcType="VARCHAR" property="code" />
+    <result column="TITLE" jdbcType="VARCHAR" property="title" />
+    <result column="TYPE_ID" jdbcType="DECIMAL" property="typeId" />
+    <result column="TYPE_NAME" jdbcType="VARCHAR" property="typeName" />
+    <result column="STATUS" jdbcType="INTEGER" property="status" />
+    <!--<result column="DISPLAY" jdbcType="SMALLINT" property="display" />-->
+    <result column="WEB" property="web" jdbcType="TINYINT" />
+    <result column="WAP" property="wap" jdbcType="TINYINT" />
+    <result column="ANDROID" property="android" jdbcType="TINYINT" />
+    <result column="IOS" property="ios" jdbcType="TINYINT" />
+    <result column="ORDER_ID" jdbcType="INTEGER" property="orderId" />
+    <result column="SOURCES" jdbcType="VARCHAR" property="sources" />
+    <result column="URL" jdbcType="VARCHAR" property="url" />
+    <result column="HELP_URL" jdbcType="VARCHAR" property="helpUrl" />
+    <result column="SUMMARY" jdbcType="VARCHAR" property="summary" />
+    <result column="LABEL" jdbcType="VARCHAR" property="label" />
+    <result column="CLICK" jdbcType="DECIMAL" property="click" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="AUDIT_BY" jdbcType="VARCHAR" property="auditBy" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="RELEASE_TIME" jdbcType="TIMESTAMP" property="releaseTime" />
+    <result column="AUDIT_TIME" jdbcType="TIMESTAMP" property="auditTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="AUDIO" jdbcType="VARCHAR" property="audio" />
+    <result column="ABLE" jdbcType="INTEGER" property="able" />
+    <result column="UNABLE" jdbcType="INTEGER" property="unable" />
+    <result column="CORRECT" jdbcType="VARCHAR" property="correct" />
+    <result column="ICO" jdbcType="VARCHAR" property="ico" />
+    <result column="ICO_DISPLAY" jdbcType="SMALLINT" property="icoDisplay" />
+    <result column="CONTENT" property="content" jdbcType="CLOB" />
+    <collection property="helpTops" ofType="com.hhly.skeleton.cms.operatemgr.bo.OperateHelpTopBO">
+  	    <id column="TOP_ID" jdbcType="DECIMAL" property="id" />
+	    <result column="TOP_TYPE_ID" jdbcType="DECIMAL" property="typeId" />
+	    <result column="HELP_ID" jdbcType="DECIMAL" property="helpId" />
+	    <result column="TOP_TITLE" jdbcType="VARCHAR" property="title" />
+	    <result column="UPTIME" jdbcType="TIMESTAMP" property="uptime" />
+	    <result column="DOWNTIME" jdbcType="TIMESTAMP" property="downtime" />
+	    <result column="ISTOP" jdbcType="SMALLINT" property="isTop" />
+  	</collection>
+  </resultMap>
+ 	
+	<sql id="Table">
+  	OPERATE_HELP
+  </sql>
+  
+	<sql id="Table_Top">
+  	OPERATE_HELP_TOP
+  </sql>
+  
+    <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+   		limit #{startRow},#{pageSize}
+ 	 </if>
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+		<if test="title != null and title != ''">
+			and oh.TITLE like CONCAT('%',#{title},'%')
+  		</if>
+		<if test="status != null">
+			and status = #{status}
+  		</if>
+		<if test="createBy != null and createBy !=''">
+			and CREATE_BY like CONCAT('%',#{createBy},'%')
+  		</if>
+  		<if test="searchTimeType != null and startTime != null and endTime != null">
+			<choose>
+				<when test="searchTimeType == 1">
+					<![CDATA[ and CREATE_TIME >= #{startTime} and CREATE_TIME <= #{endTime}]]>
+				</when>
+				<when test="searchTimeType == 2">
+					<![CDATA[ and RELEASE_TIME >= #{startTime} and RELEASE_TIME <= #{endTime}]]>
+				</when>
+				<when test="searchTimeType == 3">
+					<![CDATA[ and MODIFY_TIME >= #{startTime} and MODIFY_TIME <= #{endTime}]]>
+				</when>
+				<when test="searchTimeType == 4">
+					<![CDATA[ and AUDIT_TIME >= #{startTime} and AUDIT_TIME <= #{endTime}]]>
+				</when>
+			</choose>
+		</if>
+		<if test="typeId != null">
+			and oht.TYPE_ID = #{typeId}
+  		</if>
+	</where>
+  </sql>
+  <!-- 文章列表 -->
+  <select id="list" resultMap="BaseResultMap">
+	   	select ID, CODE, TITLE, TYPE_NAME, STATUS, CLICK, CREATE_BY,RELEASE_TIME,LABEL
+	   	from(
+	   		select distinct oh.ID, CODE, oh.TITLE, TYPE_NAME, STATUS, CLICK, CREATE_BY,RELEASE_TIME,ORDER_ID,LABEL,
+           	case STATUS  
+		   	when 0 then 99   
+		   	else STATUS end as order_field
+		from <include refid="Table"/> oh
+		join <include refid="Table_Top"/> oht
+		on oh.id = oht.help_id
+	  	<include refid="Query_Condition"/>
+	  	order by ORDER_FIELD, RELEASE_TIME DESC, CREATE_TIME DESC,ORDER_ID
+	  	) AS T
+   	 	<include refid="Page_Condition"/>
+  </select>
+  
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateHelpVO" resultType="int">
+    select count(distinct oh.ID) total
+    	from <include refid="Table"/> oh
+		left join <include refid="Table_Top"/> oht
+		on oh.id = oht.help_id
+	  	<include refid="Query_Condition"/>
+  </select>
+  
+  <select id="findSingle" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateHelpVO" resultMap="BaseResultMap">
+    select HELP.ID, HELP.CODE, HELP.TITLE, HELP.TYPE_ID, TYPE_NAME, STATUS, ORDER_ID, SOURCES, 
+    URL, HELP_URL, ICO, ICO_DISPLAY,  
+    LABEL, CLICK, CREATE_BY, MODIFY_BY, AUDIT_BY, MODIFY_TIME, RELEASE_TIME, 
+    AUDIT_TIME, CREATE_TIME,CONTENT,WEB,WAP,ANDROID,IOS,
+    SUMMARY,
+	    TOP.ID as TOP_ID,
+	    TOP.TYPE_ID as TOP_TYPE_ID,
+	    TOP.HELP_ID,
+	    TOP.UPTIME,
+	    TOP.DOWNTIME,
+	    TOP.ISTOP,
+	    TOP.TITLE as TOP_TITLE
+    	from <include refid="Table"/> HELP
+    	left outer join OPERATE_HELP_TOP TOP on HELP.id = TOP.HELP_ID
+  		where HELP.id = #{id}
+  </select>
+  
+  <select id="findMaxHelpCode" resultType="string">
+  	select max(CODE) from <include refid="Table"/> where CODE like CONCAT(${helpCodeLike},'%')
+  </select>
+  
+  <insert id="add" parameterType="com.hhly.cmscore.persistence.operate.po.OperateHelpPO" useGeneratedKeys="true" keyProperty="id">
+    insert into <include refid="Table"/> (CODE, TITLE, 
+      TYPE_ID, TYPE_NAME, STATUS, 
+      ORDER_ID,
+      SOURCES,URL,HELP_URL, 
+      ICO, ICO_DISPLAY,
+      SUMMARY, LABEL, 
+      CREATE_BY, MODIFY_BY, 
+      MODIFY_TIME, 
+      CREATE_TIME, 
+      RELEASE_TIME,
+      CONTENT,
+      WEB,WAP,ANDROID,IOS,
+      AUDIO
+      )
+    values (#{code,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+      #{typeId,jdbcType=DECIMAL}, #{typeName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      DEFAULT,
+      #{sources,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{helpUrl,jdbcType=VARCHAR}, 
+      #{ico,jdbcType=VARCHAR},#{icoDisplay,jdbcType=SMALLINT},
+      #{summary,jdbcType=VARCHAR}, #{label,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{modifyBy,jdbcType=VARCHAR}, 
+      now(),now(), #{releaseTime,jdbcType=TIMESTAMP}, #{content,jdbcType=CLOB},
+      #{web,jdbcType=TINYINT},#{wap,jdbcType=TINYINT},#{android,jdbcType=TINYINT},#{ios,jdbcType=TINYINT},
+      #{audio}
+      )
+  </insert>
+  
+  <update id="updateStatus" parameterType="com.hhly.cmscore.persistence.operate.po.OperateHelpPO">
+  	update <include refid="Table"/> 
+  	<set>
+  		<if test="status != null">
+  			status = #{status},
+  		</if>
+  		<if test="auditBy != null">
+  			audit_by = #{auditBy},
+  			audit_time = now(),
+  		</if>
+  	</set>
+  	 where id=#{id}
+  </update>
+  
+  <update id="update" parameterType="com.hhly.cmscore.persistence.operate.po.OperateHelpPO">
+    update <include refid="Table"/> 
+    set 
+      CODE = #{code,jdbcType=VARCHAR},
+      TITLE = #{title,jdbcType=VARCHAR},
+      TYPE_ID = #{typeId,jdbcType=DECIMAL},
+      TYPE_NAME = #{typeName,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=INTEGER},
+      <!--
+      ORDER_ID = #{orderId},
+      CLICK = #{click,jdbcType=DECIMAL},
+      AUDIT_BY = #{auditBy},
+      AUDIT_TIME = #{auditTime,jdbcType=DATE},
+      CREATE_TIME = #{createTime,jdbcType=DATE},
+      UPDATE_TIME = #{updateTime,jdbcType=DATE},
+      CREATE_BY = #{createBy,jdbcType=VARCHAR},
+      -->
+      RELEASE_TIME = #{releaseTime,jdbcType=TIMESTAMP},
+      SOURCES = #{sources,jdbcType=VARCHAR},
+      URL = #{url,jdbcType=VARCHAR},
+      HELP_URL = #{helpUrl,jdbcType=VARCHAR},
+      ICO = #{ico,jdbcType=VARCHAR},
+      ICO_DISPLAY = #{icoDisplay,jdbcType=SMALLINT},
+      SUMMARY = #{summary,jdbcType=VARCHAR},
+      LABEL = #{label,jdbcType=VARCHAR},
+      MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+      MODIFY_TIME = now(),
+      CONTENT = #{content,jdbcType=CLOB},
+      WEB = #{web,jdbcType=TINYINT},
+      WAP = #{wap,jdbcType=TINYINT},
+      ANDROID = #{android,jdbcType=TINYINT},
+      IOS = #{ios,jdbcType=TINYINT},
+      AUDIO = #{audio}
+      where ID = #{id,jdbcType=DECIMAL}
+  </update>
+ 	
+ 	<!-- *******************use to CMS end***************************** -->
+</mapper>

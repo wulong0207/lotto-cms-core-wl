@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.payment.dao.PayBankCardDaoMapper">
+	<resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.payment.vo.PayBankCardVO" >
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="userid" jdbcType="INTEGER" property="userId" />
+		<result column="bankid" jdbcType="INTEGER" property="bankId" />
+		<result column="bankname" jdbcType="VARCHAR" property="bankName" />
+		<result column="cardcode" jdbcType="VARCHAR" property="cardCode" />
+		<result column="banktype" jdbcType="BIT" property="bankType" />
+		<result column="overdue" jdbcType="VARCHAR" property="overdue" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="status" jdbcType="BIT" property="status" />
+	</resultMap>
+	
+	<sql id="Table">
+		 pay_bankcard
+	</sql>
+
+	<sql id="Base_Column_List" >
+		id,userid,bankid,bankname,cardcode,banktype,overdue,update_time,status
+	</sql>
+  	
+  	<sql id="Where_Clause">
+		<where>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="userId != null">
+				and userid = #{userId}
+			</if>
+		</where>
+	</sql>
+
+	<sql id="Order_Clause">
+		<if test="sortField != null and sortField != '' and sortOrder !=null">
+			order by ${sortField} ${sortOrder}
+		</if>
+	</sql>
+
+  	<select id="count" parameterType="com.hhly.skeleton.cms.payment.vo.PayBankCardVO" resultType="int">
+		select count(1) from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+  	</select>
+  	
+	<select id="find" parameterType="com.hhly.skeleton.cms.payment.vo.PayBankCardVO" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+		<include refid="Order_Clause" />
+	</select>
+
+	<update id="update" parameterType="com.hhly.skeleton.cms.payment.vo.PayBankCardVO" >
+			update <include refid="Table" />
+			<set>
+				<if test="bankId != null">
+					bankid = #{bankId,jdbcType=INTEGER},
+				</if>
+				<if test="bankName != null">
+					bankname = #{bankName,jdbcType=VARCHAR},
+				</if>
+				<if test="cardCode != null and cardCode">
+					cardcode = #{cardCode,jdbcType=VARCHAR},
+				</if>
+				<if test="bankType != null">
+					banktype = #{bankType,jdbcType=BIT},
+				</if>
+				<if test="overdue != null">
+					overdue = #{overdue,jdbcType=VARCHAR},
+				</if>
+				<if test="updateTime != null">
+					update_time = #{updateTime,jdbcType=TIMESTAMP},
+				</if>
+				<if test="status != null">
+					status = #{status,jdbcType=BIT},
+				</if>
+			</set>
+			<include refid="Where_Clause" />
+	</update>
+
+	<update id="batchUpdate">
+		<foreach item="item" collection="list">
+			update <include refid="Table" />
+			<set>
+				<if test="item.bankId != null">
+					bankid = #{item.bankId,jdbcType=INTEGER},
+				</if>
+				<if test="item.bankName != null">
+					bankname = #{item.bankName,jdbcType=VARCHAR},
+				</if>
+				<if test="item.cardCode != null and item.cardCode">
+					cardcode = #{item.cardCode,jdbcType=VARCHAR},
+				</if>
+				<if test="item.bankType != null">
+					banktype = #{item.bankType,jdbcType=BIT},
+				</if>
+				<if test="item.overdue != null">
+					overdue = #{item.overdue,jdbcType=VARCHAR},
+				</if>
+				<if test="item.updateTime != null">
+					update_time = #{item.updateTime,jdbcType=TIMESTAMP},
+				</if>
+				<if test="item.status != null">
+					status = #{item.status,jdbcType=BIT},
+				</if>
+			</set>
+            <where>
+                <if test="item.id != null">
+                    and id = #{item.id}
+                </if>
+                <if test="item.userId != null">
+                    and userid = #{item.userId}
+                </if>
+            </where>;
+		</foreach>
+	</update>
+
+
+</mapper>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.agent.dao.AgentUserInfoMapper" >
+  
+  <resultMap type="com.hhly.skeleton.cms.agent.vo.AgentSetVO" id="agentUserMap">
+  	<id property="id" column="id"/>
+  	<result property="agentCode" column="agent_code"/>
+  	<result property="agentWallet" column="agent_wallet"/>
+  	<result property="agentStatus" column="agent_status"/>
+  	<result property="accountName" column="account_name"/>
+  	<result property="cusMobile" column="cus_mobile"/>
+  	<result property="actualName" column="actual_name"/>
+  </resultMap>
+  
+  <select id="getAgentUserInfoList" parameterType="com.hhly.skeleton.cms.agent.vo.AgentSetVO" resultMap="agentUserMap">
+  	select   
+  		b.id,b.agent_code,b.agent_wallet,b.agent_status,a.account_name,a.cus_mobile,a.actual_name 
+  	from 
+  		m_user_info a,agent_info b where a.id = b.user_id
+  		<if test="accountName!=null and accountName!=''">
+  			and a.account_name = #{accountName}
+  		</if>
+  		<if test="cusMobile!=null and cusMobile!=''">
+  			and a.cus_mobile = #{cusMobile}
+  		</if>
+  		<if test="agentStatus!=null">
+  			and b.agent_status = #{agentStatus}
+  		</if>
+  	limit #{startRow} ,#{pageSize}	
+  </select>
+  
+  <select id="getTotal" parameterType="com.hhly.skeleton.cms.agent.vo.AgentSetVO" resultType="int">
+  		select count(id) from
+  		(
+		  	select   
+		  		b.id,b.agent_code,b.agent_wallet,b.agent_status,a.account_name,a.cus_mobile,a.actual_name 
+		  	from 
+		  		m_user_info a,agent_info b where a.id = b.user_id
+		  		<if test="accountName!=null and accountName!=''">
+		  			and a.account_name = #{accountName}
+		  		</if>
+		  		<if test="cusMobile!=null and cusMobile!=''">
+		  			and a.cus_mobile = #{cusMobile}
+		  		</if>
+		  		<if test="agentStatus!=null">
+		  			and b.agent_status = #{agentStatus}
+		  		</if>
+  		) t
+  </select>
+  
+  <select id="getUserInfo" parameterType="string" resultType="com.hhly.skeleton.cms.agent.vo.AgentSetVO">
+  	select id,account_name accountName from m_user_info 
+  	<where>
+  		<if test="accountName!=null and accountName!=''">
+  			and account_name = #{accountName}
+  		</if>
+  	</where>
+  </select>
+  
+  <!-- 更新状态 -->
+  <update id="updateAgent" parameterType="com.hhly.skeleton.cms.agent.vo.AgentSetVO">
+  		update agent_info set agent_status=#{agentStatus} where id = #{agentId}
+  </update>
+  
+  
+  <!-- 获取返佣设置 -->
+  <select id="getAgentRebateConfigs" resultType="com.hhly.skeleton.cms.agent.vo.AgentRebateConfigVO">
+  		SELECT
+			id,direct_min_money directMinMoney,direct_max_money directMaxMoney,direct_ratio directRatio,
+			agent_min_money agentMinMoney,agent_max_money agentMaxMoney,
+			agent_ratio agentRatio,create_by configCreateBy,create_time configCreateTime
+		FROM
+			agent_rebate_config
+		WHERE
+			rebate_id = (
+				SELECT
+					id
+				FROM
+					agent_rebate
+				WHERE
+					agent_id = #{agentId}
+				ORDER BY
+					id DESC
+				LIMIT 1
+			)
+			order by direct_ratio ,agent_ratio 
+  </select>
+  
+  
+  <!-- 获取变更历史 -->
+  
+  	<select id="getAgentRebateHistory" resultType="com.hhly.skeleton.cms.agent.vo.AgentRebateConfigVO">
+    	SELECT
+			id,direct_min_money directMinMoney,direct_max_money directMaxMoney,direct_ratio directRatio,
+			agent_min_money agentMinMoney,agent_max_money agentMaxMoney,
+			agent_ratio agentRatio,create_by configCreateBy,create_time configCreateTime
+		FROM
+			agent_rebate_config
+		WHERE
+			rebate_id = #{id}
+		order by direct_ratio ,agent_ratio 
+  	</select>	
+  	
+  	
+  	<select id="getRebateIdByAgentId"  resultType="com.hhly.skeleton.cms.agent.bo.AgentRebateBo" >
+  				SELECT
+					id,create_time createTime
+				FROM
+					agent_rebate
+				WHERE
+					agent_id = #{agentId}
+				ORDER BY
+					id DESC
+				<if test="flag==true">
+					LIMIT 1
+				</if>	
+  	</select>
+  	
+  	<insert id="insertAgentRebate" parameterType="com.hhly.skeleton.cms.agent.vo.AgentRebateConfigVO" useGeneratedKeys="true" keyProperty="id">
+  		insert into 
+  		agent_rebate(agent_id,add_time,default_flag,create_by,create_time) 
+  		values (#{agentId},now(),#{defaultFlag},#{createBy},now())
+  	</insert>
+  	
+  	<insert id="insertAgentRebateConfigs" >
+  		insert into 
+  		agent_rebate_config(rebate_id,direct_min_money,direct_max_money,direct_ratio,agent_min_money,agent_max_money,agent_ratio,create_by,create_time) 
+  		values 
+  		<foreach collection="list" item="item" index="index" separator=",">
+            (
+	            #{item.configId},#{item.directMinMoney},#{item.directMaxMoney},#{item.directRatio},#{item.agentMinMoney},
+	            #{item.agentMaxMoney}, #{item.agentRatio}, #{item.configCreateBy},now()
+            )
+        </foreach>
+  	</insert>
+  	
+  	<update id="updateDefaultAgentRebate" parameterType="com.hhly.skeleton.cms.agent.vo.AgentRebateConfigVO">
+  		update agent_rebate set update_by = #{updateBy} ,update_time = now() where  default_flag = 1
+  	</update>
+  	
+  	<delete id="deleteAllDefaultRebateConfig">
+  		delete from agent_rebate_config where rebate_id = #{rebateId}
+  	</delete>
+  	
+  	<!-- 查询所有的代理人 -->
+  	<select id="getAllAgents" parameterType="com.hhly.skeleton.cms.agent.bo.AgentInfoBO" resultType="com.hhly.skeleton.cms.agent.bo.AgentInfoBO">
+  		
+  		select id from `agent_info` where agent_status = #{agentStatus}
+  	</select>	 
+	
+  	
+</mapper>

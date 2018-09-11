@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateMarketChannelDaoMapper">
+	<resultMap id="BaseResultMap"
+		type="com.hhly.cmscore.persistence.operate.po.OperateMarketChannelPO">
+		<id column="ID" property="id" jdbcType="DECIMAL" />
+		<result column="CHANNEL_ID" property="channelId" jdbcType="VARCHAR" />
+		<result column="CHANNEL_NAME" property="channelName" jdbcType="OTHER" />
+		<result column="TERMINAL_PLATFORM" property="terminalPlatform"
+			jdbcType="DECIMAL" />
+		<result column="PARENT_CHANNEL_ID" property="parentChannelId"
+			jdbcType="VARCHAR" />
+		<result column="GRADE" property="grade" jdbcType="DECIMAL" />
+		<result column="SETTLEMENT_TYPE" property="settlementType"
+			jdbcType="DECIMAL" />
+		<result column="RESOURCE_URL" property="resourceUrl" jdbcType="VARCHAR" />
+		<result column="SETTLEMENT_RATE" property="settlementRate"
+			jdbcType="DECIMAL" />
+		<result column="COOP_START_TIME" property="coopStartTime"
+			jdbcType="TIMESTAMP" />
+		<result column="COOP_END_TIME" property="coopEndTime" jdbcType="TIMESTAMP" />
+		<result column="CHANNEL_STATUS" property="channelStatus"
+			jdbcType="DECIMAL" />
+		<result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+		<result column="MODIFY_BY" property="modifyBy" jdbcType="OTHER" />
+		<result column="CREATE_BY" property="createBy" jdbcType="OTHER" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="REMARK" property="remark" jdbcType="OTHER" />
+		<result column="RESOURCE_NAME" property="resourceName" jdbcType="OTHER" />
+		<result column="SECRET_KEY" property="secretKey" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, CHANNEL_ID, CHANNEL_NAME, TERMINAL_PLATFORM, PARENT_CHANNEL_ID,
+		GRADE, SETTLEMENT_TYPE,
+		RESOURCE_URL, SETTLEMENT_RATE, COOP_START_TIME, COOP_END_TIME, CHANNEL_STATUS,
+		MODIFY_TIME,
+		MODIFY_BY, CREATE_BY, UPDATE_TIME, CREATE_TIME, REMARK,RESOURCE_NAME,SECRET_KEY
+	</sql>
+
+	<select id="findAllSimple" resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMarketChannelBO">
+		select
+		channel_id channelId,
+		channel_name channelName,
+		PARENT_CHANNEL_ID PARENTCHANNELID,
+		GRADE GRADE
+		from OPERATE_MARKET_CHANNEL
+		where CHANNEL_STATUS = 1 
+	</select>
+
+	<sql id="Column_List">
+		ID,
+		CHANNEL_ID CHANNELID,
+		CHANNEL_NAME CHANNELNAME,
+		TERMINAL_PLATFORM TERMINALPLATFORM,
+		PARENT_CHANNEL_ID PARENTCHANNELID,
+		GRADE,
+		SETTLEMENT_TYPE SETTLEMENTTYPE,
+		RESOURCE_URL RESOURCEURL,
+		SETTLEMENT_RATE SETTLEMENTRATE,
+		COOP_START_TIME COOPSTARTTIME,
+		COOP_END_TIME COOPENDTIME,
+		CHANNEL_STATUS CHANNELSTATUS,
+		MODIFY_TIME MODIFYTIME,
+		MODIFY_BY MODIFYBY,
+		CREATE_BY CREATEBY,
+		UPDATE_TIME UPDATETIME,
+		CREATE_TIME CREATETIME,
+		REMARK,
+		RESOURCE_NAME RESOURCENAME,
+		MAJIA,
+		SECRET_KEY SECRETKEY
+	</sql>
+	<sql id="sql_condition_OperateMarketChannelVO">
+		<where>
+			<if test="channelId!=null and channelId!=''">
+				and CHANNEL_ID = #{channelId}
+			</if>
+			<if test="channelName!=null and channelName!=''">
+				and channel_Name = #{channelName}
+			</if>
+			<if test="parentChannelId!=null and parentChannelId!=''">
+				and parent_Channel_Id = #{parentChannelId}
+			</if>
+			<if test="grade!=null">
+				and grade = #{grade}
+			</if>
+			<if test="terminalPlatform !=null">
+				and terminal_Platform = #{terminalPlatform}
+			</if>
+			<if test="settlementType!=null">
+				and settlement_Type = #{settlementType}
+			</if>
+	        <if test="coopStartTime !=null">
+				and COOP_START_TIME >= #{coopStartTime}
+			</if>
+			<if test="coopEndTime!=null">
+				and coop_End_Time <![CDATA[<=]]>#{coopEndTime}
+			</if>
+			
+			<if test="createStartTime !=null">
+				and CREATE_TIME >= #{createStartTime}
+			</if>
+			<if test="createEndTime!=null">
+				and CREATE_TIME <![CDATA[<=]]>#{createEndTime}
+			</if>
+			<if test="updateStartTime !=null">
+				and UPDATE_TIME >= #{updateStartTime}
+			</if>
+			<if test="updateEndTime!=null">
+				and UPDATE_TIME <![CDATA[<=]]>#{updateEndTime}
+			</if>
+			<if test="appUrlLike!=null and appUrlLike!=''">
+				and app_url like concat('%', #{appUrlLike})
+			</if>
+			<if test="majia != null">
+				and majia = #{majia}
+			</if>
+		</where>
+	</sql>
+	<select id="findList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMarketChannelVO"
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMarketChannelBO">
+		select t.* from (
+			select
+			<include refid="Column_List" />
+			
+			from OPERATE_MARKET_CHANNEL
+			<include refid="sql_condition_OperateMarketChannelVO" />
+			order by
+			<choose>
+				<when test="sortField !=null and sortField!=''">
+					${sortField} ${sortOrder}
+				</when>
+				<otherwise>
+					id
+				</otherwise>
+			</choose>
+		) as t
+
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow} ,#{pageSize}
+		</if>
+	</select>
+	<select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMarketChannelVO" resultType="int">
+	    select count(*)
+	    from OPERATE_MARKET_CHANNEL
+		<include refid="sql_condition_OperateMarketChannelVO" />
+	</select>
+	<select id="findParentId" resultType="String">
+		 select channel_id
+		  from OPERATE_MARKET_CHANNEL
+		 where grade = #{grade}
+		   and CHANNEL_STATUS = 1	
+	</select>
+	<update id="updOperateMarketChannel" parameterType="com.hhly.cmscore.persistence.operate.po.OperateMarketChannelPO">
+	    update OPERATE_MARKET_CHANNEL
+	    set 
+	      CHANNEL_NAME = #{channelName,jdbcType=OTHER},
+	      TERMINAL_PLATFORM = #{terminalPlatform,jdbcType=DECIMAL},
+	      PARENT_CHANNEL_ID = #{parentChannelId,jdbcType=VARCHAR},
+	      GRADE = #{grade,jdbcType=DECIMAL},
+	      SETTLEMENT_TYPE = #{settlementType,jdbcType=DECIMAL},
+	      RESOURCE_URL = #{resourceUrl,jdbcType=VARCHAR},
+	      SETTLEMENT_RATE = #{settlementRate,jdbcType=DECIMAL},
+	      COOP_START_TIME = #{coopStartTime,jdbcType=TIMESTAMP},
+	      COOP_END_TIME = #{coopEndTime,jdbcType=TIMESTAMP},
+	      CHANNEL_STATUS = #{channelStatus,jdbcType=DECIMAL},
+	      MODIFY_TIME = now(),
+	      MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+	      UPDATE_TIME = now(),
+	      REMARK = #{remark,jdbcType=OTHER},
+	      <if test="majia != null">
+			  MAJIA = #{majia},
+		  </if>
+	      RESOURCE_NAME=#{resourceName,jdbcType=OTHER},
+	      SECRET_KEY = #{secretKey,jdbcType=VARCHAR}
+	    where ID = #{id,jdbcType=DECIMAL}	
+	</update>
+	<insert id="addOperateMarketChannel" parameterType="com.hhly.cmscore.persistence.operate.po.OperateMarketChannelPO">
+	 insert into OPERATE_MARKET_CHANNEL ( CHANNEL_ID, CHANNEL_NAME, 
+      TERMINAL_PLATFORM, PARENT_CHANNEL_ID, GRADE, 
+      SETTLEMENT_TYPE, RESOURCE_URL, SETTLEMENT_RATE, 
+      COOP_START_TIME, COOP_END_TIME, CHANNEL_STATUS, 
+      MODIFY_TIME, MODIFY_BY, CREATE_BY, 
+      UPDATE_TIME, CREATE_TIME, REMARK,
+      <if test="majia !=null">
+		  MAJIA,
+	  </if>
+      RESOURCE_NAME,SECRET_KEY
+      )
+    values ( #{channelId,jdbcType=VARCHAR}, #{channelName,jdbcType=OTHER}, 
+      #{terminalPlatform,jdbcType=DECIMAL}, #{parentChannelId,jdbcType=VARCHAR}, #{grade,jdbcType=DECIMAL}, 
+      #{settlementType,jdbcType=DECIMAL}, #{resourceUrl,jdbcType=VARCHAR}, #{settlementRate,jdbcType=DECIMAL}, 
+      #{coopStartTime,jdbcType=TIMESTAMP}, #{coopEndTime,jdbcType=TIMESTAMP}, #{channelStatus,jdbcType=DECIMAL}, 
+      now(), #{modifyBy,jdbcType=OTHER}, #{createBy,jdbcType=OTHER},
+      now(), now(), #{remark,jdbcType=OTHER},
+		<if test="majia !=null">
+			#{majia},
+		</if>
+		#{resourceName,jdbcType=OTHER}, #{secretKey,jdbcType=VARCHAR}
+      )
+	</insert>
+	<select id="findIdByChannelId" resultType="Integer">
+	   select id from OPERATE_MARKET_CHANNEL where channel_id = #{channelId}
+	</select>
+	<select id="findExcelMarketChannel" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMarketChannelVO"
+	 resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMarketChannelExcelBO">
+		select
+		CHANNEL_ID CHANNELID,
+		CHANNEL_NAME CHANNELNAME,
+		TERMINAL_PLATFORM TERMINALPLATFORM,
+		PARENT_CHANNEL_ID PARENTCHANNELID,
+		GRADE,
+		SETTLEMENT_TYPE SETTLEMENTTYPE,
+		RESOURCE_URL RESOURCEURL,
+		SETTLEMENT_RATE SETTLEMENTRATE,
+		date_format(COOP_START_TIME,'%Y-%m-%d %T') COOPSTARTTIME,
+		date_format(COOP_END_TIME,'%Y-%m-%d %T') COOPENDTIME,
+		CHANNEL_STATUS CHANNELSTATUS,
+		date_format(UPDATE_TIME,'%Y-%m-%d %T') UPDATETIME,
+		date_format(CREATE_TIME,'%Y-%m-%d %T') CREATETIME,
+		REMARK,
+		RESOURCE_NAME RESOURCENAME
+		from OPERATE_MARKET_CHANNEL
+		<include refid="sql_condition_OperateMarketChannelVO" />
+		order by id 
+	 </select>
+	 <select id="findMaxChannelId" resultType="String">
+	   select CHANNEL_ID from OPERATE_MARKET_CHANNEL
+	 </select>
+ 	<update id="updAppUrl" parameterType="com.hhly.cmscore.persistence.operate.po.OperateMarketChannelPO">
+	    update OPERATE_MARKET_CHANNEL
+	    set 
+	      APP_URL = #{appUrl}
+	    where CHANNEL_ID = #{channelId}	
+	</update>
+	<select id="findVersionByChannel" parameterType="com.hhly.skeleton.lotto.base.operate.vo.OperateLottSoftwareVersionVO" resultType="com.hhly.skeleton.lotto.base.operate.bo.OperateLottSoftwareVersionBO">
+  	  select APP_URL wapAppUrl 	  
+  	  from operate_market_channel
+  	  where CHANNEL_ID = #{channelId}
+  </select>
+  	<select id="findLeaf" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateMarketChannelVO"
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateMarketChannelBO">
+  	  SELECT CHANNEL_ID channelId FROM operate_market_channel 
+  	  where terminal_platform=#{terminalPlatform} and 
+  	  parent_channel_id is not null and 
+  	  channel_id not in (
+		 select parent_channel_id from operate_market_channel   
+	   ) 
+  </select>
+</mapper>

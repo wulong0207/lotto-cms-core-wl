@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.hhly.cmscore.persistence.ticket.dao.TicketAlarmConfigDaoMapper">
+	<resultMap id="BaseResultMap"
+		type="com.hhly.cmscore.persistence.ticket.po.TicketAlarmConfigPO">
+		<id column="ID" property="id" jdbcType="DECIMAL" />
+		<result column="ALARM_TYPE" property="alarmType" jdbcType="DECIMAL" />
+		<result column="ALARM_CHILD" property="alarmChild" jdbcType="DECIMAL" />
+		<result column="STATUS" property="status" jdbcType="DECIMAL" />
+		<result column="ALARM_LEVEL" property="alarmLevel" jdbcType="DECIMAL" />
+		<result column="PARAMETER" property="parameter" jdbcType="DECIMAL" />
+		<result column="FORMAT" property="format" jdbcType="OTHER" />
+		<result column="CREATE_BY" property="createBy" jdbcType="OTHER" />
+		<result column="MODIFY_BY" property="modifyBy" jdbcType="OTHER" />
+		<result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, ALARM_TYPE, ALARM_CHILD, `STATUS`, ALARM_LEVEL,
+		PARAMETER, FORMAT,
+		CREATE_BY, MODIFY_BY,
+		MODIFY_TIME, UPDATE_TIME,
+		CREATE_TIME
+	</sql>
+	<sql id="Column_List">
+		ID,
+		ALARM_TYPE ALARMTYPE,
+		ALARM_CHILD ALARMCHILD,
+		`STATUS`,
+		ALARM_LEVEL ALARMLEVEL,
+		PARAMETER,
+		FORMAT,
+		CREATE_BY CREATEBY,
+		MODIFY_BY MODIFYBY,
+		MODIFY_TIME MODIFYTIME,
+		CREATE_TIME CREATETIME
+	</sql>
+	<sql id="sql_condition_TicketAlarmConfigVO">
+		<where>
+            <if test="alarmType != null">
+				and ALARM_TYPE=#{alarmType}
+			</if>
+			<if test="alarmChild !=null">
+				and ALARM_CHILD  = #{alarmChild}
+			</if>
+			<if test="alarmLevel !=null">
+				and ALARM_LEVEL  = #{alarmLevel}
+			</if>
+			<if test="status !=null">
+				and `status`  = #{status}
+			</if>
+		</where>
+	</sql>
+	<select id="listPage"
+		parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketAlarmConfigVO"
+		resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketAlarmConfigBO">
+		select
+		<include refid="Column_List" />
+		from TICKET_ALARM_CONFIG
+		<include refid="sql_condition_TicketAlarmConfigVO" />
+			order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				id
+			</otherwise>
+		</choose>		
+			<if test="startRow != null and pageSize != null">
+				limit #{startRow}, #{pageSize}
+			</if>
+	</select>
+	<select id="countPage"
+		parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketAlarmConfigVO"
+		resultType="int">
+		select count(1)
+		from TICKET_ALARM_CONFIG
+		<include refid="sql_condition_TicketAlarmConfigVO" />
+	</select>
+	<insert id="add" useGeneratedKeys="true" keyProperty="id"
+		parameterType="com.hhly.cmscore.persistence.ticket.po.TicketAlarmConfigPO">
+		insert into TICKET_ALARM_CONFIG (ALARM_TYPE, ALARM_CHILD,
+		`STATUS`, ALARM_LEVEL, PARAMETER,
+		FORMAT, CREATE_BY, MODIFY_BY,
+		MODIFY_TIME, UPDATE_TIME, CREATE_TIME
+		)
+		values (#{alarmType,jdbcType=DECIMAL},
+		#{alarmChild,jdbcType=DECIMAL},
+		#{status,jdbcType=DECIMAL}, #{alarmLevel,jdbcType=DECIMAL}, #{parameter,jdbcType=DECIMAL},
+		#{format,jdbcType=OTHER}, #{createBy,jdbcType=OTHER},
+		#{modifyBy,jdbcType=OTHER},
+		now(),now(),now()
+		)
+	</insert>
+
+	<update id="update"
+		parameterType="com.hhly.cmscore.persistence.ticket.po.TicketAlarmConfigPO">
+		update TICKET_ALARM_CONFIG
+		set
+		ALARM_TYPE = #{alarmType,jdbcType=DECIMAL},
+		ALARM_CHILD = #{alarmChild,jdbcType=DECIMAL},
+		`STATUS` = #{status,jdbcType=DECIMAL},
+		ALARM_LEVEL = #{alarmLevel,jdbcType=DECIMAL},
+		PARAMETER = #{parameter,jdbcType=DECIMAL},
+		FORMAT = #{format,jdbcType=OTHER},
+		MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+		MODIFY_TIME = now(),
+		UPDATE_TIME = now()
+		where ID = #{id,jdbcType=DECIMAL}
+	</update>
+</mapper>

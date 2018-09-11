@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.payment.dao.PayChannelDaoMapper">
+
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.payment.bo.PayChannelBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="bankid" jdbcType="INTEGER" property="bankid" />
+    <result column="type" jdbcType="BIT" property="type" />
+    <result column="cardtype" jdbcType="BIT" property="cardtype" />
+    <result column="available" jdbcType="BIT" property="available" />
+    <result column="pause" jdbcType="BIT" property="pause" />
+    <result column="begintime" jdbcType="TIMESTAMP" property="begintime" />
+    <result column="endtime" jdbcType="TIMESTAMP" property="endtime" />
+    <result column="pc" jdbcType="BIT" property="pc" />
+    <result column="h5" jdbcType="BIT" property="h5" />
+    <result column="android" jdbcType="BIT" property="android" />
+    <result column="ios" jdbcType="BIT" property="ios" />
+    <result column="wechat" jdbcType="BIT" property="wechat" />
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="rate" jdbcType="DECIMAL" property="rate" />
+    <result column="charge" jdbcType="BIT" property="charge" />
+    <result column="pay_channel_mgr_id" jdbcType="INTEGER" property="payChannelMgrId" />
+    <result column="app_invoke_type" jdbcType="INTEGER" property="appInvokeType" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    pc.id, pc.name, pc.bankid, pc.type, pc.cardtype, pc.available, pc.pause, pc.begintime, pc.endtime, pc.pc, pc.h5, pc.android, 
+    pc.ios, pc.wechat, pc.order_id, pc.code,
+    pc.rate, pc.charge, pc.pay_channel_mgr_id,
+    pc.create_by,
+    pc.create_time,
+    ifnull(pc.app_invoke_type,0) app_invoke_type
+  </sql>
+
+	<sql id="Table">
+		 pay_channel pc
+		 <if test="joinBank">
+		 left join pay_bank pb on pc.bankid = pb.id
+		 </if>
+	</sql>
+
+   	<sql id="Where_Clause">
+		<where>
+			<if test="id != null">
+				and pc.id = ${id}
+			</if>
+			<if test="ids != null">
+				and pc.id in
+				<foreach collection="ids" item="id" open="(" close=")" separator=",">
+					${id}
+				</foreach>
+			</if>
+			<if test="bankid != null">
+				and pc.bankid= #{bankid}
+			</if>
+			<if test="type != null">
+				and pc.type = ${type}
+			</if>
+			<if test="payChannelMgrId != null">
+				and pc.pay_channel_mgr_id = ${payChannelMgrId}
+			</if>
+			<if test="joinBank and bankName !=null and bankName !=''">
+				and pb.name like CONCAT('%',#{bankName},'%')
+			</if>
+		</where>
+	</sql>
+	
+  	<sql id="Order_Clause">
+   		<if test="sortField != null and sortField != '' and sortOrder !=null">
+   			order by ${sortField} ${sortOrder}
+   		</if>
+	</sql>
+  	
+  	<sql id="Page_Clause">
+		<if test="startRow != null and endRow !=null">
+			limit #{startRow},#{endRow}
+		</if>
+	</sql>
+	
+  <select id="find" resultMap="BaseResultMap" >
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+		<include refid="Order_Clause" />
+		<include refid="Page_Clause" />
+  </select>
+  
+  	<select id="count" resultType="int">
+		select count(1) from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+  	</select>
+  
+  <insert id="saveList" >
+  	<foreach collection="po" item="item" >
+  	 insert into PAY_CHANNEL (`NAME`,BANKID,TYPE,CARDTYPE,AVAILABLE,PAUSE,BEGINTIME,ENDTIME,PC,H5,ANDROID,IOS,WECHAT, CREATE_BY,MODIFY_BY, MODIFY_TIME, UPDATE_TIME,CREATE_TIME,ORDER_ID,CODE,PAY_CHANNEL_MGR_ID,APP_INVOKE_TYPE)
+  	 select #{item.name,jdbcType=VARCHAR},#{item.bankid,jdbcType=DECIMAL},#{item.type,jdbcType=DECIMAL},#{item.cardtype,jdbcType=DECIMAL},#{item.available,jdbcType=DECIMAL},#{item.pause,jdbcType=DECIMAL},#{item.begintime,jdbcType=TIMESTAMP},#{item.endtime,jdbcType=TIMESTAMP},#{item.pc,jdbcType=DECIMAL},#{item.h5,jdbcType=DECIMAL},#{item.android,jdbcType=DECIMAL},#{item.ios,jdbcType=DECIMAL},#{item.wechat,jdbcType=DECIMAL}
+        ,#{item.createBy,jdbcType=VARCHAR}, #{item.modifyBy,jdbcType=VARCHAR}, now(),now(), now(),(select if(max(ORDER_ID) is null, 1, max(ORDER_ID)+1) from PAY_CHANNEL),#{item.code},#{item.payChannelMgrId},#{item.appInvokeType};
+    </foreach>
+  </insert>
+  
+  <update id="updateList" >
+  	<foreach collection="po" item="item" >
+        update PAY_CHANNEL
+        <set>
+        	<if test="item.name!=null">`NAME`=#{item.name,jdbcType=VARCHAR},</if>
+        	<if test="item.available!=null">AVAILABLE=#{item.available,jdbcType=DECIMAL},</if>
+        	<if test="item.cardtype!=null">CARDTYPE=#{item.cardtype,jdbcType=DECIMAL},</if>
+        	<if test="item.pause!=null">PAUSE=#{item.pause,jdbcType=DECIMAL},</if>
+        	<if test="item.begintime!=null">BEGINTIME=#{item.begintime,jdbcType=TIMESTAMP},</if>
+        	<if test="item.endtime!=null">ENDTIME=#{item.endtime,jdbcType=TIMESTAMP}, </if>
+        	<if test="item.pc!=null">PC=#{item.pc,jdbcType=DECIMAL},</if>
+        	<if test="item.h5!=null">H5=#{item.h5,jdbcType=DECIMAL},</if>
+        	<if test="item.android!=null">ANDROID=#{item.android,jdbcType=DECIMAL},</if>
+        	<if test="item.ios!=null">IOS=#{item.ios,jdbcType=DECIMAL},</if>
+			<if test="item.wechat!=null">WECHAT=#{item.wechat,jdbcType=DECIMAL},</if>
+        	<if test="item.orderId!=null">ORDER_ID=#{item.orderId,jdbcType=DECIMAL},</if>
+	        <if test="item.modifyBy!=null">MODIFY_BY = #{item.modifyBy,jdbcType=VARCHAR},</if>
+	        <if test="item.code!=null">CODE = #{item.code,jdbcType=VARCHAR},</if>
+	        <if test="item.payChannelMgrId!=null">PAY_CHANNEL_MGR_ID = #{item.payChannelMgrId},</if>
+	        <if test="item.appInvokeType!=null">APP_INVOKE_TYPE = #{item.appInvokeType},</if>
+	    	MODIFY_TIME = now(),
+	    	UPDATE_TIME = now()
+        </set>
+        where id=#{item.id,jdbcType=DECIMAL};
+    </foreach>
+  </update>
+  
+<update id="update" parameterType="com.hhly.cmscore.persistence.payment.po.PayChannelPO">
+    update pay_channel
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="bankid != null">
+        bankid = #{bankid,jdbcType=INTEGER},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=BIT},
+      </if>
+      <if test="cardtype != null">
+        cardtype = #{cardtype,jdbcType=BIT},
+      </if>
+      <if test="available != null">
+        available = #{available,jdbcType=BIT},
+      </if>
+      <if test="pause != null">
+        pause = #{pause,jdbcType=BIT},
+      </if>
+      <if test="begintime != null">
+        begintime = #{begintime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endtime != null">
+        endtime = #{endtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pc != null">
+        pc = #{pc,jdbcType=BIT},
+      </if>
+      <if test="h5 != null">
+        h5 = #{h5,jdbcType=BIT},
+      </if>
+      <if test="android != null">
+        android = #{android,jdbcType=BIT},
+      </if>
+      <if test="ios != null">
+        ios = #{ios,jdbcType=BIT},
+      </if>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyBy != null and modifyBy!= ''">
+        modify_by = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="rate != null">
+        rate = #{rate,jdbcType=DECIMAL},
+      </if>
+      <if test="charge != null">
+        charge = #{charge,jdbcType=BIT},
+      </if>
+      <if test="payChannelMgrId != null">
+        pay_channel_mgr_id = #{payChannelMgrId,jdbcType=INTEGER},
+      </if>
+    </set>
+	<where>
+		<if test="id != null">
+			and id = ${id}
+		</if>
+		<if test="payChannelMgrId != null">
+			and pay_channel_mgr_id = ${payChannelMgrId}
+		</if>
+	</where>
+  </update>
+  
+  	<update id="batchMerge" parameterType="list">
+	   	<foreach collection="list" item="item" separator=";" >
+	 	  INSERT INTO PAY_CHANNEL 
+		  (id,name, bankid, 
+      type, cardtype, available, pause, 
+      begintime, endtime, pc, 
+      h5, android, ios, order_id, 
+      create_by, modify_by, modify_time, 
+      update_time, create_time, code, 
+      rate, charge, pay_channel_mgr_id
+      )
+    values (#{item.id,jdbcType=INTEGER}, #{item.name,jdbcType=VARCHAR}, #{item.bankid,jdbcType=INTEGER}, 
+      #{item.type,jdbcType=BIT}, #{item.cardtype,jdbcType=BIT}, #{item.available,jdbcType=BIT}, #{item.pause,jdbcType=BIT}, 
+      #{item.begintime,jdbcType=TIMESTAMP}, #{item.endtime,jdbcType=TIMESTAMP}, #{item.pc,jdbcType=BIT}, 
+      #{item.h5,jdbcType=BIT}, #{item.android,jdbcType=BIT}, #{item.ios,jdbcType=BIT}, #{item.orderId,jdbcType=INTEGER}, 
+      #{item.createBy,jdbcType=VARCHAR}, #{item.modifyBy,jdbcType=VARCHAR}, #{item.modifyTime,jdbcType=TIMESTAMP}, 
+      #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.code,jdbcType=VARCHAR}, 
+      #{item.rate,jdbcType=DECIMAL}, #{item.charge,jdbcType=BIT}, #{item.payChannelMgrId,jdbcType=INTEGER}
+      )
+		 ON DUPLICATE KEY UPDATE
+		<trim suffixOverrides=",">
+			<if test="item.name != null and item.name !=''">
+	        name = values(name),
+	      </if>
+	      <if test="item.bankid != null">
+	        bankid = values(bankid),
+	      </if>
+	      <if test="item.type != null">
+	        type = values(type),
+	      </if>
+	      <if test="item.cardtype != null">
+	        cardtype = values(cardtype),
+	      </if>
+	      <if test="item.available != null">
+	        available = values(available),
+	      </if>
+	      <if test="item.pause != null">
+	        pause = values(pause),
+	      </if>
+	      <if test="item.begintime != null">
+	        begintime = values(begintime),
+	      </if>
+	      <if test="item.endtime != null">
+	        endtime = values(endtime),
+	      </if>
+	      <if test="item.pc != null">
+	        pc = values(pc),
+	      </if>
+	      <if test="item.h5 != null">
+	        h5 = values(h5),
+	      </if>
+	      <if test="item.android != null">
+	        android = values(android),
+	      </if>
+	      <if test="item.ios != null">
+	        ios = values(ios),
+	      </if>
+	      <if test="item.orderId != null">
+	        order_id = values(order_id),
+	      </if>
+	      <if test="item.modifyBy != null and item.modifyBy!=''">
+	        modify_by = values(modify_by),
+	      </if>
+	      <if test="item.modifyTime != null">
+	        modify_time = values(modify_time),
+	      </if>
+	      <if test="item.updateTime != null">
+	        update_time = values(update_time),
+	      </if>
+	      <if test="item.code != null and item.code !=''">
+	        code = values(code),
+	      </if>
+	      <if test="item.rate != null">
+	        rate = values(rate),
+	      </if>
+	      <if test="item.charge != null">
+	        charge = values(charge),
+	      </if>
+		</trim>
+	  	</foreach>
+ 	</update>
+ 	
+	<delete id="delete">
+		delete pc from PAY_CHANNEL pc
+		<include refid="Where_Clause" />
+	</delete>
+</mapper>

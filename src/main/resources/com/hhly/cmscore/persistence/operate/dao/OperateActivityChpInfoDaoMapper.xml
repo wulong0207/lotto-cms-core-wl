@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityChpInfoDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityChpInfoBO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="activity_info_id" jdbcType="INTEGER" property="activityInfoId" />
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+        <result column="team_score" jdbcType="DECIMAL" property="teamScore" />
+        <result column="total_score" jdbcType="DECIMAL" property="totalScore" />
+        <result column="user_type" jdbcType="BIT" property="userType" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="total_rebate_money" jdbcType="DECIMAL" property="totalRebateMoney" />
+        <result column="rank" jdbcType="INTEGER" property="rank" />
+    </resultMap>
+
+    <sql id="Where_Clause">
+        <where>
+            <if test="activityCode != null and activityCode !=null">
+                and b.activity_code = #{activityCode}
+            </if>
+            <if test="type !=null and type !=''">
+                and ${type} in
+                <foreach collection="values" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userType != null">
+                and user_type = #{userType}
+            </if>
+        </where>
+    </sql>
+
+    <select id="find" resultMap="BaseResultMap">
+        select c.*, @rownum:=@rownum + 1 as rank from (
+        SELECT
+        nick_name,
+        IFNULL(total_score, 0) total_score,
+        IFNULL(sum(rebate_money), 0) total_rebate_money
+        FROM
+        (select * from operate_activity_chp_info order by create_time desc) a
+
+        LEFT JOIN operate_activity_info b ON a.activity_info_id = b.id
+        <include refid="Where_Clause"/>
+        GROUP BY
+        nick_name
+        ORDER BY
+        total_score DESC
+        <if test="startRow != null and endRow !=null">
+            limit #{startRow},#{pageSize}
+        </if>
+        ) c,
+        (SELECT @rownum := 0) r
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(DISTINCT(nick_name)) from operate_activity_chp_info a
+        <if test="activityCode !=null and activityCode !=''">
+            left join
+            operate_activity_info b
+            on a.activity_info_id = b.id
+        </if>
+        <include refid="Where_Clause"/>
+    </select>
+
+    <select id="findChpInfo" resultMap="BaseResultMap">
+      SELECT id, activity_info_id,nick_name from operate_activity_chp_info
+        <include refid="Where_Clause"/>
+    </select>
+
+    <delete id="delete" parameterType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityChpInfoBO">
+        delete from operate_activity_chp_info <include refid="Where_Clause"/>
+    </delete>
+
+    <insert id="addBatch" parameterType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityChpInfoBO">
+        <foreach collection="list" item="item" separator=";">
+        insert into operate_activity_chp_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="item.id != null">
+                id,
+            </if>
+            <if test="item.activityInfoId != null">
+                activity_info_id,
+            </if>
+            <if test="item.nickName != null">
+                nick_name,
+            </if>
+            <if test="item.teamScore != null">
+                team_score,
+            </if>
+            <if test="item.totalScore != null">
+                total_score,
+            </if>
+            <if test="item.userType != null">
+                user_type,
+            </if>
+            <if test="item.createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="item.id != null">
+                #{item.id,jdbcType=INTEGER},
+            </if>
+            <if test="item.activityInfoId != null">
+                #{item.activityInfoId,jdbcType=INTEGER},
+            </if>
+            <if test="item.nickName != null">
+                #{item.nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="item.teamScore != null">
+                #{item.teamScore,jdbcType=DECIMAL},
+            </if>
+            <if test="item.totalScore != null">
+                #{item.totalScore,jdbcType=DECIMAL},
+            </if>
+            <if test="item.userType != null">
+                #{item.userType,jdbcType=BIT},
+            </if>
+            <if test="item.createTime != null">
+                #{item.createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+        </foreach>
+    </insert>
+</mapper>

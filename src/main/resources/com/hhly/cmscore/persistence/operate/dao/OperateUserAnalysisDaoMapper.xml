@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateUserAnalysisDaoMapper">
+	
+	<!--                 COMMON                -->
+  	<!-- 公共结果集 -->
+  	<resultMap id="OperateUserAnalysisResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateUserAnalysisBO">
+  	  <id property="id" column="id" jdbcType="BIGINT"/>
+  	  <result property="userId" column="user_id" jdbcType="BIGINT"/>
+  	  <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+  	  <result property="channelId" column="channel_id" jdbcType="VARCHAR"/>
+  	  <result property="ip" column="ip" jdbcType="VARCHAR"/>
+  	  <result property="seconds" column="seconds" jdbcType="INTEGER"/>
+  	  <result property="webName" column="web_name" jdbcType="VARCHAR"/>
+  	  <result property="url" column="url" jdbcType="VARCHAR"/>
+  	  <result property="goWebName" column="go_web_name" jdbcType="VARCHAR"/>
+  	  <result property="goUrl" column="go_url" jdbcType="VARCHAR"/>
+  	  <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+  	  <association property="user" javaType="com.hhly.skeleton.cms.customermgr.bo.LottoCustomerBO">
+  	  	  <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+  	  	  <result property="accountName" column="account_name" jdbcType="VARCHAR"/>
+  	  	  <result property="cusMobile" column="cus_mobile" jdbcType="VARCHAR"/>
+  	  	  <result property="actualName" column="actual_name" jdbcType="VARCHAR"/>
+  	  	  <result property="idNum" column="id_num" jdbcType="VARCHAR"/>
+  	  	  <result property="cusMail" column="cus_mail" jdbcType="VARCHAR"/>
+  	  </association>
+  	</resultMap>
+  	
+  	
+  	<!--                CMS 后台                                                 -->
+  	<!--sql语句块：会员访问信息分析列表查询 -->
+	<sql id="cms_sql_statement_user_analysis_list">
+  		select oua.id,
+               oua.user_id,
+               oua.nick_name,
+               oua.channel_id,
+               oua.ip,
+               oua.seconds,
+               oua.web_name,
+               oua.url,
+               oua.go_web_name,
+               oua.go_url,
+               oua.create_time
+          from operate_user_analysis oua
+          <if test="joinUser != null and joinUser == true">
+		  left join m_user_info mui on oua.user_id = mui.id
+		  </if>
+ 	</sql>
+ 	
+ 	<!--sql查询条件: 会员访问信息分析列表查询 -->
+  	<sql id="cms_sql_condition_user_analysis_list">
+  		where 1 = 1
+  		<if test="channelId != null and channelId != ''">
+  		and oua.channel_id = #{channelId,jdbcType=VARCHAR}
+  		</if>
+  		<if test="startTime != null">
+  		and oua.create_time >= #{startTime,jdbcType=TIMESTAMP}
+  		</if>
+  		<if test="endTime != null">
+  		and oua.create_time <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+  		</if>
+  		<if test="user != null">
+  			<if test="user.nickName != null and user.nickName != ''">
+	  		and mui.nick_name = #{user.nickName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.accountName != null and user.accountName != ''">
+	  		and mui.account_name = #{user.accountName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.cusMobile != null and user.cusMobile != ''">
+	  		and mui.cus_mobile = #{user.cusMobile,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.actualName != null and user.actualName != ''">
+	  		and mui.actual_name = #{user.actualName,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.idNum != null and user.idNum != ''">
+	  		and mui.id_num = #{user.idNum,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.cusMail != null and user.cusMail != ''">
+	  		and mui.cus_mail = #{user.cusMail,jdbcType=VARCHAR}
+	  		</if>
+	  		<if test="user.id != null">
+	  		and mui.id = #{user.id,jdbcType=BIGINT}
+	  		</if>
+  		</if>
+		<if test="typeField != null and typeField !=''">
+	     	and mui.${typeField} in 
+	        <foreach collection="typeValues" open="(" close=")" separator="," item="item">
+				#{item}
+	        </foreach>
+		</if>
+  	</sql>
+  	
+  	<sql id="cms_sql_orderby_user_analysis">
+  		<choose>
+  			<when test="sortField != null and sortField != ''">
+  				order by ${sortField}  ${sortOrder}
+  			</when>
+  			<otherwise>
+  				order by oua.id desc
+  			</otherwise>
+  		</choose>
+  	</sql>
+  	
+	<!-- 查询分页 -->
+  	<select id="findPaging" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateUserAnalysisVO" resultMap="OperateUserAnalysisResultMap">
+		<include refid="cms_sql_statement_user_analysis_list" />
+	  	<include refid="cms_sql_condition_user_analysis_list" />
+	  	<include refid="cms_sql_orderby_user_analysis" />
+	  	<if test="startRow != null and pageSize != null">
+			limit #{startRow},#{pageSize}
+		</if>
+  	</select>
+  	
+  	<!-- 查询记录数 -->
+  	<select id="findCount" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateUserAnalysisVO" resultType="int">
+		select count(*) count from operate_user_analysis oua
+		  <if test="joinUser != null and joinUser == true">
+		  left join m_user_info mui on oua.user_id = mui.id
+		  </if>
+		<include refid="cms_sql_condition_user_analysis_list" />
+  	</select>
+  	<!-- 查询excel的导出数据 -->
+  	<select id="findExcel" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateUserAnalysisVO" resultMap="OperateUserAnalysisResultMap">
+		<include refid="cms_sql_statement_user_analysis_list" />
+		<include refid="cms_sql_condition_user_analysis_list" />
+		<include refid="cms_sql_orderby_user_analysis" />
+  	</select>
+</mapper>

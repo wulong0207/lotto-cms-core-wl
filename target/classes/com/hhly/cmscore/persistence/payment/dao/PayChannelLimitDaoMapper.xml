@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.payment.dao.PayChannelLimitDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.payment.bo.PayChannelLimitBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="pay_channel_mgr_id" jdbcType="INTEGER" property="payChannelMgrId" />
+    <result column="limittime" jdbcType="DECIMAL" property="limittime" />
+    <result column="limitday" jdbcType="DECIMAL" property="limitday" />
+    <result column="limitmonth" jdbcType="DECIMAL" property="limitmonth" />
+    <result column="pay_type" jdbcType="BIT" property="payType" />
+    <result column="card_type" jdbcType="BIT" property="cardType" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  
+  	<sql id="Table">
+		 pay_channel_limit
+	</sql>
+	
+  	<sql id="Base_Column_List">
+	    id, pay_channel_mgr_id, limittime, limitday, limitmonth, pay_type, card_type, remark
+	</sql>
+	
+  	<sql id="Where_Clause">
+		<where>
+			<if test="payChannelMgrId != null">
+				and pay_channel_mgr_id = #{payChannelMgrId}
+			</if>
+			<if test="ids != null">
+				and id in
+				<foreach collection="ids" item="id" open="(" close=")" separator=",">
+					${id}
+				</foreach>
+			</if>
+		</where>
+	</sql>
+  	
+   	<select id="count" parameterType="com.hhly.skeleton.cms.payment.vo.PayChannelMgrVO" resultType="int">
+		select count(1) from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+  	</select>
+  	
+	<select id="find" parameterType="com.hhly.skeleton.cms.payment.vo.PayChannelMgrVO" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+
+  	<update id="batchMerge" parameterType="list">
+	   	<foreach collection="list" item="item" separator=";" >
+	 	  INSERT INTO <include refid="Table" /> 
+		  (id,pay_channel_mgr_id, limittime, 
+	      limitday, limitmonth, pay_type, 
+	      card_type, remark)
+	      values (#{item.id},#{item.payChannelMgrId,jdbcType=INTEGER}, #{item.limittime,jdbcType=DECIMAL}, 
+	      #{item.limitday,jdbcType=DECIMAL}, #{item.limitmonth,jdbcType=DECIMAL}, #{item.payType,jdbcType=BIT}, 
+	      #{item.cardType,jdbcType=BIT}, #{item.remark,jdbcType=VARCHAR})
+		 ON DUPLICATE KEY UPDATE
+		<trim suffixOverrides=",">
+	      <if test="item.limittime != null">
+	        limittime = values(limittime),
+	      </if>
+	      <if test="item.limitday != null">
+	        limitday = values(limitday),
+	      </if>
+	      <if test="item.limitmonth != null">
+	        limitmonth = values(limitmonth),
+	      </if>
+	      <if test="item.payType != null">
+	        pay_type = values(pay_type),
+	      </if>
+	      <if test="item.cardType != null">
+	        card_type = values(card_type),
+	      </if>
+	      <if test="item.remark != null and item.remark != ''">
+	        remark = values(remark),
+	      </if>
+		</trim>
+	  	</foreach>
+ 	</update>
+ 	
+	<delete id="delete">
+		delete from <include refid="Table" /> 
+		<include refid="Where_Clause" />
+	</delete>
+</mapper>

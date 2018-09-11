@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityRuleDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.operate.po.OperateActivityRulePO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_config_id" jdbcType="INTEGER" property="activityConfigId" />
+    <result column="lottery_child_code" jdbcType="VARCHAR" property="lotteryChildCode" />
+    <result column="lottery_pass_type" jdbcType="VARCHAR" property="lotteryPassType" />
+    <result column="rule_type" jdbcType="BIT" property="ruleType" />
+    <result column="rule_start" jdbcType="VARCHAR" property="ruleStart" />
+    <result column="rule_end" jdbcType="VARCHAR" property="ruleEnd" />
+    <result column="win_start_money" jdbcType="DECIMAL" property="winStartMoney" />
+    <result column="win_end_money" jdbcType="DECIMAL" property="winEndMoney" />
+    <result column="rebate_type" jdbcType="BIT" property="rebateType" />
+    <result column="rebate_num" jdbcType="DECIMAL" property="rebateNum" />
+    <result column="is_multiple" jdbcType="BIT" property="isMultiple" />
+    <result column="multiple_sub" jdbcType="VARCHAR" property="multipleSub" />
+    <result column="added_add" jdbcType="VARCHAR" property="addedAdd" />
+    <result column="user_action" jdbcType="BIT" property="userAction" />
+    <result column="gift_type" jdbcType="BIT" property="giftType" />
+    <result column="gift_money" jdbcType="DECIMAL" property="giftMoney" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  
+  <resultMap id="BoResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityRuleBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_config_id" jdbcType="INTEGER" property="activityConfigId" />
+    <result column="lottery_child_code" jdbcType="VARCHAR" property="lotteryChildCode" />
+    <result column="lottery_pass_type" jdbcType="VARCHAR" property="lotteryPassType" />
+    <result column="rule_type" jdbcType="BIT" property="ruleType" />
+    <result column="rule_start" jdbcType="VARCHAR" property="ruleStart" />
+    <result column="rule_end" jdbcType="VARCHAR" property="ruleEnd" />
+    <result column="win_start_money" jdbcType="DECIMAL" property="winStartMoney" />
+    <result column="win_end_money" jdbcType="DECIMAL" property="winEndMoney" />
+    <result column="rebate_type" jdbcType="BIT" property="rebateType" />
+    <result column="rebate_num" jdbcType="DECIMAL" property="rebateNum" />
+    <result column="is_multiple" jdbcType="BIT" property="isMultiple" />
+    <result column="multiple_sub" jdbcType="VARCHAR" property="multipleSub" />
+    <result column="added_add" jdbcType="VARCHAR" property="addedAdd" />
+    <result column="user_action" jdbcType="BIT" property="userAction" />
+    <result column="gift_type" jdbcType="BIT" property="giftType" />
+    <result column="gift_money" jdbcType="DECIMAL" property="giftMoney" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>  
+
+
+  <sql id="Base_Column_List">
+    id, activity_config_id, lottery_child_code, lottery_pass_type, rule_type, rule_start, 
+    rule_end, win_start_money, win_end_money, rebate_type, rebate_num, is_multiple, multiple_sub, 
+    added_add, user_action, gift_type, gift_money, status, create_by, create_time, modify_by, 
+    modify_time, update_time
+  </sql>
+  
+	<sql id="Column_List">
+    id, activity_config_id, lottery_child_code, lottery_pass_type, rule_type, rule_start, 
+    rule_end, win_start_money, win_end_money, rebate_type, rebate_num, is_multiple, multiple_sub, 
+    added_add, user_action, gift_type, gift_money, status, create_by, create_time, modify_by, 
+    modify_time, update_time
+	</sql>
+	
+	<sql id="sql_condition_OperateActivityRuleVO">
+		<where>
+		     <if test="id != null">
+		       and id = #{id,jdbcType=INTEGER}
+		      </if>
+		      <if test="activityConfigId != null">
+		        and activity_config_id = #{activityConfigId,jdbcType=INTEGER}
+		      </if>
+		      <if test="lotteryChildCode != null">
+		        and lottery_child_code = #{lotteryChildCode,jdbcType=VARCHAR}
+		      </if>
+		      <if test="lotteryPassType != null">
+		        and lottery_pass_type = #{lotteryPassType,jdbcType=VARCHAR}
+		      </if>
+		      <if test="ruleType != null">
+		        and rule_type = #{ruleType,jdbcType=BIT}
+		      </if>
+		      <if test="ruleStart != null">
+		        and rule_start = #{ruleStart,jdbcType=VARCHAR}
+		      </if>
+		      <if test="ruleEnd != null">
+		        and rule_end = #{ruleEnd,jdbcType=VARCHAR}
+		      </if>
+		      <if test="winStartMoney != null">
+		        and win_start_money = #{winStartMoney,jdbcType=DECIMAL}
+		      </if>
+		      <if test="winEndMoney != null">
+		        and win_end_money = #{winEndMoney,jdbcType=DECIMAL}
+		      </if>
+		      <if test="rebateType != null">
+		        and rebate_type = #{rebateType,jdbcType=BIT}
+		      </if>
+		      <if test="rebateNum != null">
+		        and rebate_num = #{rebateNum,jdbcType=DECIMAL}
+		      </if>
+		      <if test="isMultiple != null">
+		        and is_multiple = #{isMultiple,jdbcType=BIT}
+		      </if>
+		      <if test="multipleSub != null">
+		        and multiple_sub = #{multipleSub,jdbcType=VARCHAR}
+		      </if>
+		      <if test="addedAdd != null">
+		        and added_add = #{addedAdd,jdbcType=VARCHAR}
+		      </if>
+		      <if test="userAction != null">
+		        and user_action = #{userAction,jdbcType=BIT}
+		      </if>
+		      <if test="giftType != null">
+		        and gift_type = #{giftType,jdbcType=BIT}
+		      </if>
+		      <if test="giftMoney != null">
+		        and gift_money = #{giftMoney,jdbcType=DECIMAL}
+		      </if>
+		      <if test="status != null">
+		        and status = #{status,jdbcType=BIT}
+		      </if>	  
+		</where>
+	</sql>  
+ 
+  <delete id="deleteById" parameterType="java.lang.Integer">
+    delete from operate_activity_rule
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteBatch" parameterType="java.util.List">
+    delete from operate_activity_rule
+    where id in 
+    <foreach collection="list" item="id" open="(" close=")" separator=",">
+    	#{id,jdbcType=INTEGER}
+    </foreach>
+  </delete>
+  
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityRulePO" 
+  useGeneratedKeys="true" keyProperty="id">
+    insert into operate_activity_rule (activity_config_id, lottery_child_code, 
+      lottery_pass_type, rule_type, rule_start, 
+      rule_end, win_start_money, win_end_money, 
+      rebate_type, rebate_num, is_multiple, 
+      multiple_sub, added_add, user_action, 
+      gift_type, gift_money, status, 
+      create_by, create_time,content_type,is_add)
+    values (#{activityConfigId,jdbcType=INTEGER}, #{lotteryChildCode,jdbcType=VARCHAR}, 
+      #{lotteryPassType,jdbcType=VARCHAR}, #{ruleType,jdbcType=BIT}, #{ruleStart,jdbcType=VARCHAR}, 
+      #{ruleEnd,jdbcType=VARCHAR}, #{winStartMoney,jdbcType=DECIMAL}, #{winEndMoney,jdbcType=DECIMAL}, 
+      #{rebateType,jdbcType=BIT}, #{rebateNum,jdbcType=DECIMAL}, #{isMultiple,jdbcType=BIT}, 
+      #{multipleSub,jdbcType=VARCHAR}, #{addedAdd,jdbcType=VARCHAR}, #{userAction,jdbcType=BIT}, 
+      #{giftType,jdbcType=BIT}, #{giftMoney,jdbcType=DECIMAL}, #{status,jdbcType=BIT},
+      #{createBy,jdbcType=VARCHAR}, now(),#{contentType,jdbcType=VARCHAR},#{isAdd,jdbcType=BIT})
+  </insert>
+  
+  <insert id="mergeBatch" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityConfigPO">
+    insert into operate_activity_rule (id,activity_config_id, lottery_child_code, 
+      lottery_pass_type, rule_type, rule_start, 
+      rule_end, win_start_money, win_end_money, 
+      rebate_type, rebate_num, is_multiple, 
+      multiple_sub, added_add, user_action, 
+      gift_type, gift_money, status, 
+      create_by, create_time, modify_by, modify_time,content_type,is_Add)
+    	values
+		<foreach collection="operateActivityRulePOList" item="po" separator=",">
+			(
+          	#{po.id,jdbcType=INTEGER},
+            #{id,jdbcType=INTEGER},
+            #{po.lotteryChildCode,jdbcType=VARCHAR},
+		    #{po.lotteryPassType,jdbcType=VARCHAR},
+            #{po.ruleType,jdbcType=BIT},
+            #{po.ruleStart,jdbcType=VARCHAR},
+		    #{po.ruleEnd,jdbcType=VARCHAR},
+            #{po.winStartMoney,jdbcType=DECIMAL},
+            #{po.winEndMoney,jdbcType=DECIMAL},
+		    #{po.rebateType,jdbcType=BIT},
+            #{po.rebateNum,jdbcType=DECIMAL},
+            #{po.isMultiple,jdbcType=BIT},
+		    #{po.multipleSub,jdbcType=VARCHAR},
+            #{po.addedAdd,jdbcType=VARCHAR},
+            #{po.userAction,jdbcType=BIT},
+		    #{po.giftType,jdbcType=BIT},
+            #{po.giftMoney,jdbcType=DECIMAL},
+            #{po.status,jdbcType=BIT},
+		    #{po.createBy,jdbcType=VARCHAR}, now(),
+            #{po.modifyBy,jdbcType=VARCHAR},
+            #{po.modifyTime,jdbcType=TIMESTAMP},
+            #{po.contentType,jdbcType=VARCHAR},
+             #{po.isAdd,jdbcType=VARCHAR}
+			)
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+			activity_config_id	= values(activity_config_id), 
+	       	lottery_child_code		= values(lottery_child_code), 
+	      	lottery_pass_type   	= values(lottery_pass_type),
+	     	rule_type	= values(rule_type), 
+	      	rule_start	= values(rule_start), 
+	      	rule_end	= values(rule_end), 
+	      	win_start_money		= values(win_start_money), 
+	      	win_end_money = values(win_end_money), 
+	      	rebate_type		= values(rebate_type), 
+	      	rebate_num		= values(rebate_num), 
+	      	is_multiple	= values(is_multiple), 
+	      	multiple_sub= values(multiple_sub),
+	       	added_add		= values(added_add),
+	       	user_action         = values(user_action),
+	       	gift_type = values(gift_type),
+	       	gift_money = values(gift_money),
+	       	status = values(status),
+			modify_by = values(modify_by),
+			modify_time = now()	,
+			content_type=values(content_type),
+			is_add=values(is_add)
+  </insert>
+  
+  <insert id="merge" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityRulePO" 
+  useGeneratedKeys="true" keyProperty="id">
+    insert into operate_activity_rule (id,activity_config_id, lottery_child_code, 
+      lottery_pass_type, rule_type, rule_start, 
+      rule_end, win_start_money, win_end_money, 
+      rebate_type, rebate_num, is_multiple, 
+      multiple_sub, added_add, user_action, 
+      gift_type, gift_money, status, 
+      create_by, create_time,content_type,single_user_num,is_add)
+    values (#{id,jdbcType=INTEGER}, #{activityConfigId,jdbcType=INTEGER}, #{lotteryChildCode,jdbcType=VARCHAR}, 
+      #{lotteryPassType,jdbcType=VARCHAR}, #{ruleType,jdbcType=BIT}, #{ruleStart,jdbcType=VARCHAR}, 
+      #{ruleEnd,jdbcType=VARCHAR}, #{winStartMoney,jdbcType=DECIMAL}, #{winEndMoney,jdbcType=DECIMAL}, 
+      #{rebateType,jdbcType=BIT}, #{rebateNum,jdbcType=DECIMAL}, #{isMultiple,jdbcType=BIT}, 
+      #{multipleSub,jdbcType=VARCHAR}, #{addedAdd,jdbcType=VARCHAR}, #{userAction,jdbcType=BIT}, 
+      #{giftType,jdbcType=BIT}, #{giftMoney,jdbcType=DECIMAL}, #{status,jdbcType=BIT},
+      #{createBy,jdbcType=VARCHAR}, now(),#{contentType,jdbcType=VARCHAR},#{singleUserNum,jdbcType=INTEGER}, #{isAdd,jdbcType=BIT})
+	ON DUPLICATE KEY UPDATE 
+	    activity_config_id	= values(activity_config_id), 
+       	lottery_child_code		= values(lottery_child_code), 
+      	lottery_pass_type   	= values(lottery_pass_type),
+     	rule_type	= values(rule_type), 
+      	rule_start	= values(rule_start), 
+      	rule_end	= values(rule_end), 
+      	win_start_money		= values(win_start_money), 
+      	win_end_money = values(win_end_money), 
+      	rebate_type		= values(rebate_type), 
+      	rebate_num		= values(rebate_num), 
+      	is_multiple	= values(is_multiple), 
+      	multiple_sub= values(multiple_sub),
+       	added_add		= values(added_add),
+       	user_action         = values(user_action),
+       	gift_type = values(gift_type),
+       	gift_money = values(gift_money),
+       	status = values(status),
+		modify_by = values(modify_by),
+		modify_time = now()	,
+		content_type=values(content_type),
+		single_user_num=values(single_user_num),
+		is_add=values(is_add)
+  </insert>
+  
+  <update id="updateById" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityRuleVO">
+    update operate_activity_rule
+    <set>
+      <if test="activityConfigId != null">
+        activity_config_id = #{activityConfigId,jdbcType=INTEGER},
+      </if>
+      <if test="lotteryChildCode != null">
+        lottery_child_code = #{lotteryChildCode,jdbcType=VARCHAR},
+      </if>
+      <if test="lotteryPassType != null">
+        lottery_pass_type = #{lotteryPassType,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null">
+        rule_type = #{ruleType,jdbcType=BIT},
+      </if>
+      <if test="ruleStart != null">
+        rule_start = #{ruleStart,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleEnd != null">
+        rule_end = #{ruleEnd,jdbcType=VARCHAR},
+      </if>
+      <if test="winStartMoney != null">
+        win_start_money = #{winStartMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="winEndMoney != null">
+        win_end_money = #{winEndMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="rebateType != null">
+        rebate_type = #{rebateType,jdbcType=BIT},
+      </if>
+      <if test="rebateNum != null">
+        rebate_num = #{rebateNum,jdbcType=DECIMAL},
+      </if>
+      <if test="isMultiple != null">
+        is_multiple = #{isMultiple,jdbcType=BIT},
+      </if>
+      <if test="multipleSub != null">
+        multiple_sub = #{multipleSub,jdbcType=VARCHAR},
+      </if>
+      <if test="addedAdd != null">
+        added_add = #{addedAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="userAction != null">
+        user_action = #{userAction,jdbcType=BIT},
+      </if>
+      <if test="giftType != null">
+        gift_type = #{giftType,jdbcType=BIT},
+      </if>
+      <if test="giftMoney != null">
+        gift_money = #{giftMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=BIT},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyBy != null">
+        modify_by = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="contentType != null">
+        content_type = #{contentType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityRuleVO">
+  		select count(1) from operate_activity_rule 
+  		<include refid="sql_condition_OperateActivityRuleVO" />
+  </select>
+  
+  <select id="findList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityRuleVO" resultMap="BoResultMap">
+  		select 
+  		<include refid="Base_Column_List" />
+  		from 
+  		operate_activity_rule
+  		<include refid="sql_condition_OperateActivityRuleVO" />
+  </select>
+  
+  <select id="findDetailById" parameterType="java.lang.Integer" resultMap="BoResultMap">
+  		select 
+  		<include refid="Base_Column_List" />
+  		from 
+  		operate_activity_rule
+  		where id = #{id,jdbcType=INTEGER}	
+  </select>
+
+</mapper>

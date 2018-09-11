@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.lottery.dao.LotteryChildDaoMapper">
+  
+  <!--                           Used to CMS                           -->
+  
+  <select id="findByCode" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryChildBO">
+	  select 
+		  ID id, 
+		  LOTTERY_CHILD_CODE lotteryChildCode, 
+		  LOTTERY_CODE lotteryCode, 
+		  CHILD_NAME childName, 
+		  SALE_STATUS saleStatus, 
+		  UPDATE_TIME updateTime, 
+		  CREATE_TIME createTime
+	  from  LOTTERY_CHILD
+	  where 
+	  LOTTERY_CODE = #{code}
+  </select>
+  <insert id="add" parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryChildPO">
+    insert into LOTTERY_CHILD (LOTTERY_CHILD_CODE, 
+      LOTTERY_CODE, CHILD_NAME, SALE_STATUS, 
+      UPDATE_TIME, CREATE_TIME)
+    values (#{lotteryChildCode,jdbcType=VARCHAR}, 
+      #{lotteryCode,jdbcType=VARCHAR}, #{childName,jdbcType=VARCHAR}, #{saleStatus,jdbcType=DECIMAL}, 
+      now(),now())
+  </insert>
+  <update id="updByPrimaryKey" parameterType="com.hhly.cmscore.persistence.lottery.po.LotteryChildPO">
+    update LOTTERY_CHILD
+    set 
+      LOTTERY_CHILD_CODE = #{lotteryChildCode,jdbcType=VARCHAR},
+      CHILD_NAME = #{childName,jdbcType=VARCHAR},
+      SALE_STATUS = #{saleStatus,jdbcType=DECIMAL},
+      UPDATE_TIME = now()
+     where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <delete id="delByPrimaryKeyList">
+	    delete from LOTTERY_CHILD
+	    where ID in 
+	    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+	       #{item}
+	    </foreach>
+   </delete>
+   
+   
+   <sql id="sql_statement_all">
+	  	select ID   id,
+		       LOTTERY_CHILD_CODE lotteryChildCode,
+		       LOTTERY_CODE       lotteryCode,
+		       CHILD_NAME         childName,
+		       SALE_STATUS        saleStatus,
+		       UPDATE_TIME        updateTime,
+		       CREATE_TIME        createTime
+		  from LOTTERY_CHILD
+  </sql>
+  <sql id="sql_condition_all">
+  		where 1 = 1
+  		<if test="id != null">
+  			and ID = #{id,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryCode != null">
+  			and LOTTERY_CODE = #{lotteryCode,jdbcType=DECIMAL}
+  		</if>
+  		<if test="lotteryCodeList != null">
+  			and LOTTERY_CODE in
+  			<foreach collection="lotteryCodeList" item="lotteryCode" index="index" open="(" separator="," close=")">
+  				#{lotteryCode,jdbcType=INTEGER}
+  			</foreach>
+  		</if>  		
+  		<if test="lotteryChildCode != null and lotteryChildCode != ''">
+  			and LOTTERY_CHILD_CODE = #{lotteryChildCode,jdbcType=VARCHAR}
+  		</if>
+  		<if test="lotteryChildrenCode != null">
+  			and LOTTERY_CHILD_CODE in
+  			<foreach collection="lotteryChildrenCode" item="lotteryChildCode" index="index" open="(" separator="," close=")">
+  				#{lotteryChildCode,jdbcType=VARCHAR}
+  			</foreach>
+  		</if>
+  </sql>
+  <!-- 查询多条 (CMS用)-->
+  <select id="findMultipleCms" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryChildCmsVO" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryChildBO">
+  		<include refid="sql_statement_all" />
+  		<include refid="sql_condition_all" />
+  		order by LOTTERY_CHILD_CODE
+  </select>
+  <select id="listChildCodeName" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryChildBO">
+      select
+       LOTTERY_CHILD_CODE lotteryChildCode,
+       CHILD_NAME childName
+      from LOTTERY_CHILD
+      where LOTTERY_CHILD_CODE in 
+      <foreach collection="codes" separator="," open="(" close=")" item="item">
+        #{item}
+      </foreach>
+  </select>
+  
+  
+  
+  <!--                           Used to LOTTO                           -->
+  
+  	<!-- 前端接口：sql语句块：子玩法配置查询 -->
+	<sql id="front_sql_statement_child">
+	  	select lottery_child_code lotteryChildCode,
+		       lottery_code       lotteryCode,
+		       child_name         childName,
+		       sale_status        saleStatus
+		  from LOTTERY_CHILD
+	</sql>
+	<!-- 前端接口：sql查询条件：子玩法配置查询 -->
+	<sql id="front_sql_condition_child">
+  		where 1 = 1
+  		<if test="lotteryCode != null">
+  			and lottery_code = #{lotteryCode,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryChildCode != null">
+  			and lottery_child_code = #{lotteryChildCode,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryChildCodes != null">
+  			and lottery_child_code in
+  			<foreach collection="lotteryChildCodes" item="lotteryChildCode" index="index" open="(" separator="," close=")">
+  				#{lotteryChildCode,jdbcType=VARCHAR}
+  			</foreach>
+  		</if>
+  		<if test="saleStatus">
+  			and SALE_STATUS = #{saleStatus}
+  		</if>
+	</sql>
+  	<!-- 前端接口：查询单条子玩法配置 -->
+  	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotChildVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotChildBO">
+		<include refid="front_sql_statement_child" />
+		<include refid="front_sql_condition_child" />
+		LIMIT 1
+  	</select>
+  	<!-- 前端接口：查询多条子玩法配置 -->
+  	<select id="findMultipleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotChildBO">
+  		<include refid="front_sql_statement_child" />
+  		 where 1 = 1
+  		<if test="lotteryCode != null">
+  			and lottery_code = #{lotteryCode,jdbcType=INTEGER}
+  		</if>
+  		order by lottery_child_code
+  	</select>
+  	<select id="count" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotChildVO" resultType="int">
+  		select count(*) from LOTTERY_CHILD <include refid="front_sql_condition_child" />
+  	</select>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.trend.high.dao.X115DaoMapper">
+	<resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.trend.high.bo.X115OmitBO" >
+	    <result column="ISSUE" property="issue" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="DRAWCODE" property="drawCode" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="BTYPE" property="subPlay" jdbcType="TINYINT" javaType="string"/>
+	    <result column="FLAG" property="omitType" jdbcType="TINYINT" javaType="string"/>
+	    <result column="B01" property="b01" jdbcType="INTEGER" />
+	    <result column="B02" property="b02" jdbcType="INTEGER" />
+	    <result column="B03" property="b03" jdbcType="INTEGER" />
+	    <result column="B04" property="b04" jdbcType="INTEGER" />
+	    <result column="B05" property="b05" jdbcType="INTEGER" />
+	    <result column="B06" property="b06" jdbcType="INTEGER" />
+	    <result column="B07" property="b07" jdbcType="INTEGER" />
+	    <result column="B08" property="b08" jdbcType="INTEGER" />
+	    <result column="B09" property="b09" jdbcType="INTEGER" />
+	    <result column="B10" property="b10" jdbcType="INTEGER" />
+	    <result column="B11" property="b11" jdbcType="INTEGER" />
+ 	</resultMap>
+ 	
+  	<sql id="Base_Column_List" >
+	    LOTTERY_CODE, BTYPE, FLAG, B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11
+	</sql>
+	
+  	<sql id="Trend_11x5_Base_Column_List" >
+	    ISSUE, DRAWCODE, BTYPE, B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11
+	</sql>
+	
+	<sql id="Table">
+  		TREND_11X5_RESULT
+	</sql>
+	
+	<sql id="Query_Condition">
+  		<where>
+	  		<if test="lotteryCode != null">
+				and LOTTERY_CODE = #{lotteryCode}
+	  		</if>
+	  		<if test="subPlays != null">
+	  			and BTYPE in
+	  			<foreach collection="subPlays" item="subPlay" open="(" close=")" separator=",">
+	  				#{subPlay}
+	  			</foreach>
+	  		</if>
+	  		<if test="omitTypes != null">
+	  			and FLAG in
+	  			<foreach collection="omitTypes" item="omitType" open="(" close=")" separator=",">
+	  				#{omitType}
+	  			</foreach>
+	  		</if>
+  		</where>
+	</sql>
+	
+	<select id="findResultOmit" parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO" resultMap="BaseResultMap">
+     	select <include refid="Base_Column_List"/>
+			from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+	</select>
+	
+	<select id="findRecentOmit" parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO" resultMap="BaseResultMap">
+     	<foreach collection="subPlays" item="subPlay" index="index" separator="UNION ALL">
+         (
+         select <include refid="Trend_11x5_Base_Column_List"/>
+			from TREND_11X5_BASE
+			where LOTTERY_CODE = #{lotteryCode} and BTYPE = #{subPlay}
+         	order by issue desc
+			limit 0,#{qryCount}
+		)
+      </foreach>
+	</select>
+	
+</mapper>

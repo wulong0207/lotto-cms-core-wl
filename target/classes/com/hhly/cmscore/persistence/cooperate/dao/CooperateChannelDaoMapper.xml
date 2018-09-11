@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.cooperate.dao.CooperateChannelDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.cooperate.bo.CooperateChannelBO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="cooperate_name" jdbcType="VARCHAR" property="cooperateName"/>
+        <result column="balance" jdbcType="DECIMAL" property="balance"/>
+        <result column="single_recharge_amount" property="singleRechargeAmount" jdbcType="DECIMAL"/>
+        <result column="recharge_type" property="rechargeType" jdbcType="TINYINT"/>
+        <result column="market_channel_id" jdbcType="VARCHAR" property="marketChannelId"/>
+        <result column="ticket_channel" jdbcType="VARCHAR" property="ticketChannel"/>
+        <result column="action_time" jdbcType="TIMESTAMP" property="actionTime"/>
+        <result column="cooperate_begin_time" jdbcType="TIMESTAMP" property="cooperateBeginTime"/>
+        <result column="cooperate_end_time" jdbcType="TIMESTAMP" property="cooperateEndTime"/>
+        <result column="is_stop" jdbcType="INTEGER" property="isStop"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="settlement_type" jdbcType="INTEGER" property="settlementType"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="key" jdbcType="VARCHAR" property="key"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_by" jdbcType="VARCHAR" property="modifyBy"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, cooperate_name, balance, single_recharge_amount, recharge_type, ticket_channel,
+        action_time,settlement_type, cooperate_begin_time,
+        cooperate_end_time, market_channel_id, type, `password`,
+        is_stop, create_by, create_time, modify_by, modify_time
+    </sql>
+
+    <sql id="where_vo">
+        where 1=1
+        <if test="id != null">
+            and a.id=#{id,jdbcType=INTEGER}
+        </if>
+        <if test="cooperateName != null">
+            and b.channel_name like CONCAT('%', #{cooperateName,jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="marketChannelId != null">
+            and a.market_channel_id = #{marketChannelId,jdbcType=VARCHAR}
+        </if>
+        <if test="isOver != null">
+            and b.coop_end_time &lt;=now() and b.coop_end_time is not null
+        </if>
+    </sql>
+
+    <!--  查询可用渠道 -->
+    <update id="updateBalance" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateChannelVO">
+        update cooperate_channel set balance = #{balance,jdbcType=DECIMAL} where id=#{id,jdbcType=INTEGER}
+    </update>
+
+    <!--  查询可用渠道 -->
+    <update id="updateStop" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateChannelVO">
+        update cooperate_channel set is_stop = 0
+        where id in(
+        <foreach collection="list" separator="," item="item">
+            #{item.id,jdbcType=INTEGER}
+        </foreach>)
+    </update>
+
+    <!--  查询可用渠道 -->
+    <select id="selectChannelNameDictBO" resultType="com.hhly.skeleton.base.bo.DictionaryBO">
+        select
+        a.market_channel_id as id,
+        b.channel_name as text
+        from cooperate_channel a
+        inner join operate_market_channel b on a.market_channel_id=b.channel_id
+        where b.channel_status=1
+    </select>
+
+    <select id="findCount" resultType="int" parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateChannelVO">
+        select
+        count(1)
+        from cooperate_channel a
+        inner join operate_market_channel b on a.market_channel_id=b.channel_id
+        <include refid="where_vo"/>
+    </select>
+
+    <select id="findCooperateChannelBOList" resultMap="BaseResultMap"
+            parameterType="com.hhly.skeleton.cms.cooperate.vo.CooperateChannelVO">
+        select
+        a.id,
+        a.market_channel_id,
+        a.balance,
+        a.single_recharge_amount,
+        a.recharge_type,
+        a.ticket_channel,
+        a.settlement_type,
+        b.secret_key as `key`,
+        a.type,
+        a.`password`,
+        b.channel_name as cooperate_name,
+        b.coop_start_time as cooperate_begin_time,
+        b.coop_end_time as cooperate_end_time,
+        a.is_stop as is_stop,
+        a.action_time,
+        a.create_by,
+        a.create_time,
+        a.modify_by,
+        a.modify_time
+        from cooperate_channel a
+        inner join operate_market_channel b on a.market_channel_id=b.channel_id
+        <include refid="where_vo"/>
+        <if test="startRow != null and pageSize != null">
+            limit #{startRow},#{pageSize}
+        </if>
+    </select>
+
+    <select id="selectByMarketChannelId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        a.id,
+        a.market_channel_id,
+        a.balance,
+        a.single_recharge_amount,
+        a.recharge_type,
+        a.ticket_channel,
+        a.settlement_type,
+        b.secret_key as `key`,
+            a.type,
+            a.`password`,
+        b.channel_name as cooperate_name,
+        b.coop_start_time as cooperate_begin_time,
+        b.coop_end_time as cooperate_end_time,
+        a.is_stop as is_stop,
+        a.action_time,
+        a.create_by,
+        a.create_time,
+        a.modify_by,
+        a.modify_time
+        from cooperate_channel a
+        inner join operate_market_channel b on a.market_channel_id=b.channel_id
+        where market_channel_id =#{marketChannelId,jdbcType=VARCHAR} for update
+    </select>
+
+
+    <select id="selectByChannelId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cooperate_channel
+        where market_channel_id =#{marketChannelId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cooperate_channel
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM cooperate_channel
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateChannelPO">
+        INSERT INTO cooperate_channel (id, cooperate_name, balance, single_recharge_amount, recharge_type,
+                                       ticket_channel, action_time, cooperate_begin_time,
+                                       cooperate_end_time, is_stop, create_by,
+        create_time, modify_by, modify_time, settlement_type, market_channel_id,rcode,`password`,type
+        )
+        VALUES (#{id,jdbcType=INTEGER}, #{cooperateName,jdbcType=VARCHAR}, #{balance,jdbcType=DECIMAL},
+        								#{singleRechargeAmount,jdbcType=DECIMAL}, #{rechargeType, jdbcType=TINYINT},
+                                        #{ticketChannel,jdbcType=VARCHAR}, #{actionTime,jdbcType=TIMESTAMP},
+                                        #{cooperateBeginTime,jdbcType=TIMESTAMP},
+                                        #{cooperateEndTime,jdbcType=TIMESTAMP}, #{isStop,jdbcType=INTEGER},
+                                        #{createBy,jdbcType=VARCHAR},
+        now(), #{modifyBy,jdbcType=VARCHAR}, now(),
+        #{settlementType,jdbcType=INTEGER},
+        #{marketChannelId,jdbcType=VARCHAR},#{rcode,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{type,jdbcType=INTEGER}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateChannelPO">
+        insert into cooperate_channel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="cooperateName != null">
+                cooperate_name,
+            </if>
+            <if test="balance != null">
+                balance,
+            </if>
+            <if test="singleRechargeAmount != null">
+            	single_recharge_amount,
+            </if>
+            <if test="rechargeType != null">
+            	recharge_type,
+            </if>
+            <if test="ticketChannel != null">
+                ticket_channel,
+            </if>
+            <if test="actionTime != null">
+                action_time,
+            </if>
+            <if test="cooperateBeginTime != null">
+                cooperate_begin_time,
+            </if>
+            <if test="cooperateEndTime != null">
+                cooperate_end_time,
+            </if>
+            <if test="isStop != null">
+                is_stop,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+
+            <if test="modifyBy != null">
+                modify_by,
+            </if>
+            <if test="settlementType != null">
+                settlement_type,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="password != null">
+                `password`,
+            </if>
+            create_time,
+            modify_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="cooperateName != null">
+                #{cooperateName,jdbcType=VARCHAR},
+            </if>
+            <if test="balance != null">
+                #{balance,jdbcType=DECIMAL},
+            </if>
+            <if test="singleRechargeAmount != null">
+            	#{singleRechargeAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="rechargeType != null">
+            	#{rechargeType,jdbcType=TINYINT},
+            </if>
+            <if test="ticketChannel != null">
+                #{ticketChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="actionTime != null">
+                #{actionTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cooperateBeginTime != null">
+                #{cooperateBeginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cooperateEndTime != null">
+                #{cooperateEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isStop != null">
+                #{isStop,jdbcType=INTEGER},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyBy != null">
+                #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="settlementType != null">
+                #{settlementType,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            now(),
+            now()
+
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateChannelPO">
+        update cooperate_channel
+        <set>
+            <if test="cooperateName != null">
+                cooperate_name = #{cooperateName,jdbcType=VARCHAR},
+            </if>
+            <if test="ticketChannel != null">
+                ticket_channel = #{ticketChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="singleRechargeAmount != null">
+            	single_recharge_amount = #{singleRechargeAmount,jdbcType=DECIMAL},
+            </if>
+            recharge_type = #{rechargeType,jdbcType=TINYINT},
+            <if test="cooperateBeginTime != null">
+                cooperate_begin_time = #{cooperateBeginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cooperateEndTime != null">
+                cooperate_end_time = #{cooperateEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isStop != null">
+                is_stop = #{isStop,jdbcType=INTEGER},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyBy != null">
+                modify_by = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="settlementType != null">
+                settlement_type = #{settlementType,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            action_time = now(),
+            modify_time = now()
+        </set>
+        where market_channel_id = #{marketChannelId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateChannelPO">
+        UPDATE cooperate_channel
+        SET cooperate_name       = #{cooperateName,jdbcType=VARCHAR},
+            balance              = #{balance,jdbcType=DECIMAL},
+            single_recharge_amount = #{singleRechargeAmount,jdbcType=DECIMAL},
+            recharge_type = #{rechargeType,jdbcType=TINYINT},
+            ticket_channel       = #{ticketChannel,jdbcType=VARCHAR},
+            action_time          = #{actionTime,jdbcType=TIMESTAMP},
+            cooperate_begin_time = #{cooperateBeginTime,jdbcType=TIMESTAMP},
+            cooperate_end_time   = #{cooperateEndTime,jdbcType=TIMESTAMP},
+            is_stop              = #{isStop,jdbcType=INTEGER},
+            create_by            = #{createBy,jdbcType=VARCHAR},
+            create_time          = #{createTime,jdbcType=TIMESTAMP},
+            modify_by            = #{modifyBy,jdbcType=VARCHAR},
+            modify_time          = #{modifyTime,jdbcType=TIMESTAMP}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updatePassword" parameterType="com.hhly.cmscore.persistence.cooperate.po.CooperateChannelPO">
+        UPDATE cooperate_channel
+        SET rcode      = #{rcode,jdbcType=VARCHAR},
+            `password` = #{password,jdbcType=VARCHAR}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

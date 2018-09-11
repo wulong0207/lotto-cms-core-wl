@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.ticket.dao.TicketChannelDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.ticket.po.TicketChannelPO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="TICKET_CHANNEL_ID" property="ticketChannelId" jdbcType="VARCHAR" />
+    <result column="DRAWER_NAME" property="drawerName" jdbcType="OTHER" />
+    <result column="DRAWER_ACCOUNT" property="drawerAccount" jdbcType="VARCHAR" />
+    <result column="ACCOUNT_PASSWORD" property="accountPassword" jdbcType="VARCHAR" />
+    <result column="AUTH_CODE" property="authCode" jdbcType="VARCHAR" />
+    <result column="SEND_URL" property="sendUrl" jdbcType="VARCHAR" />
+    <result column="SEARCH_URL" property="searchUrl" jdbcType="VARCHAR" />
+    <result column="SEARCH_URL_SPARE" property="searchUrlSpare" jdbcType="VARCHAR" />
+    <result column="NOTICE_URL" property="noticeUrl" jdbcType="VARCHAR" />
+    <result column="ACCOUNT_BALANCE" property="accountBalance" jdbcType="DECIMAL" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="OTHER" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="OTHER" />
+    <result column="CREATE_BY" property="createBy" jdbcType="OTHER" />
+    <result column="CHANNEL_STATUS" property="channelStatus" jdbcType="DECIMAL" />
+    <result column="LOTTERY_STATUS" property="lotteryStatus" jdbcType="DECIMAL" />
+    <result column="TICKET_STATUS" property="ticketStatus" jdbcType="DECIMAL" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    ID, TICKET_CHANNEL_ID, DRAWER_NAME, DRAWER_ACCOUNT, ACCOUNT_PASSWORD, AUTH_CODE, 
+    SEND_URL, SEARCH_URL, SEARCH_URL_SPARE, NOTICE_URL, ACCOUNT_BALANCE, MODIFY_BY, UPDATE_TIME, 
+    CREATE_TIME, REMARK,CREATE_BY
+  </sql>
+
+	<sql id="Column_List">
+		ID,
+		TICKET_CHANNEL_ID TICKETCHANNELID,
+		DRAWER_NAME DRAWERNAME,
+		DRAWER_ACCOUNT DRAWERACCOUNT,
+		ACCOUNT_PASSWORD ACCOUNTPASSWORD,
+		AUTH_CODE AUTHCODE,
+		SEND_URL SENDURL,
+		SEARCH_URL SEARCHURL,
+		SEARCH_URL_SPARE SEARCHURLSPARE,
+		NOTICE_URL NOTICEURL,
+		ACCOUNT_BALANCE ACCOUNTBALANCE,
+		MODIFY_BY MODIFYBY,
+		CREATE_BY CREATEBY,
+		UPDATE_TIME UPDATETIME,
+		CREATE_TIME CREATETIME, 
+		REMARK,
+		CHANNEL_STATUS CHANNELSTATUS,
+		LOTTERY_STATUS LOTTERYSTATUS,
+		TICKET_STATUS TICKETSTATUS
+	</sql>
+	<sql id="sql_condition_TicketChannelVO">
+		<where>
+			<if test="ticketChannelId!=null and ticketChannelId!=''">
+				and TICKET_CHANNEL_ID = #{ticketChannelId}
+			</if>
+			<if test="drawerName!=null and drawerName!=''">
+				and DRAWER_NAME like '%${drawerName}%'
+			</if>
+		</where>
+	</sql>
+	<select id="listPage" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketChannelVO"
+		resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketChannelBO">
+		select
+		<include refid="Column_List" />
+		from TICKET_CHANNEL
+		<include refid="sql_condition_TicketChannelVO" />
+		order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				id
+			</otherwise>
+		</choose>
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow},#{pageSize}
+		</if>
+	</select>
+	<select id="countPage" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketChannelVO" resultType="int">
+	    select count(1)
+	    from TICKET_CHANNEL
+		<include refid="sql_condition_TicketChannelVO" />
+	</select>
+	<select id="listDrawerName" resultType="String">
+	    select DRAWER_NAME
+	    from TICKET_CHANNEL
+	</select>
+	<select id="listDrawerIdName" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketChannelBO">
+	  select 
+	     TICKET_CHANNEL_ID TICKETCHANNELID,
+		 DRAWER_NAME DRAWERNAME
+	  from TICKET_CHANNEL
+	</select>
+	<select id="findById" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketChannelBO">
+		select
+		<include refid="Column_List" />
+		from TICKET_CHANNEL
+		WHERE ID = #{id,jdbcType=DECIMAL}
+		LIMIT 1		
+	</select>
+	
+	<update id="update" parameterType="com.hhly.cmscore.persistence.ticket.po.TicketChannelPO">
+		update TICKET_CHANNEL
+	    set 
+	      DRAWER_NAME = #{drawerName,jdbcType=OTHER},
+	      DRAWER_ACCOUNT = #{drawerAccount,jdbcType=VARCHAR},
+	      ACCOUNT_PASSWORD = #{accountPassword,jdbcType=VARCHAR},
+	      AUTH_CODE = #{authCode,jdbcType=VARCHAR},
+	      SEND_URL = #{sendUrl,jdbcType=VARCHAR},
+	      SEARCH_URL = #{searchUrl,jdbcType=VARCHAR},
+	      SEARCH_URL_SPARE = #{searchUrlSpare,jdbcType=VARCHAR},
+	      NOTICE_URL = #{noticeUrl,jdbcType=VARCHAR},
+	      ACCOUNT_BALANCE = #{accountBalance,jdbcType=DECIMAL},
+	      MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+	      UPDATE_TIME = now(),
+	      REMARK = #{remark,jdbcType=OTHER},
+	      CHANNEL_STATUS = #{channelStatus,jdbcType=DECIMAL},
+	      LOTTERY_STATUS = #{lotteryStatus,jdbcType=DECIMAL},
+	      TICKET_STATUS = #{ticketStatus,jdbcType=DECIMAL}
+	   where ID = #{id,jdbcType=DECIMAL}
+	</update>
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.hhly.cmscore.persistence.ticket.po.TicketChannelPO">
+		insert into TICKET_CHANNEL (TICKET_CHANNEL_ID, DRAWER_NAME, 
+	      DRAWER_ACCOUNT, ACCOUNT_PASSWORD, AUTH_CODE, 
+	      SEND_URL, SEARCH_URL, SEARCH_URL_SPARE, 
+	      NOTICE_URL, ACCOUNT_BALANCE, MODIFY_BY, 
+	      UPDATE_TIME, CREATE_TIME, REMARK,CREATE_BY,CHANNEL_STATUS,LOTTERY_STATUS,TICKET_STATUS
+	      )
+	    values (#{ticketChannelId,jdbcType=VARCHAR}, #{drawerName,jdbcType=OTHER}, 
+	      #{drawerAccount,jdbcType=VARCHAR}, #{accountPassword,jdbcType=VARCHAR}, #{authCode,jdbcType=VARCHAR}, 
+	      #{sendUrl,jdbcType=VARCHAR}, #{searchUrl,jdbcType=VARCHAR}, #{searchUrlSpare,jdbcType=VARCHAR}, 
+	      #{noticeUrl,jdbcType=VARCHAR}, #{accountBalance,jdbcType=DECIMAL}, #{modifyBy,jdbcType=OTHER}, 
+	      now(),now(), #{remark,jdbcType=OTHER},#{createBy,jdbcType=OTHER},#{channelStatus,jdbcType=DECIMAL},
+	       #{lotteryStatus,jdbcType=DECIMAL},#{ticketStatus,jdbcType=DECIMAL}
+	      )
+	</insert>
+	<select id="listDrawerIdNameSending" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketChannelBO">
+		SELECT
+			tc.TICKET_CHANNEL_ID TICKETCHANNELID,
+			tc.DRAWER_NAME DRAWERNAME
+		FROM
+			TICKET_CHANNEL tc
+		JOIN ticket_config tf ON tc.ticket_channel_id = tf.ticket_channel_id
+		WHERE
+			tc.TICKET_STATUS = 1
+		AND tf.send_status = 1
+		AND tf.lottery_code = #{lotteryCode}
+		GROUP BY
+			tc.TICKET_CHANNEL_ID,
+			tc.DRAWER_NAME	
+	</select>
+</mapper>

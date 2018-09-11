@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.CmsCacheDaoMapper">
+
+	<resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.operate.po.CmsCachePO">
+		<id column="ID" property="id" jdbcType="DECIMAL" />
+		<result column="TYPE" property="type" jdbcType="DECIMAL" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="C_KEY" property="cKey" jdbcType="VARCHAR" />
+		<result column="STATUS" property="status" jdbcType="DECIMAL" />
+		<result column="REMARK" property="remark" jdbcType="VARCHAR" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<resultMap id="CachePageMap" type="com.hhly.skeleton.cms.operatemgr.bo.CmsCacheBO">
+		<id column="ID" property="id" jdbcType="DECIMAL" />
+		<result column="TYPE" property="type" jdbcType="DECIMAL" />
+		<result column="DIC_DATA_NAME" property="typeName" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="C_KEY" property="cKey" jdbcType="VARCHAR" />
+		<result column="STATUS" property="status" jdbcType="DECIMAL" />
+		<result column="REMARK" property="remark" jdbcType="VARCHAR" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, TYPE, NAME, C_KEY, STATUS, REMARK,
+		UPDATE_TIME,
+		CREATE_TIME
+	</sql>
+	
+	<sql id="query_condition_cachepage">
+		<trim prefix="where" prefixOverrides="and|or">
+			<if test="id != null and id != ''">
+				and CC.ID = #{id,jdbcType=DECIMAL}
+			</if>
+			<if test="type != null and type != ''">
+				and CC.TYPE = #{type,jdbcType=DECIMAL}
+			</if>
+			<if test="typeName != null and typeName != ''">
+				and DD.DIC_DATA_NAME = #{typeName,jdbcType=VARCHAR}
+			</if>
+			<if test="name != null and name != ''">
+				and CC.NAME = #{name,jdbcType=VARCHAR}
+			</if>
+			<if test="cKey != null and cKey != ''">
+				and CC.C_KEY = #{cKey,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</sql>
+	
+	<select id="findCacheListByPage" parameterType="com.hhly.skeleton.cms.operatemgr.vo.CmsCacheVO" resultMap="CachePageMap">
+		SELECT CC.*,DD.DIC_DATA_NAME
+			FROM CMS_CACHE CC
+			LEFT JOIN DIC_DATA_DETAIL DD ON (
+			CC.TYPE = DD.DIC_DATA_VALUE
+			AND DIC_CODE = '0519')
+			<include refid="query_condition_cachepage"/>
+		ORDER BY CC.CREATE_TIME DESC 
+		 <if test="startRow != null and pageSize != null">
+	   		 limit #{startRow},#{pageSize} 
+	 	 </if>
+	</select>
+	
+	<select id="findCacheTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.CmsCacheVO"  resultType="int">
+		select count(1) total FROM CMS_CACHE CC
+			LEFT JOIN DIC_DATA_DETAIL DD ON (
+			CC.TYPE = DD.DIC_DATA_VALUE
+			AND DIC_CODE = '0519')
+		<include refid="query_condition_cachepage"/>
+	</select>
+	
+	<select id="findCache" parameterType="com.hhly.skeleton.cms.operatemgr.vo.CmsCacheVO" resultMap="CachePageMap">
+		SELECT CC.*,DD.DIC_DATA_NAME
+			FROM CMS_CACHE CC
+			LEFT JOIN DIC_DATA_DETAIL DD ON (
+			CC.TYPE = DD.DIC_DATA_VALUE
+			AND DIC_CODE = '')
+			<include refid="query_condition_cachepage"/>
+	</select>
+	
+	<insert id="insertCache" parameterType="com.hhly.cmscore.persistence.operate.po.CmsCachePO">
+		INSERT INTO CMS_CACHE (
+			TYPE,
+			NAME,
+			C_KEY,
+			STATUS,
+			REMARK,
+			UPDATE_TIME,
+			CREATE_TIME
+		) VALUES (
+			#{type,jdbcType=SMALLINT},
+			#{name,jdbcType=VARCHAR},
+			#{cKey,jdbcType=VARCHAR},
+			#{status,jdbcType=SMALLINT},
+			#{remark,jdbcType=VARCHAR},
+			now(),now()
+		)
+	</insert>
+	
+	<delete id="delCacheById" parameterType="java.lang.Integer">
+		delete from CMS_CACHE where ID = #{id,jdbcType=DECIMAL}
+	</delete>
+	
+	<update id="updateCache" parameterType="com.hhly.cmscore.persistence.operate.po.CmsCachePO">
+		update CMS_CACHE set
+			<if test="type != null and type != ''">
+				TYPE = #{type,jdbcType=DECIMAL},
+			</if>
+			<if test="name != null and name != ''">
+				NAME = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="cKey != null and cKey != ''">
+				C_KEY = #{cKey,jdbcType=VARCHAR},
+			</if>
+			UPDATE_TIME = now()
+		where ID = #{id,jdbcType=DECIMAL}
+	</update>
+</mapper>

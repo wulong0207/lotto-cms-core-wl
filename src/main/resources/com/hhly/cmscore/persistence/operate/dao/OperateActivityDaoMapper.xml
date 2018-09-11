@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityDaoMapper">
+	<resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.operate.po.OperateActivityPO">
+		<id column="ID" property="id" jdbcType="DECIMAL" />
+		<result column="ACTIVITY_CODE" property="activityCode" jdbcType="VARCHAR" />
+		<result column="ACTIVITY_NAME" property="activityName"
+			jdbcType="OTHER" />
+		<result column="ACTIVITY_TYPE" property="activityType"
+			jdbcType="DECIMAL" />
+		<result column="ACTIVITY_START_TIME" property="activityStartTime"
+			jdbcType="TIMESTAMP" />
+		<result column="ACTIVITY_END_TIME" property="activityEndTime"
+			jdbcType="TIMESTAMP" />
+		<result column="ACTIVITY_URL" property="activityUrl" jdbcType="VARCHAR" />
+		<result column="ACTIVITY_STATUS" property="activityStatus"
+			jdbcType="DECIMAL" />
+		<result column="UV_COUNT" property="uvCount" jdbcType="DECIMAL" />
+		<result column="PV_COUNT" property="pvCount" jdbcType="DECIMAL" />
+		<result column="PART_NUM" property="partNum" jdbcType="DECIMAL" />
+		<result column="PRIZE_GET_NUM" property="prizeGetNum" jdbcType="DECIMAL" />
+		<result column="TOTAL_COST" property="totalCost" jdbcType="DECIMAL" />
+		<result column="COST_PAID" property="costPaid" jdbcType="DECIMAL" />
+		<result column="CHANNEL_ID" property="channelId" jdbcType="VARCHAR" />
+		<result column="ACTIVITY_DES" property="activityDes" jdbcType="OTHER" />
+		<result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+		<result column="MODIFY_BY" property="modifyBy" jdbcType="OTHER" />
+		<result column="CREATE_BY" property="createBy" jdbcType="OTHER" />
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="REMARK" property="remark" jdbcType="OTHER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, ACTIVITY_CODE, ACTIVITY_NAME, ACTIVITY_TYPE, ACTIVITY_START_TIME,
+		ACTIVITY_END_TIME,
+		ACTIVITY_URL, ACTIVITY_STATUS, UV_COUNT, PV_COUNT, PART_NUM, PRIZE_GET_NUM,
+		TOTAL_COST,
+		COST_PAID, CHANNEL_ID, ACTIVITY_DES, MODIFY_TIME, MODIFY_BY, CREATE_BY,
+		UPDATE_TIME,
+		CREATE_TIME, REMARK
+	</sql>
+	<sql id="Column_List">
+		ID,
+		ACTIVITY_CODE ACTIVITYCODE,
+		ACTIVITY_NAME ACTIVITYNAME,
+		ACTIVITY_TYPE ACTIVITYTYPE,
+		ACTIVITY_START_TIME ACTIVITYSTARTTIME,
+		ACTIVITY_END_TIME ACTIVITYENDTIME,
+		ACTIVITY_URL ACTIVITYURL,
+		ACTIVITY_STATUS ACTIVITYSTATUS,
+		UV_COUNT UVCOUNT,
+		PV_COUNT PVCOUNT,
+		PART_NUM PARTNUM,
+		PRIZE_GET_NUM PRIZEGETNUM,
+		TOTAL_COST TOTALCOST,
+		COST_PAID COSTPAID,
+		REMARK,
+		UPDATE_TIME UPDATETIME,
+		CREATE_TIME CREATETIME
+	</sql>
+	<sql id="sql_condition_OperateActivityVO">
+		<where>
+			<if test="activityCode != null and activityCode != ''">
+				and ACTIVITY_CODE = #{activityCode,jdbcType=VARCHAR}
+			</if>
+			<if test="activityName != null and activityName != ''">
+				and ACTIVITY_NAME = #{activityName,jdbcType=OTHER}
+			</if>
+			<if test="activityType != null">
+				and ACTIVITY_TYPE = #{activityType,jdbcType=DECIMAL}
+			</if>
+			<if test="activityStatus != null">
+				and ACTIVITY_STATUS = #{activityStatus,jdbcType=DECIMAL}
+			</if>
+			<if test="activityStartTime != null">
+				and ACTIVITY_START_TIME >= #{activityStartTime,jdbcType=TIMESTAMP}
+			</if>
+			<if test="activityEndTime != null">
+				and ACTIVITY_END_TIME <![CDATA[<=]]>
+				#{activityEndTime,jdbcType=TIMESTAMP}
+			</if>
+			<if test="createStartTime !=null">
+				and CREATE_TIME >= #{createStartTime}
+			</if>
+			<if test="createEndTime!=null">
+				and CREATE_TIME <![CDATA[<=]]>#{createEndTime}
+			</if>
+			<if test="updateStartTime !=null">
+				and UPDATE_TIME >= #{updateStartTime}
+			</if>
+			<if test="updateEndTime!=null">
+				and UPDATE_TIME <![CDATA[<=]]>#{updateEndTime}
+			</if>
+			
+			<if test="publishStatus==1">
+				and  now() <![CDATA[<]]>  ACTIVITY_START_TIME
+			</if>
+			<if test="publishStatus==2">
+				and  now() <![CDATA[>=]]>  ACTIVITY_START_TIME
+				and  now() <![CDATA[<=]]>  ACTIVITY_END_TIME
+			</if>
+			<if test="publishStatus==3">
+				and  now() <![CDATA[>]]>  ACTIVITY_END_TIME
+			</if>
+		</where>
+	</sql>
+	<select id="findList" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityVO"
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityBO">
+		select t.* from
+		(    select
+			<include refid="Column_List" />
+			from OPERATE_ACTIVITY
+			<include refid="sql_condition_OperateActivityVO" />	
+			order by			 
+			<choose>
+				<when test="sortField !=null and sortField!=''">
+					${sortField} ${sortOrder}
+				</when>
+				<otherwise>
+					id
+				</otherwise>
+			</choose>
+		) as t
+		limit #{startRow} ,#{pageSize}
+		
+	</select>
+	<select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityVO" resultType="int">
+	    select count(*)
+	    from OPERATE_ACTIVITY
+		<include refid="sql_condition_OperateActivityVO" />
+	</select>
+	<insert id="addOperateActivity" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityPO">
+	insert into OPERATE_ACTIVITY ( ACTIVITY_CODE, ACTIVITY_NAME, 
+      ACTIVITY_TYPE, ACTIVITY_START_TIME, ACTIVITY_END_TIME, 
+      ACTIVITY_URL, ACTIVITY_STATUS, UV_COUNT, 
+      PV_COUNT, PART_NUM, PRIZE_GET_NUM, 
+      TOTAL_COST, COST_PAID, CHANNEL_ID, 
+      ACTIVITY_DES, MODIFY_TIME, MODIFY_BY, 
+      CREATE_BY, UPDATE_TIME, CREATE_TIME, 
+      REMARK)
+    values ( #{activityCode,jdbcType=VARCHAR}, #{activityName,jdbcType=OTHER}, 
+      #{activityType,jdbcType=DECIMAL}, #{activityStartTime,jdbcType=TIMESTAMP}, #{activityEndTime,jdbcType=TIMESTAMP}, 
+      #{activityUrl,jdbcType=VARCHAR}, #{activityStatus,jdbcType=DECIMAL}, #{uvCount,jdbcType=DECIMAL}, 
+      #{pvCount,jdbcType=DECIMAL}, #{partNum,jdbcType=DECIMAL}, #{prizeGetNum,jdbcType=DECIMAL}, 
+      #{totalCost,jdbcType=DECIMAL}, #{costPaid,jdbcType=DECIMAL}, #{channelId,jdbcType=VARCHAR}, 
+      #{activityDes,jdbcType=OTHER},now(), #{modifyBy,jdbcType=OTHER},
+      #{createBy,jdbcType=OTHER}, now(), now(),
+      #{remark,jdbcType=OTHER})
+	</insert>
+	<update id="updOperateActivity" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityPO">
+	 update OPERATE_ACTIVITY
+      set
+	      ACTIVITY_NAME = #{activityName,jdbcType=OTHER},
+	      ACTIVITY_TYPE = #{activityType,jdbcType=DECIMAL},
+	      ACTIVITY_START_TIME = #{activityStartTime,jdbcType=TIMESTAMP},
+	      ACTIVITY_END_TIME = #{activityEndTime,jdbcType=TIMESTAMP},
+	      ACTIVITY_URL = #{activityUrl,jdbcType=VARCHAR},
+	      ACTIVITY_STATUS = #{activityStatus,jdbcType=DECIMAL},
+	      CHANNEL_ID = #{channelId,jdbcType=VARCHAR},
+	      ACTIVITY_DES = #{activityDes,jdbcType=OTHER},
+	      MODIFY_TIME = now(),
+	      MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+	      UPDATE_TIME = now(),
+	      REMARK = #{remark,jdbcType=OTHER}
+     where ID = #{id,jdbcType=DECIMAL}
+	</update>
+	<select id="findOperateActivityDetail" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityVO"
+		resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityBO">
+	  select 
+	   <include refid="Column_List" />
+	   ,MODIFY_BY MODIFYBY
+	   ,CREATE_BY CREATEBY
+	   ,CHANNEL_ID CHANNELID
+	   ,modify_Time modifyTime
+	   ,ACTIVITY_DES ACTIVITYDES
+	  from OPERATE_ACTIVITY
+	  where id  = #{id} 
+    </select>
+    <select id="findExcelActivity" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityVO"
+     resultType="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityExcelBO">
+     select
+		ACTIVITY_CODE ACTIVITYCODE,
+		ACTIVITY_NAME ACTIVITYNAME,
+		ACTIVITY_TYPE ACTIVITYTYPE,
+		date_format(ACTIVITY_START_TIME,'%Y-%m-%d %T') ACTIVITYSTARTTIME,
+		date_format(ACTIVITY_END_TIME,'%Y-%m-%d %T') ACTIVITYENDTIME,
+		ACTIVITY_URL ACTIVITYURL,
+		ACTIVITY_STATUS ACTIVITYSTATUS,
+		UV_COUNT UVCOUNT,
+		PV_COUNT PVCOUNT,
+		PART_NUM PARTNUM,
+		PRIZE_GET_NUM PRIZEGETNUM,
+		TOTAL_COST TOTALCOST,
+		COST_PAID COSTPAID,
+		REMARK,
+		date_format(UPDATE_TIME,'%Y-%m-%d %T') UPDATETIME,
+		date_format(CREATE_TIME,'%Y-%m-%d %T') CREATETIME,
+		@rownum:=@rownum+1 AS id
+		from OPERATE_ACTIVITY,(SELECT @rownum:=0) r		
+		<include refid="sql_condition_OperateActivityVO" />
+		order by id 
+     </select>
+     <select id="findIdByActivityCode" resultType="Integer">
+        select id from OPERATE_ACTIVITY where activity_code = #{activityCode}
+     </select>
+	<insert id="addOperateActivityDetail" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityConfigPO">
+		INSERT INTO OPERATE_ACTIVITY_CONFIG(
+			activity_code,
+			lottery_code,
+			single_order_money,
+			single_user_red_money,
+			single_user_money,
+			is_follow_order
+			is_care_order
+
+		) VALUES (
+			#{activityCode},
+
+		)
+
+
+	</insert>
+	<select id="findActivityStatusTrue" resultType="com.hhly.skeleton.base.bo.DictionaryBO">
+		select activity_code id ,CONCAT(activity_code,'-',activity_name) text from operate_activity where activity_end_time >NOW()
+	</select>
+</mapper>

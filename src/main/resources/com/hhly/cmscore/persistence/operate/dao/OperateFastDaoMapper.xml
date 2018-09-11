@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateFastDaoMapper">
+
+  <resultMap id="OperateFastMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateFastBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="FAST_CODE" property="fastCode" jdbcType="VARCHAR" />
+    <result column="PLATFORM" property="platform" jdbcType="SMALLINT" />
+     <result column="POSITION" property="position" jdbcType="SMALLINT" />
+    <result column="STATUS" property="status" jdbcType="SMALLINT" />
+    <result column="FAST_DESC" property="fastDesc" jdbcType="VARCHAR" />
+    <result column="ONLINE_TIME" property="onlineTime" jdbcType="VARCHAR" />
+    <result column="OFFLINE_TIME" property="offlineTime" jdbcType="VARCHAR" />
+    <result column="ONLINE_WEEK" property="onlineWeek" jdbcType="SMALLINT" />
+    <result column="OFFLINE_WEEK" property="offlineWeek" jdbcType="SMALLINT" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="ISDEFAULT" property="isDefault" jdbcType="SMALLINT" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    ID, FAST_CODE, PLATFORM,POSITION, STATUS, FAST_DESC, ONLINE_TIME, OFFLINE_TIME,ONLINE_WEEK,OFFLINE_WEEK, CREATE_BY, 
+    MODIFY_BY, UPDATE_TIME, CREATE_TIME,ISDEFAULT
+  </sql>
+
+  
+  <sql id="Page_Condition">
+  	  <if test="startRow != null and pageSize != null">
+		limit #{startRow} ,#{pageSize}
+	</if>
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+			<if test="platform != null">
+				and platform = #{platform}
+			</if>
+			<if test="position != null">
+				and position = #{position}
+			</if>
+			<if test="status != null">
+				and status = #{status}
+			</if>
+			<if test="isDefault != null">
+				and ISDEFAULT = #{isDefault}
+			</if>
+			<if test="idNotEqual != null">
+				and id != #{idNotEqual}
+			</if>
+			<if test="fastCode != null and fastCode != ''">
+				and FAST_CODE = #{fastCode}
+			</if>
+			<if test="searchTimeType != null and startWeek != null and endWeek != null ">
+				<choose>
+					<when test="searchTimeType == 1">
+						<![CDATA[ and CONCAT(ONLINE_WEEK,ONLINE_TIME) >CONCAT(#{startWeek},#{startTime}) and  CONCAT(ONLINE_WEEK,ONLINE_TIME)<= CONCAT(#{endWeek},#{endTime})]]>
+					</when>
+					<when test="searchTimeType == 2">
+						<![CDATA[ and CONCAT(OFFLINE_WEEK,OFFLINE_TIME) >CONCAT(#{startWeek},#{startTime}) and CONCAT(OFFLINE_WEEK,OFFLINE_TIME) <= CONCAT(#{endWeek},#{endTime})]]>					
+					</when>
+				</choose>
+			</if>
+				
+		</where>
+  </sql>
+  
+  <sql id="Table">
+  	OPERATE_FAST
+  </sql>
+  
+  <sql id="Table_Detail">
+  	OPERATE_FAST_INFO
+  </sql>
+  
+  <select id="list" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateFastVO" resultMap="OperateFastMap">
+     select t.* from (
+	     select <include refid="Base_Column_List"/>
+				from <include refid="Table"/>
+				<include refid="Query_Condition"/>
+				order by 
+			     <choose>  
+			       <when test="sortField !=null and sortField!=''">  
+			           ${sortField} ${sortOrder}
+			       </when>   
+			       <otherwise>  
+			            ID
+			       </otherwise>  
+			     </choose>  
+     )as t
+     <include refid="Page_Condition"/>
+  </select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateFastVO" resultType="int">
+	    select count(*) total
+	    from <include refid="Table"/>
+				<include refid="Query_Condition"/>
+	</select>
+	
+  <insert id="addOperateFast" parameterType="com.hhly.cmscore.persistence.operate.po.OperateFastPO" useGeneratedKeys="true" keyProperty="id">
+      <![CDATA[insert into OPERATE_FAST ( FAST_CODE, PLATFORM, POSITION,
+     STATUS, FAST_DESC, ONLINE_TIME, 
+     OFFLINE_TIME, CREATE_BY, MODIFY_BY, 
+     CREATE_TIME, UPDATE_TIME,ONLINE_WEEK,OFFLINE_WEEK,ISDEFAULT)
+   values (#{fastCode,jdbcType=VARCHAR}, #{platform,jdbcType=SMALLINT}, #{position,jdbcType=SMALLINT}, 
+     #{status,jdbcType=SMALLINT}, #{fastDesc,jdbcType=VARCHAR}, #{onlineTime,jdbcType=TIMESTAMP}, 
+     #{offlineTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, #{modifyBy,jdbcType=VARCHAR}, 
+     now(), now(),#{onlineWeek,jdbcType=SMALLINT},#{offlineWeek,jdbcType=SMALLINT},#{isDefault,jdbcType=SMALLINT})
+     ]]> 
+  </insert>
+  
+  <update id="updateOperateFast" parameterType="com.hhly.cmscore.persistence.operate.po.OperateFastPO">
+    UPDATE <include refid="Table"/>
+    <set>
+	    PLATFORM = #{platform,jdbcType=SMALLINT},
+	    POSITION = #{position,jdbcType=SMALLINT},
+	    STATUS = #{status,jdbcType=SMALLINT},
+	    FAST_DESC = #{fastDesc,jdbcType=VARCHAR},
+	    ONLINE_TIME = #{onlineTime,jdbcType=TIMESTAMP},
+	    OFFLINE_TIME = #{offlineTime,jdbcType=TIMESTAMP},
+	    MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+	    UPDATE_TIME = now(),
+	    ONLINE_WEEK = #{onlineWeek,jdbcType=SMALLINT},
+	    OFFLINE_WEEK = #{offlineWeek,jdbcType=SMALLINT},
+	    ISDEFAULT = #{isDefault,jdbcType=SMALLINT}
+    </set>
+    	WHERE ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <!-- 批量保存或更新彩种运营详情信息 -->
+  <insert id="mergeOperateFastInfo" parameterType="com.hhly.cmscore.persistence.operate.po.OperateFastPO">
+  
+  INSERT INTO <include refid="Table_Detail"/> 
+		 (ID,
+			FAST_ID, TYPE_ID, 
+		      ORDER_ID, CATEGORY_ID, FAST_ALIAS, 
+		      FAST_URL, FAST_SELECTED, MULTIPLE, 
+		      ICON, TARGET, TYPE_KEY, 
+		      TYPE_KEY_URL
+		)
+		VALUES
+		<foreach collection="fastInfos" item="item"  separator=",">
+		(#{item.id,jdbcType=DECIMAL}, 
+			#{id,jdbcType=DECIMAL}, 
+			#{item.typeId,jdbcType=INTEGER},
+		    #{item.orderId,jdbcType=SMALLINT},
+		    #{item.categoryId,jdbcType=SMALLINT}	,
+		     #{item.fastAlias,jdbcType=VARCHAR},
+		     #{item.fastUrl,jdbcType=VARCHAR},
+		     #{item.fastSelected,jdbcType=SMALLINT},
+		     #{item.multiple,jdbcType=TIMESTAMP},
+		     #{item.icon,jdbcType=SMALLINT},
+		     #{item.target,jdbcType=SMALLINT},
+		     #{item.typeKey,jdbcType=VARCHAR},
+		     #{item.typeKeyUrl,jdbcType=VARCHAR}
+		)
+		</foreach>
+		ON DUPLICATE KEY
+		UPDATE 
+		  FAST_ID = values(FAST_ID),
+	      TYPE_ID = values(TYPE_ID),
+	      ORDER_ID = values(ORDER_ID),
+	      CATEGORY_ID = values(CATEGORY_ID),
+	      FAST_ALIAS =  values(FAST_ALIAS),
+	      FAST_URL = values(FAST_URL),
+	      FAST_SELECTED = values(FAST_SELECTED),
+	      MULTIPLE = values(MULTIPLE),
+	      ICON = values(ICON),
+	      TARGET = values(TARGET),
+	      TYPE_KEY = values(TYPE_KEY),
+	      TYPE_KEY_URL = values(TYPE_KEY_URL)
+  </insert>
+  <!-- 查询数据是否冲突 -->
+   <select id="findTimeRepeatTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateFastVO" resultType="int">
+	    select count(*) total
+	    from  OPERATE_FAST
+	     where
+	     platform = #{platform}
+	     and position = #{position}
+	     and isDefault = #{isDefault}
+	    and STATUS =#{status}
+	     <if test="id != null">
+				 and id !=#{id}
+  		</if>	   
+		 and 				
+		 (
+		  ( 
+		    ( CONCAT(#{onlineWeek},#{onlineTime}) >CONCAT(ONLINE_WEEK,ONLINE_TIME)  AND CONCAT(OFFLINE_WEEK,OFFLINE_TIME) > CONCAT(#{onlineWeek},#{onlineTime}) )
+		    OR 
+		    (CONCAT(#{offlineWeek},#{offlineTime}) > CONCAT(ONLINE_WEEK,ONLINE_TIME) AND CONCAT(OFFLINE_WEEK,OFFLINE_TIME) >CONCAT(#{offlineWeek},#{offlineTime}) )
+		  )
+		  or 
+		  ( 
+		    ( CONCAT(ONLINE_WEEK,ONLINE_TIME)>CONCAT(#{onlineWeek},#{onlineTime})  AND CONCAT(#{offlineWeek},#{offlineTime}) >CONCAT(ONLINE_WEEK,ONLINE_TIME)  )
+		    OR 
+		    (CONCAT(OFFLINE_WEEK,OFFLINE_TIME)>CONCAT(#{onlineWeek},#{onlineTime})  AND CONCAT(#{offlineWeek},#{offlineTime}) >CONCAT(OFFLINE_WEEK,OFFLINE_TIME) )
+		  )
+		)	     	    	   
+   </select>
+</mapper>

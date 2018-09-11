@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.ordergroup.dao.GroupUserDaoMapper">
+
+	<sql id="group_user_column">
+		gu.id id,
+		u.account_name userAccount,
+		gu.flag flag,
+		gu.is_recommend isRecommend,
+		gu.order_count orderCount,
+		gu.order_suc_rate orderSucRate,
+		gu.win_count winCount,
+		gu.win_amount winAmount,
+		gu.profit_amount profitAmount,
+		gu.profit_rate profitRate,
+		gu.customization_count customizationCount,
+		gu.create_time createTime
+	</sql>
+
+	<sql id="search_condition">
+		where 1=1 
+		<if test="isRecommend!=null">
+			and gu.is_recommend = #{isRecommend}
+		</if>
+		
+		<if test="userType!=null and userTypeVal!=null and userTypeVal!=''">
+				<choose>
+					<when test="userType==1">
+						and u.NICK_NAME = #{userTypeVal}
+					</when>
+					<when test="userType==2">
+						and u.ACCOUNT_NAME = #{userTypeVal}
+					</when>
+					<when test="userType==3">
+						and u.CUS_MOBILE = #{userTypeVal}
+					</when>
+				</choose>
+		</if>
+	</sql>
+	
+	<select id="findGroupUser" parameterType="com.hhly.skeleton.cms.ordermgr.vo.GroupUserVO" resultType="com.hhly.skeleton.cms.ordermgr.bo.GroupUserBO">
+		SELECT
+			<include refid="group_user_column"/>
+		FROM
+			order_group_user gu
+		LEFT JOIN m_user_info u
+		ON gu.user_id = u.id
+		<include refid="search_condition"/>
+		order by gu.create_time
+		LIMIT #{startRow},#{pageSize}
+	</select>
+	
+	<select id="exprotGroupUserExcel" parameterType="com.hhly.skeleton.cms.ordermgr.vo.GroupUserVO" resultType="com.hhly.skeleton.cms.ordermgr.bo.GroupUserExcelBO">
+		SELECT
+			gu.id id,
+			u.account_name userAccount,
+			CASE WHEN gu.flag=2 THEN '合买红人' ELSE '普通用户' END flagName,
+			CASE WHEN gu.is_recommend=1 THEN '推荐' ELSE '不推荐' END recommendName,
+			gu.order_count orderCount,
+			gu.order_suc_rate orderSucRate,
+			gu.win_count winCount,
+			gu.win_amount winAmount,
+			gu.profit_amount profitAmount,
+			gu.profit_rate profitRate,
+			gu.customization_count customizationCount,
+			gu.create_time createTime
+		FROM
+			order_group_user gu
+		LEFT JOIN m_user_info u
+		ON gu.user_id = u.id
+		<include refid="search_condition"/>
+	</select>
+	
+	<select id="findGroupUserTotal" parameterType="com.hhly.skeleton.cms.ordermgr.vo.GroupUserVO" resultType="Integer">
+		SELECT
+			count(*)
+		FROM
+			order_group_user gu
+		LEFT JOIN m_user_info u
+		ON gu.user_id = u.id
+		<include refid="search_condition"/>
+	</select>
+	
+	<update id="updateRecommand" parameterType="com.hhly.skeleton.cms.ordermgr.vo.GroupUserVO">
+		update order_group_user set is_recommend = #{isRecommend} where id = #{id}
+	</update>
+	
+	<update id="updateUserFlag" parameterType="com.hhly.skeleton.cms.ordermgr.vo.GroupUserVO">
+		update order_group_user set flag = #{flag} where id = #{id}
+	</update>
+	
+	
+</mapper>

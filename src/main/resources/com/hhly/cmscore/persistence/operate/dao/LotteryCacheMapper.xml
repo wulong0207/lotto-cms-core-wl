@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.LotteryCacheMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.operate.po.LotteryCachePO" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="cache_group" property="cacheGroup" jdbcType="TINYINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="cache_key" property="cacheKey" jdbcType="VARCHAR" />
+    <result column="cache_type" property="cacheType" jdbcType="BIT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  
+  <resultMap id="BoBaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.LotteryCacheBO" >
+    <id column="id" property="id" jdbcType="SMALLINT" />
+    <result column="cache_group" property="cacheGroup" jdbcType="TINYINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="cache_key" property="cacheKey" jdbcType="VARCHAR" />
+    <result column="cache_type" property="cacheType" jdbcType="BIT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  	<resultMap type="com.hhly.skeleton.lotto.base.sport.bo.SPMessageBO" id="ResultSPMessageBO">
+		<result column="cus_mobile" property="mobile" jdbcType="VARCHAR"/>
+		<result column="cus_mail" property="mail" jdbcType="VARCHAR"/>
+		<result column="actual_name" property="name" jdbcType="VARCHAR"/>
+		<result column="id_num" property="num" jdbcType="VARCHAR"/>
+		<result column="recharge_channel" property="channel" jdbcType="VARCHAR"/>
+		<result column="recharge_amount" property="amount" jdbcType="VARCHAR"/>
+	</resultMap>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, cache_group, name, cache_key, cache_type, remark, update_time, create_time
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Short" >
+    select 
+    <include refid="Base_Column_List" />
+    from lottery_cache
+    where id = #{id,jdbcType=SMALLINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Short" >
+    delete from lottery_cache
+    where id = #{id,jdbcType=SMALLINT}
+  </delete>
+  
+  <insert id="insert" parameterType="com.hhly.cmscore.persistence.operate.po.LotteryCachePO" >
+    insert into lottery_cache (id, cache_group, name, 
+      cache_key, cache_type, remark, 
+      update_time, create_time)
+    values (#{id,jdbcType=SMALLINT}, #{cacheGroup,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, 
+      #{cacheKey,jdbcType=VARCHAR}, #{cacheType,jdbcType=BIT}, #{remark,jdbcType=VARCHAR}, 
+      CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP())
+  </insert>
+  <insert id="insertSelective" parameterType="com.hhly.cmscore.persistence.operate.po.LotteryCachePO" >
+    insert into lottery_cache
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="cacheGroup != null" >
+        cache_group,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="cacheKey != null" >
+        cache_key,
+      </if>
+      <if test="cacheType != null" >
+        cache_type,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=SMALLINT},
+      </if>
+      <if test="cacheGroup != null" >
+        #{cacheGroup,jdbcType=TINYINT},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="cacheKey != null" >
+        #{cacheKey,jdbcType=VARCHAR},
+      </if>
+      <if test="cacheType != null" >
+        #{cacheType,jdbcType=BIT},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        CURRENT_TIMESTAMP(),
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+ 
+  <update id="updateByPrimaryKeySelective" parameterType="com.hhly.cmscore.persistence.operate.po.LotteryCachePO" >
+    update lottery_cache
+    <set >
+      <if test="cacheGroup != null" >
+        cache_group = #{cacheGroup,jdbcType=TINYINT},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="cacheKey != null" >
+        cache_key = #{cacheKey,jdbcType=VARCHAR},
+      </if>
+      <if test="cacheType != null" >
+        cache_type = #{cacheType,jdbcType=BIT},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = CURRENT_TIMESTAMP(),
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hhly.cmscore.persistence.operate.po.LotteryCachePO" >
+    update lottery_cache
+    set cache_group = #{cacheGroup,jdbcType=TINYINT},
+      name = #{name,jdbcType=VARCHAR},
+      cache_key = #{cacheKey,jdbcType=VARCHAR},
+      cache_type = #{cacheType,jdbcType=BIT},
+      remark = #{remark,jdbcType=VARCHAR},
+      update_time = CURRENT_TIMESTAMP(),
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=SMALLINT}
+  </update>
+  
+  <select id="findCacheTotal" parameterType="com.hhly.skeleton.cms.operatemgr.vo.LotteryCacheVO"  resultType="int">
+		select count(1) total FROM lottery_cache CC
+		<trim prefix="where" prefixOverrides="and|or">
+			<if test="id != null ">
+				and CC.id = #{id}
+			</if>
+			<if test="cacheGroup != null and cacheGroup != ''">
+				and CC.cache_group = #{cacheGroup,jdbcType=DECIMAL}
+			</if>
+			<if test="name != null and name != ''">
+				and CC.name like concat(concat('%',#{name}),'%')
+			</if>
+			<if test="cacheKey != null and cacheKey != ''">
+				and CC.cache_key = #{cacheKey,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</select>
+	
+	<select id="findCacheListByPage" parameterType="com.hhly.skeleton.cms.operatemgr.vo.LotteryCacheVO" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> FROM lottery_cache CC
+		<trim prefix="where" prefixOverrides="and|or">
+			<if test="id != null ">
+				and CC.id = #{id}
+			</if>
+			<if test="cacheGroup != null and cacheGroup != ''">
+				and CC.cache_group = #{cacheGroup,jdbcType=DECIMAL}
+			</if>
+			<if test="name != null and name != ''">
+				and CC.name like concat(concat('%',#{name}),'%')
+			</if>
+			<if test="cacheKey != null and cacheKey != ''">
+				and CC.cache_key = #{cacheKey,jdbcType=VARCHAR}
+			</if>
+		</trim>
+		ORDER BY CC.create_time DESC 
+		 <if test="startRow != null and pageSize != null">
+	   		 limit #{startRow},#{pageSize} 
+	 	 </if>
+	</select>
+	
+	<select id="findCache" parameterType="com.hhly.skeleton.cms.operatemgr.vo.LotteryCacheVO"  resultMap="BoBaseResultMap">
+		select <include refid="Base_Column_List" /> FROM lottery_cache CC
+		<trim prefix="where" prefixOverrides="and|or">
+			<if test="id != null ">
+				and CC.id = #{id}
+			</if>
+			<if test="cacheGroup != null and cacheGroup != ''">
+				and CC.cache_group = #{cacheGroup,jdbcType=DECIMAL}
+			</if>
+			<if test="name != null and name != ''">
+				and CC.name like concat(concat('%',#{name}),'%')
+			</if>
+			<if test="cacheKey != null and cacheKey != ''">
+				and CC.cache_key = #{cacheKey,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</select>
+	
+		<select id="findMessage" resultMap="ResultSPMessageBO">
+		SELECT
+			m.cus_mobile,
+			m.cus_mail,
+			m.actual_name,
+			m.id_num,
+			r.recharge_channel,
+			r.recharge_amount
+			
+		FROM
+			m_user_info m
+		LEFT JOIN trans_recharge r  ON m.id = r.user_id 
+		WHERE
+			r.trans_status = 2 GROUP BY r.user_id limit #{min},#{max};
+	</select>
+	
+	<select id="findCount"  resultType="int">
+		select count(t.id) from (
+		SELECT
+			m.id
+		FROM
+			m_user_info m
+		LEFT JOIN trans_recharge r  ON m.id = r.user_id 
+		WHERE
+			r.trans_status = 2 GROUP BY r.user_id
+			) t
+	</select>
+</mapper>

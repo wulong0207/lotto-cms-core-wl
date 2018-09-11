@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.trans.dao.TransUserDaoMapper" >
+  <resultMap type="com.hhly.skeleton.cms.transmgr.bo.TransUserBO" id="BaseResultMap">
+  	<id column="id" property="id" jdbcType="DECIMAL"/>
+  	<result column="NICK_NAME" property="nickName" jdbcType="VARCHAR"/>
+  	<result column="trans_code" property="transCode" jdbcType="VARCHAR"/>
+  	<result column="order_code" property="orderCode" jdbcType="VARCHAR"/>
+  	<result column="trans_type" property="transType" jdbcType="INTEGER"/>
+  	<result column="order_info" property="orderInfo" jdbcType="VARCHAR"/>
+  	<result column="trans_end_time" property="transEndTime" jdbcType="TIMESTAMP"/>
+  	<result column="trans_time" property="transTime" jdbcType="TIMESTAMP"/>
+  	<result column="third_trans_time" property="thirdTransTime" jdbcType="TIMESTAMP"/>
+  	<result column="trans_amount" property="transAmount" jdbcType="DECIMAL"/>
+  	<result column="cash_amount" property="cashAmount" jdbcType="DECIMAL"/>
+  	<result column="red_trans_amount" property="redTransAmount" jdbcType="DECIMAL"/>
+  	<result column="trans_status" property="transStatus" jdbcType="INTEGER"/>
+  	<result column="channel_name" property="channelName" jdbcType="VARCHAR"/>
+  	<result column="third_trans_id" property="thirdTransId" jdbcType="VARCHAR"/>
+  	<result column="service_charge" property="serviceCharge" jdbcType="DECIMAL"/>
+  	<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+  	<result column="terminal_platform" property="terminalPlatform" jdbcType="INTEGER"/>
+  	<result column="CUS_MOBILE" property="cusMobile" jdbcType="VARCHAR"/>
+  	<result column="ACCOUNT_NAME" property="accountName" jdbcType="BIGINT"/>
+  	<result column="TOTAL_CASH_BALANCE" property="totalCashBalance" jdbcType="DECIMAL"/>
+  	<result column="AMOUNT_80" jdbcType="DECIMAL" property="amount80" />
+	<result column="AMOUNT_20" jdbcType="DECIMAL" property="amount20" />
+	<result column="AMOUNT_WIN" jdbcType="DECIMAL" property="amountWin" />
+	<result column="TOTAL_RED_BALANCE" jdbcType="DECIMAL" property="totalRedBalance" />
+  </resultMap>
+  <sql id="Base_Column_List">
+  	tu.id,trans_code,tu.order_code,tu.trans_type,tu.order_info,tu.trans_time,trans_end_time,tu.trans_amount,cash_amount,red_trans_amount,tu.trans_status,service_charge,tu.create_time,third_trans_time,third_trans_id,
+  	TOTAL_CASH_BALANCE,AMOUNT_80,AMOUNT_20,AMOUNT_WIN,TOTAL_RED_BALANCE
+  	,channel_name,terminal_platform
+  	,NICK_NAME,ACCOUNT_NAME,CUS_MOBILE
+  </sql>
+  
+  <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+   		limit #{startRow},#{pageSize}
+ 	 </if>
+  </sql>
+  
+  <sql id="Order_Condition">
+  	<choose>  
+       <when test="sortField !=null and sortField!=''">  
+           ${sortField} ${sortOrder}
+       </when>   
+       <otherwise>  
+            tu.id desc
+       </otherwise>  
+     </choose>
+  </sql>
+  
+  <sql id="Query_Condition">
+  	<where>
+			<if test="lotteryCode != null">
+				lottery_code=#{lotteryCode}
+			</if>
+			<!-- 
+				如果endIssue不为空，且startIsse < endIssue,则查询[startIsse, endIssue],
+				否则查询issue=startIsse
+			 -->
+			<choose>
+				<when test="startIssue != null and endIssue != null">
+					<![CDATA[
+						and lottery_issue >= #{startIssue,jdbcType=BIGINT} and lottery_issue<=#{endIssue,jdbcType=BIGINT}
+					]]>
+				</when>
+				<when test="startIssue != null">
+					and lottery_issue=#{startIssue,jdbcType=BIGINT}
+				</when>
+			</choose>
+			<if test="orderInfo != null and orderInfo !=''">
+				and order_info like CONCAT('%',#{orderInfo},'%')
+			</if>
+			<if test="channelName != null and channelName !=''">
+				and channel_name like CONCAT('%',#{channelName},'%')
+			</if>
+			<if test="channelId != null">
+				and tu.channel_id = #{channelId}
+			</if>
+			<if test="transCode != null and transCode !=''">
+				and trans_code = #{transCode}
+			</if>
+			<if test="thirdTransId != null and thirdTransId !=''">
+				and third_trans_id = #{thirdTransId}
+			</if>
+			<if test="orderCode != null and orderCode !=''">
+				and tu.order_code = #{orderCode}
+			</if>
+			<if test="userSearchType != null and userSearchValue != null and userSearchValue != ''">
+				<choose>
+					<when test="userSearchType == 1">
+						and NICK_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 2">
+						and ACCOUNT_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 3">
+						and CUS_MOBILE = #{userSearchValue}
+					</when>
+					<when test="userSearchType == 4">
+						and ACTUAL_NAME like CONCAT('%',#{userSearchValue},'%')
+					</when>
+					<when test="userSearchType == 5">
+						and ID_NUM like CONCAT('%',#{userSearchValue},'%')
+					</when>
+				</choose>
+			</if>
+			<if test="transTimeType != null and startTime != null and endTime != null">
+				<choose>
+					<when test="transTimeType == 1">
+						<![CDATA[ and tu.create_time >= #{startTime} and tu.create_time <= #{endTime}]]>
+					</when>
+					<when test="transTimeType == 2">
+						<![CDATA[ and trans_end_time >= #{startTime} and trans_end_time <= #{endTime}]]>
+					</when>
+					<when test="transTimeType == 3">
+						<![CDATA[ and third_trans_time >= #{startTime} and third_trans_time <= #{endTime}]]>
+					</when>
+				</choose>
+			</if>
+			<if test="transType != null">
+				and tu.trans_type = #{transType}
+			</if>
+			<if test="transStatus != null">
+				and tu.trans_status = #{transStatus}
+			</if>
+		</where>
+  </sql>
+  
+  <sql id="Table">
+  	trans_user tu
+	  left outer join M_USER_INFO lc on tu.user_id=lc.id
+	  <if test="lotteryCode != null or startIssue != null or endIssue != null">
+		  left outer join order_info oi on tu.order_code=oi.order_code
+	  </if>
+	  left outer join operate_market_channel omc on tu.channel_id=omc.channel_id
+  </sql>
+  
+  <select id="findTrans" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransUserVO" resultMap="BaseResultMap">
+     select <include refid="Base_Column_List"/>
+			from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+			order by 
+    		<include refid="Order_Condition"/>
+    		<include refid="Page_Condition"/>
+  </select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransUserVO" resultType="int">
+  	select count(1)
+			from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+  </select>
+  
+  <select id="findStatis" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransUserVO" resultType="Map">
+	    select count(1) total,
+	    	sum(tu.trans_amount) querySumTransAmount,
+	    	sum(cash_amount) querySumCashAmount,
+	    	sum(red_trans_amount) querySumRedAmount,
+	    	sum(service_charge) querySumServiceCharge
+	    from <include refid="Table"/>
+				<include refid="Query_Condition"/>
+	</select>
+	
+  <select id="findExcel" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransUserVO" resultType="com.hhly.skeleton.cms.transmgr.bo.TransUserExcelBO">
+    select 
+      @rownum:=@rownum+1 AS id,
+      NICK_NAME nickName,
+      tu.TRANS_CODE transCode,
+      tu.TRANS_TYPE transType,
+      tu.TRANS_STATUS transStatus,
+      tu.TRANS_AMOUNT transAmount,
+      CASH_AMOUNT cashAmount,
+      RED_TRANS_AMOUNT redTransAmount,
+      SERVICE_CHARGE serviceCharge,
+      tu.ORDER_INFO orderInfo,
+      tu.ORDER_CODE orderCode,
+      THIRD_TRANS_ID thirdTransId,
+	  channel_name channelName,
+      date_format(tu.CREATE_TIME, '%Y-%m-%d %H:%i:%s') createTime,
+      date_format(TRANS_END_TIME, '%Y-%m-%d %H:%i:%s') transEndTime
+	  from <include refid="Table"/>
+	  , (SELECT @rownum:=0) r
+			<include refid="Query_Condition"/>
+			order by tu.id desc
+  </select>
+
+
+	<select id="findTransAmountTotalByChannelId" resultType="java.lang.Double">
+		SELECT ifnull(sum(trans_amount),0) AS total
+		FROM trans_user
+		WHERE channel_id = #{channelId} AND trans_type = 2 AND trans_status = 1
+	</select>
+
+</mapper>

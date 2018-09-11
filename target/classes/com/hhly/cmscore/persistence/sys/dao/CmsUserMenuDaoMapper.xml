@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.sys.dao.CmsUserMenuDaoMapper">
+
+    <sql id="Base_Column_List">
+    USER_MENU_ID, USER_ID, MENU_ID, UPDATE_TIME, CREATE_TIME
+    </sql>
+
+    <!-- 查询用户角色权限tree -->
+    <select id="findUserAuthTree" parameterType="com.hhly.skeleton.cms.sysmgr.vo.CMSUserVO"
+            resultType="com.hhly.skeleton.cms.sysmgr.bo.CMSUserAuthTreeBO">
+       SELECT
+          A.ID menuId,
+          A.MENU_TITLE menuTitle,
+          A.PARENT_MENU_ID parentMenuId,
+          B.MENU_BUTTON menuButton,
+          B.ID roleMenuId,
+          C.USER_AUTH authority,
+          C.USER_ID userId,
+          CASE
+            WHEN C.USER_ID IS NOT NULL THEN 'true'
+            ELSE 'false'
+          END checked
+       FROM CMS_MENU A
+       INNER JOIN CMS_ROLE_MENU B ON A.ID=B.MENU_ID AND B.ROLE_ID = #{cmsRoleId}
+       LEFT OUTER JOIN CMS_USER_MENU C ON A.ID=C.MENU_ID AND C.USER_ID=#{userId}
+       ORDER BY A.ORDER_ID
+    </select>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userMenuId" parameterType="com.hhly.cmscore.persistence.sys.po.CmsUserMenuPO">
+        insert into CMS_USER_MENU (USER_ID, MENU_ID,USER_AUTH,
+          UPDATE_TIME, CREATE_TIME)
+        values (#{userId,jdbcType=INTEGER}, #{menuId,jdbcType=INTEGER},#{userAuth,jdbcType=VARCHAR},
+          now(),now())
+    </insert>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="com.hhly.cmscore.persistence.sys.po.CmsUserMenuPO">
+        DELETE FROM CMS_USER_MENU
+        <where>
+            <if test="userId != null">
+                USER_ID = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="menuId != null">
+                MENU_ID = #{menuId,jdbcType=INTEGER}
+            </if>
+        </where>
+    </delete>
+
+</mapper>

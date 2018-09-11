@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.trans.dao.TransTakenDaoMapper">
+	<resultMap type="com.hhly.skeleton.cms.transmgr.bo.TransTakenBO"
+		id="BaseResultMap">
+		<id column="id" property="id" jdbcType="DECIMAL" />
+		<result column="TRANS_TAKEN_CODE" property="transTakenCode" jdbcType="VARCHAR" />
+		<result column="pay_channel" property="payChannel" jdbcType="INTEGER" />
+		<result column="NICK_NAME" property="nickName" jdbcType="VARCHAR" />
+		<result column="trans_status" property="transStatus" jdbcType="INTEGER" />
+		<result column="taken_bank" property="takenBank" jdbcType="VARCHAR" />
+		<result column="bank_card_num" property="bankCardNum" jdbcType="VARCHAR" />
+		<result column="actual_name" property="actualName" jdbcType="VARCHAR" />
+		<result column="taken_platform" property="takenPlatform" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="cus_mobile" property="cusMobile" jdbcType="VARCHAR" />
+		<result column="channel_name" property="channelName" jdbcType="VARCHAR" />
+		<result column="review_time" property="reviewTime" jdbcType="TIMESTAMP" />
+		<result column="extract_amount" property="extractAmount" jdbcType="DECIMAL" />
+		<result column="real_amount" property="realAmount" jdbcType="DECIMAL" />
+		<result column="remit_time" property="remitTime" jdbcType="TIMESTAMP" />
+		<result column="service_charge" property="serviceCharge" jdbcType="DECIMAL" />
+		<result column="third_trans_num" property="thirdTransNum" jdbcType="VARCHAR" />
+		<result column="arrival_time" property="arrivalTime" jdbcType="TIMESTAMP" />
+		<result column="REVIEW_BY" property="reviewBy" jdbcType="VARCHAR" />
+		<result column="batch_num" property="batchNum" jdbcType="VARCHAR" />
+		<result column="batch_status" property="batchStatus" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="deal_time" property="dealTime" jdbcType="TIMESTAMP" />
+		<result column="trans_cert" property="transCert" jdbcType="TIMESTAMP" />
+		<result column="send_down_time" property="sendDownTime" jdbcType="TIMESTAMP" />
+		<result column="trans_fail_info" property="transFailInfo" jdbcType="VARCHAR" />
+		<result column="bank_info" property="bankInfo" jdbcType="VARCHAR" />
+		<result column="bank_return_info" property="bankReturnInfo" jdbcType="VARCHAR" />
+		<result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+		<result column="create_by" property="createBy" jdbcType="VARCHAR" />
+		<result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		tt.id,TRANS_TAKEN_CODE,pay_channel,trans_status,taken_bank,bank_card_num,taken_platform,tt.create_time,extract_amount,review_time,remit_time,
+		service_charge,third_trans_num,arrival_time,REVIEW_BY,batch_num,batch_status,deal_time,trans_cert,send_down_time,
+		trans_fail_info,bank_info,bank_return_info,tt.MODIFY_TIME,tt.CREATE_BY,tt.MODIFY_BY,tt.remark,
+		NICK_NAME,actual_name,account_name,cus_mobile,
+		channel_name,user_id,real_amount
+	</sql>
+
+  <sql id="Order_Condition">
+  	<choose>  
+       <when test="sortField !=null and sortField!=''">  
+           ${sortField} ${sortOrder}
+       </when>   
+       <otherwise>  
+            tt.id desc
+       </otherwise>  
+     </choose>
+  </sql>
+
+  <sql id="Page_Condition">
+  	 <if test="startRow != null and pageSize != null">
+   		limit #{startRow},#{pageSize}
+ 	 </if>
+  </sql>
+
+	<sql id="Query_Condition">
+		<where>
+			<if test="transTakenCode != null and transTakenCode !=''">
+				and TRANS_TAKEN_code = #{transTakenCode}
+			</if>
+			<if test="thirdTransNum != null and thirdTransNum !=''">
+				and third_trans_num = #{thirdTransNum}
+			</if>
+			<if test="batchNum != null and batchNum !=''">
+				and batch_num = #{batchNum}
+			</if>
+			<if test="payChannel != null">
+				and pay_channel = #{payChannel}
+			</if>
+			<if test="takenBank != null">
+				and taken_bank = #{takenBank}
+			</if>
+			<if
+				test="searchUserType != null and searchUserValue != null and searchUserValue != ''">
+				<choose>
+					<when test="searchUserType == 1">
+						and NICK_NAME like CONCAT('%',#{searchUserValue},'%')
+					</when>
+					<when test="searchUserType == 2">
+						and ACCOUNT_NAME like CONCAT('%',#{searchUserValue},'%')
+					</when>
+					<when test="searchUserType == 3">
+						and CUS_MOBILE = #{searchUserValue}
+					</when>
+					<when test="searchUserType == 4">
+						and ACTUAL_NAME like CONCAT('%',#{searchUserValue},'%')
+					</when>
+					<when test="searchUserType == 5">
+						and ID_NUM like CONCAT('%',#{searchUserValue},'%')
+					</when>
+				</choose>
+			</if>
+			<if
+				test="searchTimeType != null and startTime != null and endTime != null">
+				<choose>
+					<when test="searchTimeType == 1">
+						<![CDATA[ and tt.create_time >= #{startTime} and tt.create_time <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 2">
+						<![CDATA[ and deal_time >= #{startTime} and deal_time <= #{endTime}]]>
+					</when>
+					<when test="searchTimeType == 3">
+						<![CDATA[ and third_trans_time >= #{startTime} and third_trans_time <= #{endTime}]]>
+					</when>
+				</choose>
+			</if>
+			<if test="transStatus != null">
+				and tt.trans_status = #{transStatus}
+			</if>
+			<if test="batchStatus != null">
+				and batch_status = #{batchStatus}
+			</if>
+			<if test="ids != null">
+				and tt.id in
+				<foreach collection="ids" open="(" close=")" separator="," item="id">
+					#{id}
+				</foreach>
+			</if>
+			<if test="takenType != null">
+				and taken_type = #{takenType}
+			</if>
+			<if test="extractAmountLt != null">
+				<![CDATA[and extract_amount < #{extractAmountLt}]]>
+			</if>
+			<if test="realAmount != null">
+				and real_amount = #{realAmount}
+			</if>
+			<if test="createBy != null">
+				and tt.create_by = #{createBy}
+			</if>
+			<if test="bankCardNum != null">
+				and bank_card_num = #{bankCardNum}
+			</if>
+		</where>
+	</sql>
+
+	<sql id="Table">
+		TRANS_TAKEN tt
+		left outer join operate_market_channel omc on
+		tt.channel_id=omc.channel_id
+		left outer join M_USER_INFO lc on
+		tt.user_id=lc.id
+	</sql>
+
+	<select id="findTrans" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransTakenVO"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Query_Condition" />
+		order by
+		<include refid="Order_Condition"/>
+		<include refid="Page_Condition"/>
+	</select>
+
+	<select id="findStatis" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransTakenVO"
+		resultType="Map">
+		select count(*) total,
+		sum(EXTRACT_AMOUNT) queryExtractAmount,
+		sum(SERVICE_CHARGE) queryServiceCharge
+		from
+		<include refid="Table" />
+		<include refid="Query_Condition" />
+	</select>
+
+	<select id="findTotal" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransTakenVO"
+		resultType="int">
+		select count(*) total
+		from
+		<include refid="Table" />
+		<include refid="Query_Condition" />
+	</select>
+
+	<select id="findBatchNums" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransTakenVO"
+		resultType="string">
+		select batch_num
+		from
+		TRANS_TAKEN
+		where trans_status = #{transStatus}
+		GROUP BY batch_num
+	</select>
+
+	<select id="findExcel" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransTakenVO"
+		resultType="com.hhly.skeleton.cms.transmgr.bo.TransTakenExcelBO">
+		select
+		tt.id id,
+		NICK_NAME nickName,
+		TRANS_TAKEN_CODE transTakenCode,
+		TRANS_STATUS transStatus,
+		EXTRACT_AMOUNT extractAmount,
+		SERVICE_CHARGE serviceCharge,
+		ACTUAL_NAME
+		actualName,
+		PAY_CHANNEL payChannel,
+		TAKEN_BANK takenBank,
+		BANK_CARD_NUM
+		bankCardNum,
+		BANK_INFO bankInfo,
+		date_format(tt.CREATE_TIME, '%Y-%m-%d %H:%i:%s') createTime,
+		date_format(tt.DEAL_TIME, '%Y-%m-%d %H:%i:%s') dealTime,
+		date_format(ARRIVAL_TIME, '%Y-%m-%d %H:%i:%s') arrivalTime,
+		THIRD_TRANS_NUM thirdTransNum,
+		BATCH_NUM batchNum,
+		BATCH_STATUS batchStatus,
+		REAL_AMOUNT realAmount
+		from
+		<include refid="Table" />
+		<include refid="Query_Condition" />
+		order by tt.id desc
+	</select>
+
+	<resultMap id="BankExcelMap" type="com.hhly.skeleton.base.bo.BaseBO">
+		<discriminator javaType="int" column="excelBank">
+			<case value="1"
+				resultType="com.hhly.skeleton.cms.transmgr.bo.TransTakenCMBCBankExcelBO" />
+		</discriminator>
+	</resultMap>
+	
+	<select id="findBankExcel" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransTakenVO"
+		resultMap="BankExcelMap">
+		select
+		BANK_CARD_NUM bankCardNum,
+		ACTUAL_NAME actualName,
+		EXTRACT_AMOUNT extractAmount,
+		real_amount realAmount,
+		TAKEN_BANK takenBank,
+		BANK_INFO bankInfo,
+		BATCH_NUM batchNum,
+		TRANS_TAKEN_CODE transTakenCode,
+		'' as comment,
+		#{excelBank} as excelBank
+		from
+		TRANS_TAKEN tt
+		left outer join M_USER_INFO lc on tt.user_id=lc.id
+		<include refid="Query_Condition" />
+		order by tt.id desc
+	</select>
+	
+	<select id="findTransNoPaging" parameterType="com.hhly.skeleton.cms.transmgr.vo.TransTakenVO"
+		resultMap="BaseResultMap">
+		select
+		id,
+		TRANS_TAKEN_CODE,
+		user_id,
+		bank_card_num
+		from
+		TRANS_TAKEN tt
+		<include refid="Query_Condition" />
+		order by tt.id desc
+	</select>
+
+	<update id="updateCreateBy">
+		update TRANS_TAKEN set create_by = #{param1} where user_id=#{param2}
+	</update>
+	<!--
+	<update id="updateStatus" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update TRANS_TAKEN
+			<set>
+				<if test="item.transStatus != null">
+					TRANS_STATUS = #{item.transStatus},
+				</if>
+				<if test="auditBy != null">
+					audit_by = #{auditBy},
+					audit_time = now(),
+				</if>
+			</set>
+			where id=#{item.id}
+		</foreach>
+	</update>
+	-->
+</mapper>

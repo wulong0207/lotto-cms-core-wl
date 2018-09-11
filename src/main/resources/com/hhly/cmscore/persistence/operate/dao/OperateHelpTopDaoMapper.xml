@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateHelpTopDaoMapper">
+
+  <sql id="Base_Column_List">
+    TYPE_ID, HELP_ID, TITLE, UPTIME, DOWNTIME, ISTOP
+  </sql>
+  
+  <sql id="Table">
+	OPERATE_HELP_TOP  
+  </sql>
+  
+  <insert id="batchAdd" parameterType="java.util.List">
+   	insert into <include refid="Table"/> (<include refid="Base_Column_List"/>)
+  	VALUES
+	<foreach collection="list" item="item" separator=",">
+    (
+   		#{item.typeId,jdbcType=DECIMAL}, 
+   		#{item.helpId,jdbcType=DECIMAL}, 
+      	#{item.title,jdbcType=VARCHAR}, 
+      	#{item.uptime,jdbcType=TIMESTAMP}, 
+      	#{item.downtime,jdbcType=TIMESTAMP},
+      	#{item.isTop,jdbcType=TINYINT}
+     )
+  	</foreach>
+  </insert>
+   
+  <delete id="delete">
+  	delete from <include refid="Table"/>  where HELP_ID = #{helpId}
+  </delete>
+</mapper>

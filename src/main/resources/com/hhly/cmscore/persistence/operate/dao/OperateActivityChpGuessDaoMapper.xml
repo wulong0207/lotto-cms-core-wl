@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityChpGuessDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityChpGuessBO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="activity_config_id" jdbcType="INTEGER" property="activityConfigId" />
+        <result column="sport_against_info_id" jdbcType="INTEGER" property="sportAgainstInfoId" />
+        <result column="team_group" jdbcType="VARCHAR" property="teamGroup" />
+        <result column="reality_user" jdbcType="INTEGER" property="realityUser" />
+        <result column="win_status" jdbcType="INTEGER" property="winStatus" />
+        <result column="local_user" jdbcType="INTEGER" property="localUser" />
+        <result column="reality_jackpot" jdbcType="DECIMAL" property="realityJackpot" />
+        <result column="local_jackpot" jdbcType="DECIMAL" property="localJackpot" />
+        <result column="home_name" jdbcType="VARCHAR" property="homeName" />
+        <result column="match_status" jdbcType="INTEGER" property="matchStatus"/>
+        <result column="order_id" jdbcType="INTEGER" property="orderId"/>
+    </resultMap>
+
+    <select id="find" resultMap="BaseResultMap">
+        SELECT
+            oacg.id,
+            activity_config_id,
+            sport_against_info_id,
+            team_group,
+            ifnull(reality_user,0) reality_user,
+            win_status,
+            ifnull(local_user,0) local_user,
+            ifnull(reality_jackpot,0) reality_jackpot,
+            ifnull(local_jackpot,0) local_jackpot,
+            home_name,
+            order_id,
+            match_status
+        FROM
+            operate_activity_chp_guess oacg
+        LEFT JOIN operate_activity_config oac ON oac.id = oacg.activity_config_id
+        LEFT JOIN sport_against_info sai ON oacg.sport_against_info_id = sai.id
+        AND sai.lottery_code = 308
+        <where>
+            <if test="activityCode != null and activityCode !=''">
+                and activity_code=#{activityCode}
+            </if>
+        </where>
+        order by oacg.order_id
+    </select>
+
+    <insert id="merge" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityConfigPO">
+        INSERT INTO operate_activity_chp_guess
+        (
+        id, activity_config_id, sport_against_info_id,
+        team_group, win_status,
+        local_user, local_jackpot,
+        create_time, create_by,
+        modify_time, modify_by,
+        order_id
+        )
+        VALUES
+        <foreach collection="operateActivityRulePOList" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.activityConfigId},
+            #{item.sportAgainstInfoId},
+            #{item.teamGroup},
+            #{item.winStatus},
+            #{item.localUser},
+            #{item.localJackpot},
+            now(),
+            #{item.createBy},
+            now(),
+            #{item.modifyBy},
+            #{item.orderId}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        <if test="item.teamGroup != null and item.teamGroup !=''">
+            team_group	= values(team_group),
+        </if>
+        <if test="item.localUser != null">
+            local_user		= values(local_user),
+        </if>
+        <if test="item.localJackpot != null">
+            local_jackpot   	= values(local_jackpot),
+        </if>
+        <if test="item.orderId != null">
+            order_id   	= values(order_id),
+        </if>
+        modify_time	= now(),
+        modify_by	= values(modify_by)
+    </insert>
+
+    <update id="updateLocalUser">
+        <foreach collection="map" separator=";" index="key" item="value">
+            update `operate_activity_chp_guess` set local_user=IFNULL(reality_user,0)+#{value} where id=#{key}
+        </foreach>
+    </update>
+</mapper>

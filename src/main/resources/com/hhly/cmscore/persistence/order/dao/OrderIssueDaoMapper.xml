@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.cmscore.persistence.order.dao.OrderIssueDaoMapper" >
+  
+  	<!-- ********************Used to Cms******************** -->
+	<resultMap id="BaseResultMap"
+		type="com.hhly.skeleton.cms.ordermgr.bo.OrderIssueBO">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="lottery_code" property="lotteryCode" jdbcType="INTEGER" />
+		<result column="lottery_issue" property="lotteryIssue"
+			jdbcType="VARCHAR" />
+		<result column="NICK_NAME" property="nickName" jdbcType="VARCHAR" />
+		<result column="ACCOUNT_NAME" property="accountName" jdbcType="VARCHAR" />
+		<result column="buy_type" property="buyType" jdbcType="INTEGER" />
+		<result column="order_code" property="orderCode" jdbcType="VARCHAR" />
+		<result column="order_amount" property="orderAmount" jdbcType="DECIMAL" />
+		<result column="multiple_num" property="multipleNum" jdbcType="INTEGER" />
+		<result column="pre_bonus" property="preBonus" jdbcType="DECIMAL" />
+		<result column="aft_bonus" property="aftBonus" jdbcType="DECIMAL" />
+		<result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+		<result column="winning_status" property="winningStatus"
+			jdbcType="INTEGER" />
+		<result column="commission_rate" property="commissionRate"
+			jdbcType="DECIMAL" />
+		<result column="commission_amount" property="commissionAmount"
+			jdbcType="DECIMAL" />
+		<result column="follow_num" property="followNum" jdbcType="INTEGER" />
+		<result column="follow_amount" property="followAmount"
+			jdbcType="DECIMAL" />
+		<result column="max_roi" property="maxRoi" jdbcType="DECIMAL" />
+		<result column="order_visible_type" property="orderVisibleType"
+			jdbcType="INTEGER" />
+		<result column="recommend_reason" property="recommendReason"
+			typeHandler="com.hhly.cmscore.persistence.customer.typehandler.OrderIssueTypeHandler" />
+		<result column="is_show" property="isShow" jdbcType="INTEGER" />
+		<result column="is_top" property="isTop" jdbcType="INTEGER" />
+		<result column="is_recommend" property="isRecommend" jdbcType="INTEGER" />
+		<result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+		<result column="modify_by" property="modifyBy" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="buy_time" property="buyTime" jdbcType="TIMESTAMP" />
+		<result column="category_id" property="categoryId" jdbcType="INTEGER" />
+		<result column="user_issue_id" property="userIssueId" jdbcType="INTEGER" />
+	</resultMap>
+  
+  <select id="count" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderIssueVO"
+		resultType="int">
+		select count(1) from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+	</select>
+	
+	<select id="list" parameterType="com.hhly.skeleton.cms.ordermgr.vo.OrderIssueVO" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		<include refid="Where_Clause" />
+		<include refid="Order_Condition" />
+		<include refid="Limit_Condition" />
+	</select>
+
+
+  <update id="update" parameterType="com.hhly.cmscore.persistence.order.po.OrderIssuePO" >
+    update 
+    order_issue_info issue
+    <set >
+      <if test="recommendReason != null and recommendReason !=''" >
+        recommend_reason = #{recommendReason,jdbcType=VARCHAR,typeHandler=com.hhly.cmscore.persistence.customer.typehandler.OrderIssueTypeHandler},
+      </if>
+      <if test="isShow != null" >
+        is_show = #{isShow},
+      </if>
+      <if test="isTop != null" >
+        is_top = #{isTop},
+      </if>
+      <if test="isRecommend != null" >
+        is_recommend = #{isRecommend},
+      </if>
+      <if test="modifyTime != null" >
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyBy != null and modifyBy!=''" >
+        modify_by = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <where>
+		<if test="id != null">
+			and id = #{id}
+		</if>
+	</where>
+  </update>
+
+
+	<sql id="Table">
+		order_issue_info issue
+		<if test="joinOrder">
+			left join order_info orderInfo on issue.order_code = orderInfo.order_code
+		</if>
+		<if test="joinUserIssue">
+		left join m_user_issue_info userIssue on issue.user_issue_id = userIssue.id
+		</if>
+		<if test="joinUser">
+		left join m_user_info user on userIssue.user_id = user.id
+		</if>
+		<if test="joinOrderFollowedInfo">
+		left join order_followed_info orderFlowed on issue.id = orderFlowed.order_issue_id
+		</if>
+	</sql>
+
+	<sql id="Base_Column_List">
+		issue.id,
+		issue.order_code,
+		issue.commission_rate,
+		issue.commission_amount,
+		issue.follow_amount,
+		issue.follow_num,
+		issue.max_roi,
+		issue.order_visible_type,
+		issue.recommend_reason,
+		issue.is_recommend,
+		issue.is_top,
+		issue.is_show,
+		issue.remark,
+		issue.modify_by,
+		issue.modify_time,
+		issue.user_issue_id,
+		
+		orderInfo.lottery_code,
+		orderInfo.lottery_issue,
+		orderInfo.buy_type,
+		orderInfo.order_amount,
+		orderInfo.multiple_num,
+		ifnull(orderInfo.pre_bonus,0) pre_bonus,
+		ifnull(orderInfo.aft_bonus,0) aft_bonus,
+		orderInfo.order_status,
+		orderInfo.winning_status,
+		orderInfo.buy_time,
+		ifnull(orderInfo.category_id,0) category_id,
+		
+		user.NICK_NAME,
+		user.ACCOUNT_NAME
+	</sql>
+
+	<sql id="Where_Clause">
+		<where>
+			<if test="lotteryCode != null">
+				and orderInfo.lottery_code = #{lotteryCode}
+			</if>
+			<if test="lotteryIssue != null and lotteryIssue !=''">
+				and orderInfo.lottery_issue = #{lotteryIssue}
+			</if>
+			<if test="winningStatus != null">
+				and orderInfo.winning_status = #{winningStatus}
+			</if>
+			<if test="orderCode != null and orderCode !=''">
+				and issue.order_code = #{orderCode}
+			</if>
+			<if test="joinOrderFollowedInfo and followOrderCode != null and followOrderCode !=''">
+				and orderFlowed.order_code = #{followOrderCode}
+			</if>
+			<if test="userType != null and userTypeValue != null and userTypeValue != ''">
+				<choose>
+					<when test="userType == 0">
+						and user.NICK_NAME like CONCAT('%',#{userTypeValue},'%')
+					</when>
+					<when test="userType == 1">
+						and user.ACCOUNT_NAME like CONCAT('%',#{userTypeValue},'%')
+					</when>
+					<when test="userType == 2">
+						and user.CUS_MOBILE = #{userTypeValue}
+					</when>
+					<when test="userType == 3">
+			            and userIssue.user_id = #{userTypeValue}
+			        </when>
+				</choose>
+			</if>
+			<if test="timeType != null and startTime != null and endTime != null">
+				<choose>
+					<when test="timeType == 0">
+						<![CDATA[ and orderInfo.buy_time >= #{startTime} and orderInfo.buy_time <= #{endTime}]]>
+					</when>
+					<when test="timeType == 1">
+						<![CDATA[ and orderInfo.come_out_time >= #{startTime} and orderInfo.come_out_time <= #{endTime}]]>
+					</when>
+					<when test="timeType == 3">
+						<![CDATA[ and orderInfo.end_ticket_time >= #{startTime} and orderInfo.end_ticket_time <= #{endTime}]]>
+					</when>
+					<when test="timeType == 4">
+						<![CDATA[ and orderInfo.lottery_time >= #{startTime} and orderInfo.lottery_time <= #{endTime}]]>
+					</when>
+					<when test="timeType == 5">
+						<![CDATA[ and orderInfo.send_time >= #{startTime} and orderInfo.send_time <= #{endTime}]]>
+					</when>
+				</choose>
+			</if>
+		</where>
+	</sql>
+
+	<sql id="Limit_Condition">
+		<if test="startRow != null and endRow !=null">
+			limit #{startRow},#{endRow}
+		</if>
+	</sql>
+	
+  	<sql id="Order_Condition" >
+   		<if test="sortField != null and sortField != '' and sortOrder !=null">
+   			order by ${sortField} ${sortOrder}
+   		</if>
+  	</sql>
+  	<!-- ********************Used to Cms******************** -->
+  	
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+	<!-- CMS系统权限管理菜单管理 -->
+	<bean name="/sysMgrService"
+		  class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<!-- service的ref与remoteServiceImpl中@Service中的名字一致 -->
+		<property name="service" ref="sysMgrService" />
+		<!-- 接口的路径 -->
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ISysMgrService" />
+	</bean>
+
+	<!-- CMS彩种管理 -->
+	<bean name="/lotteryMgrService"
+		 class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="lotteryMgrService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ILotteryMgrService" />
+	</bean>
+	
+	<bean name="/customerMgrService"
+		 class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="customerMgrService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ICustomerMgrService" />
+	</bean>
+	
+	<bean name="/orderMgrService"
+		 class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="orderMgrService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.IOrderMgrService" />
+	</bean>
+	
+	<bean name="/operateMgrService"
+		 class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="operateMgrService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.IOperateMgrService" />
+	</bean>
+	<!-- redis对外接口调用 -->
+	<bean name="/redisMgrService" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="redisMgrService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.IRedisMgrService" />
+	</bean>
+	<!-- CMS竞技彩管理 -->
+	<bean name="/sportBallMgrService"
+		  class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="sportBallMgrService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ISportBallMgrService" />
+	</bean>
+
+
+	
+	<!-- 调度任务服务 -->
+	<bean name="/taskMgrService" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="taskMgrService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ITaskMgrService" />
+	</bean>
+	
+	<bean name="/transMgrService" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="transMgrService"/>
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ITransMgrService"></property>
+	</bean>
+	
+	<!-- 会员钱包管理服务 -->
+	<bean name="/userWalletMgrService"
+		 class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="userWalletMgrService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.IUserWalletMgrService" />
+	</bean>
+	<bean name="/ticketMgrService" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="ticketMgrService"/>
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ITicketMgrService"></property>
+	</bean>
+	
+	<!-- 支付管理 -->
+	<!--注意：paymentMgrSercice 、 paymentMgrService两个单词不一样  -->
+	<bean name="/paymentMgrSercice" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<!-- service的ref与remoteServiceImpl中@Service中的名字一致 -->
+		<property name="service" ref="paymentMgrService" />
+		<!-- 接口的路径 -->
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.IPaymentMgrService" />
+	</bean>
+	
+	<!-- 客服管理 -->
+	<bean name="/customerServiceMgrService" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="customerServiceMgrService"></property>
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ICustomerServiceMgrService"></property>
+	</bean>
+	
+	<!-- cms缓存管理 -->
+	<bean name="/cmsCacheService" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="cmsCacheService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ICmsCacheService" />
+	</bean>
+
+
+    <!-- 积分系统 -->
+    <bean name="/cooperateService" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+        <property name="service" ref="iCooperateService"/>
+        <property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.ICooperateService"/>
+    </bean>
+    
+    <!-- 代理系统 -->
+	<bean name="/agentUserInfoService" class="com.hhly.remote.hessian.exporter.LottoHessianServiceExporter">
+		<property name="service" ref="agentUserInfoService" />
+		<property name="serviceInterface" value="com.hhly.cmscore.cms.remote.service.IAgentUserInfoService" />
+	</bean>
+
+</beans> 

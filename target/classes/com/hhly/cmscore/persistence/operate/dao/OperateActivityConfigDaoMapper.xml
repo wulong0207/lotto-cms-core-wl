@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.operate.dao.OperateActivityConfigDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.operate.po.OperateActivityConfigPO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_code" jdbcType="VARCHAR" property="activityCode" />
+    <result column="lottery_code" jdbcType="SMALLINT" property="lotteryCode" />
+    <result column="single_order_money" jdbcType="DECIMAL" property="singleOrderMoney" />
+    <result column="single_user_red_money" jdbcType="DECIMAL" property="singleUserRedMoney" />
+    <result column="single_user_money" jdbcType="DECIMAL" property="singleUserMoney" />
+    <result column="single_user_day_money" jdbcType="DECIMAL" property="singleUserDayMoney" />
+    <result column="real_user_num" jdbcType="SMALLINT" property="realUserNum" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
+	<result column="rebate_user_type" jdbcType="TINYINT" property="rebateUserType" />
+    <result column="is_follow_order" jdbcType="BIT" property="isFollowOrder" />
+    <result column="is_care_order" jdbcType="BIT" property="isCareOrder" />
+    <result column="is_mobile" jdbcType="BIT" property="isMobile" />
+    <result column="Is_real_user" jdbcType="BIT" property="isRealUser" />
+    <result column="installment" jdbcType="TINYINT" property="installment" />
+    <result column="installment_money" jdbcType="VARCHAR" property="installmentMoney" />
+    <result column="offer_num" jdbcType="SMALLINT" property="offerNum" />
+    <result column="offer_money" jdbcType="DECIMAL" property="offerMoney" />
+    <result column="platfrom" jdbcType="VARCHAR" property="platfrom" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+  </resultMap>
+  
+  <resultMap id="BoResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityConfigBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_code" jdbcType="VARCHAR" property="activityCode" />
+    <result column="lottery_code" jdbcType="INTEGER" property="lotteryCode" />
+    <result column="single_order_money" jdbcType="DECIMAL" property="singleOrderMoney" />
+    <result column="single_user_red_money" jdbcType="DECIMAL" property="singleUserRedMoney" />
+    <result column="single_user_money" jdbcType="DECIMAL" property="singleUserMoney" />
+    <result column="single_user_day_money" jdbcType="DECIMAL" property="singleUserDayMoney" />
+    <result column="real_user_num" jdbcType="SMALLINT" property="realUserNum" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
+      <result column="config_type" jdbcType="TINYINT" property="configType"/>
+	<result column="rebate_user_type" jdbcType="TINYINT" property="rebateUserType" />
+    <result column="is_follow_order" jdbcType="BIT" property="isFollowOrder" />
+    <result column="is_care_order" jdbcType="BIT" property="isCareOrder" />
+    <result column="is_mobile" jdbcType="BIT" property="isMobile" />
+    <result column="Is_real_user" jdbcType="BIT" property="isRealUser" />
+    <result column="installment" jdbcType="TINYINT" property="installment" />
+    <result column="installment_money" jdbcType="VARCHAR" property="installmentMoney" />
+    <result column="offer_num" jdbcType="SMALLINT" property="offerNum" />
+    <result column="offer_money" jdbcType="DECIMAL" property="offerMoney" />
+    <result column="platfrom" jdbcType="VARCHAR" property="platfrom" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="is_activity_page" jdbcType="BIT" property="isActivityPage" />
+    <result column="mobile_num" jdbcType="SMALLINT" property="mobileNum" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="mobile_icon_url" jdbcType="VARCHAR" property="mobileIconUrl" />
+    <result column="pc_icon_url" jdbcType="VARCHAR" property="pcIconUrl" />
+	<collection property="operateActivityRuleBOList" column="id"  javaType="java.util.ArrayList" resultMap="RuleBoResultMap"/>    
+  </resultMap>  
+
+	<resultMap id="RuleBoResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityRuleBO">
+	    <id column="rule_id" jdbcType="INTEGER" property="id" />
+	    <result column="activity_config_id" jdbcType="INTEGER" property="activityConfigId" />	    
+	    <result column="lottery_child_code" jdbcType="VARCHAR" property="lotteryChildCode" />
+	    <result column="lottery_pass_type" jdbcType="VARCHAR" property="lotteryPassType" />
+	    <result column="rule_type" jdbcType="BIT" property="ruleType" />
+	    <result column="rule_start" jdbcType="VARCHAR" property="ruleStart" />
+	    <result column="rule_end" jdbcType="VARCHAR" property="ruleEnd" />
+	    <result column="win_start_money" jdbcType="DECIMAL" property="winStartMoney" />
+	    <result column="win_end_money" jdbcType="DECIMAL" property="winEndMoney" />
+	    <result column="rebate_type" jdbcType="BIT" property="rebateType" />
+	    <result column="rebate_num" jdbcType="DECIMAL" property="rebateNum" />
+	    <result column="is_multiple" jdbcType="BIT" property="isMultiple" />
+	    <result column="multiple_sub" jdbcType="VARCHAR" property="multipleSub" />
+	    <result column="added_add" jdbcType="VARCHAR" property="addedAdd" />
+	    <result column="user_action" jdbcType="BIT" property="userAction" />
+	    <result column="gift_type" jdbcType="BIT" property="giftType" />
+	    <result column="gift_money" jdbcType="DECIMAL" property="giftMoney" />
+	    <result column="rule_status" jdbcType="BIT" property="status" />
+	    <result column="content_type" jdbcType="BIT" property="contentType" />
+	    <result column="single_user_num" jdbcType="INTEGER" property="singleUserNum" />	
+	    <result column="is_add" jdbcType="BIT" property="isAdd" />    
+	</resultMap>  
+  
+  <resultMap id="ActivityCouponResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityConfigBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_code" jdbcType="VARCHAR" property="activityCode" />
+    <result column="lottery_code" jdbcType="INTEGER" property="lotteryCode" />
+    <result column="single_order_money" jdbcType="DECIMAL" property="singleOrderMoney" />
+    <result column="single_user_red_money" jdbcType="DECIMAL" property="singleUserRedMoney" />
+    <result column="single_user_money" jdbcType="DECIMAL" property="singleUserMoney" />
+    <result column="single_user_day_money" jdbcType="DECIMAL" property="singleUserDayMoney" />
+    <result column="real_user_num" jdbcType="SMALLINT" property="realUserNum" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
+      <result column="config_type" jdbcType="TINYINT" property="configType"/>
+	<result column="rebate_user_type" jdbcType="TINYINT" property="rebateUserType" />
+    <result column="is_follow_order" jdbcType="BIT" property="isFollowOrder" />
+    <result column="is_care_order" jdbcType="BIT" property="isCareOrder" />
+    <result column="is_mobile" jdbcType="BIT" property="isMobile" />
+    <result column="Is_real_user" jdbcType="BIT" property="isRealUser" />
+    <result column="installment" jdbcType="TINYINT" property="installment" />
+    <result column="installment_money" jdbcType="VARCHAR" property="installmentMoney" />
+    <result column="offer_num" jdbcType="SMALLINT" property="offerNum" />
+    <result column="offer_money" jdbcType="DECIMAL" property="offerMoney" />
+    <result column="mobile_num" jdbcType="SMALLINT" property="mobileNum" />
+    <result column="platfrom" jdbcType="VARCHAR" property="platfrom" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="min_recharge_money" jdbcType="VARCHAR" property="minRechargeMoney" />
+    <result column="activity_day_num" jdbcType="VARCHAR" property="activityDayNum" />   
+      
+	<collection property="operateActivityRuleBOList" column="id"  javaType="java.util.ArrayList" resultMap="ActivityCouponRuleResultMap"/>    
+  </resultMap>  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+	<resultMap id="ActivityCouponRuleResultMap" type="com.hhly.skeleton.lotto.base.operate.bo.OperateCouponTempBO">
+	    <id column="rule_id" jdbcType="INTEGER" property="id" />
+	    <result column="activity_config_id" jdbcType="INTEGER" property="activityConfigId" />	    
+	    <result column="red_type" jdbcType="TINYINT" property="redType" />
+	    <result column="red_status" jdbcType="TINYINT" property="redStatus" />
+	    <result column="red_value" jdbcType="DECIMAL" property="redValue" />
+	    <result column="min_spend_amount" jdbcType="DECIMAL" property="minSpendAmount" />
+	    <result column="ectivity_day" jdbcType="SMALLINT" property="ectivityDay" />
+	    <result column="active_end_time" jdbcType="SMALLINT" property="activeEndTime" />
+	    <result column="limit_platform" jdbcType="VARCHAR" property="limitPlatform" />
+	    <result column="limit_lottery_child_type" jdbcType="VARCHAR" property="limitLotteryChildType" />
+	    <result column="limit_num" jdbcType="INTEGER" property="limitNum" />
+	    <result column="red_label" jdbcType="VARCHAR" property="redLabel" />
+	    <result column="operate_lottery_id" jdbcType="VARCHAR" property="operateLotteryId" />	
+	    <result column="limit_lottery" jdbcType="LONGVARCHAR" property="limitLottery" />
+	    <result column="limit_lottery_child" jdbcType="LONGVARCHAR" property="limitLotteryChild" /> 
+	    <result column="red_name" jdbcType="VARCHAR" property="redName" />   				   	   
+	</resultMap>
+  
+   <!-- 抽奖活动 -->
+   <resultMap id="ActivityAwardResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityConfigBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_code" jdbcType="VARCHAR" property="activityCode" />
+    <result column="lottery_code" jdbcType="INTEGER" property="lotteryCode" />
+    <result column="single_order_money" jdbcType="DECIMAL" property="singleOrderMoney" />
+    <result column="single_user_red_money" jdbcType="DECIMAL" property="singleUserRedMoney" />
+    <result column="single_user_money" jdbcType="DECIMAL" property="singleUserMoney" />
+    <result column="single_user_day_money" jdbcType="DECIMAL" property="singleUserDayMoney" />
+    <result column="real_user_num" jdbcType="SMALLINT" property="realUserNum" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
+	<result column="rebate_user_type" jdbcType="TINYINT" property="rebateUserType" />
+    <result column="is_follow_order" jdbcType="BIT" property="isFollowOrder" />
+    <result column="is_care_order" jdbcType="BIT" property="isCareOrder" />
+    <result column="is_mobile" jdbcType="BIT" property="isMobile" />
+    <result column="Is_real_user" jdbcType="BIT" property="isRealUser" />
+    <result column="installment" jdbcType="TINYINT" property="installment" />
+    <result column="installment_money" jdbcType="VARCHAR" property="installmentMoney" />
+    <result column="offer_num" jdbcType="SMALLINT" property="offerNum" />
+    <result column="offer_money" jdbcType="DECIMAL" property="offerMoney" />
+    <result column="platfrom" jdbcType="VARCHAR" property="platfrom" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="min_recharge_money" jdbcType="VARCHAR" property="minRechargeMoney" />
+    <result column="activity_day_num" jdbcType="VARCHAR" property="activityDayNum" />   
+      
+	<collection property="operateActivityRuleBOList" column="id"  javaType="java.util.ArrayList" resultMap="ActivityAwardRuleResultMap"/>    
+  </resultMap>  
+
+	<resultMap id="ActivityAwardRuleResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityAwardBO">
+	    <id column="rule_id" jdbcType="INTEGER" property="id" />
+	    <result column="award_color" jdbcType="VARCHAR" property="awardColor" />
+		<result column="award_img" jdbcType="VARCHAR" property="awardImg" />
+	    <result column="award_text" jdbcType="VARCHAR" property="awardText" />
+	    <result column="probability" jdbcType="DECIMAL" property="probability" />
+	    <result column="order_id" jdbcType="SMALLINT" property="orderId" />
+	    <result column="type" jdbcType="BIT" property="type" />
+	    <result column="type_code" jdbcType="VARCHAR" property="typeCode" />
+	    <result column="red_type" jdbcType="TINYINT" property="redType" />
+	    <result column="red_value" jdbcType="DECIMAL" property="redValue" />
+	    <result column="min_spend_amount" jdbcType="DECIMAL" property="minSpendAmount" />
+	    <result column="ectivity_day" jdbcType="SMALLINT" property="ectivityDay" />
+	    <result column="operate_lottery_id" jdbcType="VARCHAR" property="operateLotteryId" />
+	    <result column="channel_id" jdbcType="VARCHAR" property="channelId" />	    	    	 				   	   
+	</resultMap>
+	
+  <!-- 追号送活动 -->
+   <resultMap id="ActivityAddCodeResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityConfigBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_code" jdbcType="VARCHAR" property="activityCode" />
+    <result column="lottery_code" jdbcType="INTEGER" property="lotteryCode" />
+    <result column="single_order_money" jdbcType="DECIMAL" property="singleOrderMoney" />
+    <result column="single_user_red_money" jdbcType="DECIMAL" property="singleUserRedMoney" />
+    <result column="single_user_money" jdbcType="DECIMAL" property="singleUserMoney" />
+    <result column="single_user_day_money" jdbcType="DECIMAL" property="singleUserDayMoney" />
+    <result column="real_user_num" jdbcType="SMALLINT" property="realUserNum" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
+	<result column="rebate_user_type" jdbcType="TINYINT" property="rebateUserType" />
+    <result column="is_follow_order" jdbcType="BIT" property="isFollowOrder" />
+    <result column="is_care_order" jdbcType="BIT" property="isCareOrder" />
+    <result column="is_mobile" jdbcType="BIT" property="isMobile" />
+    <result column="Is_real_user" jdbcType="BIT" property="isRealUser" />
+    <result column="installment" jdbcType="TINYINT" property="installment" />
+    <result column="installment_money" jdbcType="VARCHAR" property="installmentMoney" />
+    <result column="offer_num" jdbcType="SMALLINT" property="offerNum" />
+    <result column="offer_money" jdbcType="DECIMAL" property="offerMoney" />
+    <result column="platfrom" jdbcType="VARCHAR" property="platfrom" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="min_recharge_money" jdbcType="VARCHAR" property="minRechargeMoney" />
+    <result column="activity_day_num" jdbcType="VARCHAR" property="activityDayNum" />   
+    <result column="is_dlt_add" jdbcType="BIT" property="isDltAdd" />
+    <result column="is_cancel" jdbcType="BIT" property="isCancel" />
+    <result column="is_award" jdbcType="BIT" property="isAward" />
+	<collection property="operateActivityRuleBOList" column="id"  javaType="java.util.ArrayList" resultMap="ActivityAddCodeRuleResultMap"/>    
+  </resultMap>  
+
+	<resultMap id="ActivityAddCodeRuleResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityAddedBO">
+	    <id column="rule_id" jdbcType="INTEGER" property="id" />
+	    <result column="lottery_child_code" jdbcType="VARCHAR" property="lotteryChildCode" />
+	    <result column="rule_type" jdbcType="BIT" property="ruleType" />
+	    <result column="operate_activity_coupon_id" jdbcType="INTEGER" property="operateActivityCouponId" />
+	    <result column="add_num" jdbcType="SMALLINT" property="addNum" />
+	    <result column="give_num" jdbcType="SMALLINT" property="giveNum" />
+	    <result column="single_user_num" jdbcType="SMALLINT" property="singleUserNum" />
+   		<result column="rule_offer_num" jdbcType="INTEGER" property="ruleOfferNum" />
+	    <result column="red_type" jdbcType="TINYINT" property="redType" />
+	    <result column="red_status" jdbcType="TINYINT" property="redStatus" />
+	    <result column="red_value" jdbcType="DECIMAL" property="redValue" />
+	    <result column="min_spend_amount" jdbcType="DECIMAL" property="minSpendAmount" />
+	    <result column="ectivity_day" jdbcType="SMALLINT" property="ectivityDay" />
+	    <result column="active_end_time" jdbcType="SMALLINT" property="activeEndTime" />
+	    <result column="limit_platform" jdbcType="VARCHAR" property="limitPlatform" />
+	    <result column="limit_lottery_child_type" jdbcType="VARCHAR" property="limitLotteryChildType" />
+	    <result column="limit_num" jdbcType="INTEGER" property="limitNum" />
+	    <result column="red_label" jdbcType="VARCHAR" property="redLabel" />
+	    <result column="operate_lottery_id" jdbcType="VARCHAR" property="operateLotteryId" />	
+	    <result column="limit_lottery" jdbcType="LONGVARCHAR" property="limitLottery" />
+	    <result column="limit_lottery_child" jdbcType="LONGVARCHAR" property="limitLotteryChild" /> 
+	    <result column="red_name" jdbcType="VARCHAR" property="redName" />  	    	    	 				   	   
+	</resultMap>
+
+	<!-- 冠军竞猜活动 -->
+   <resultMap id="ActivityChpResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityConfigBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="activity_code" jdbcType="VARCHAR" property="activityCode" />
+    <result column="lottery_code" jdbcType="INTEGER" property="lotteryCode" />
+    <result column="single_order_money" jdbcType="DECIMAL" property="singleOrderMoney" />
+    <result column="single_user_red_money" jdbcType="DECIMAL" property="singleUserRedMoney" />
+    <result column="single_user_money" jdbcType="DECIMAL" property="singleUserMoney" />
+    <result column="single_user_day_money" jdbcType="DECIMAL" property="singleUserDayMoney" />
+    <result column="real_user_num" jdbcType="SMALLINT" property="realUserNum" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
+	<result column="rebate_user_type" jdbcType="TINYINT" property="rebateUserType" />
+    <result column="is_follow_order" jdbcType="BIT" property="isFollowOrder" />
+    <result column="is_care_order" jdbcType="BIT" property="isCareOrder" />
+    <result column="is_mobile" jdbcType="BIT" property="isMobile" />
+    <result column="is_real_user" jdbcType="BIT" property="isRealUser" />
+    <result column="installment" jdbcType="TINYINT" property="installment" />
+    <result column="installment_money" jdbcType="VARCHAR" property="installmentMoney" />
+    <result column="offer_num" jdbcType="SMALLINT" property="offerNum" />
+    <result column="offer_money" jdbcType="DECIMAL" property="offerMoney" />
+    <result column="platfrom" jdbcType="VARCHAR" property="platfrom" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="min_recharge_money" jdbcType="VARCHAR" property="minRechargeMoney" />
+    <result column="activity_day_num" jdbcType="VARCHAR" property="activityDayNum" />
+    <result column="is_dlt_add" jdbcType="BIT" property="isDltAdd" />
+    <result column="is_cancel" jdbcType="BIT" property="isCancel" />
+    <result column="is_award" jdbcType="BIT" property="isAward" />
+	<collection property="operateActivityRuleBOList" column="id"  javaType="java.util.ArrayList" resultMap="ActivityChpRuleResultMap"/>
+  </resultMap>
+
+	<resultMap id="ActivityChpRuleResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateActivityChpGuessBO">
+	    <id column="rule_id" jdbcType="INTEGER" property="id" />
+		<result column="activity_config_id" jdbcType="INTEGER" property="activityConfigId" />
+		<result column="sport_against_info_id" jdbcType="INTEGER" property="sportAgainstInfoId" />
+		<result column="team_group" jdbcType="VARCHAR" property="teamGroup" />
+		<result column="reality_user" jdbcType="INTEGER" property="realityUser" />
+		<result column="win_status" jdbcType="INTEGER" property="winStatus" />
+		<result column="local_user" jdbcType="INTEGER" property="localUser" />
+		<result column="reality_jackpot" jdbcType="DECIMAL" property="realityJackpot" />
+		<result column="local_jackpot" jdbcType="DECIMAL" property="localJackpot" />
+		<result column="home_name" jdbcType="VARCHAR" property="homeName" />
+		<result column="match_status" jdbcType="INTEGER" property="matchStatus"/>
+		<result column="real_score" jdbcType="DECIMAL" property="realScore" />
+		<result column="local_score" jdbcType="DECIMAL" property="localScore" />
+		<result column="order_id" jdbcType="INTEGER" property="orderId"/>
+	</resultMap>
+  <sql id="Base_Column_List">
+      id, activity_code, lottery_code, single_order_money, single_user_red_money, single_user_money,
+      single_user_day_money, real_user_num, user_type,config_type, is_follow_order, is_care_order,
+    is_mobile, Is_real_user, installment, installment_money, offer_num, offer_money, 
+    platfrom, status, create_by, create_time, modify_by, modify_time, update_time, url
+  </sql>
+  
+	<sql id="sql_condition_OperateActivityConfigVO">
+		<where>
+	      <if test="id != null">
+	        and id = #{id,jdbcType=INTEGER}
+	      </if>
+	      <if test="activityCode != null">
+	        and activity_code = #{activityCode,jdbcType=VARCHAR}
+	      </if>
+	      <if test="lotteryCode != null">
+	        and lottery_code = #{lotteryCode,jdbcType=SMALLINT}
+	      </if>
+	      <if test="singleOrderMoney != null">
+	        and single_order_money = #{singleOrderMoney,jdbcType=DECIMAL}
+	      </if>
+	      <if test="singleUserRedMoney != null">
+	        and single_user_red_money = #{singleUserRedMoney,jdbcType=DECIMAL}
+	      </if>
+	      <if test="singleUserMoney != null">
+	        and single_user_money = #{singleUserMoney,jdbcType=DECIMAL}
+	      </if>
+	      <if test="singleUserDayMoney != null">
+	        and single_user_day_money = #{singleUserDayMoney,jdbcType=DECIMAL}
+	      </if>
+	      <if test="realUserNum != null">
+	        and real_user_num = #{realUserNum,jdbcType=SMALLINT}
+	      </if>
+	      <if test="userType != null">
+	        and user_type = #{userType,jdbcType=TINYINT}
+	      </if>
+	      <if test="isFollowOrder != null">
+	        and is_follow_order = #{isFollowOrder,jdbcType=BIT}
+	      </if>
+	      <if test="isCareOrder != null">
+	        and is_care_order = #{isCareOrder,jdbcType=BIT}
+	      </if>
+	      <if test="isMobile != null">
+	        and is_mobile = #{isMobile,jdbcType=BIT}
+	      </if>
+	      <if test="isRealUser != null">
+	        and is_real_user = #{isRealUser,jdbcType=BIT}
+	      </if>
+	      <if test="installment != null">
+	        and installment = #{installment,jdbcType=TINYINT}
+	      </if>
+	      <if test="installmentMoney != null">
+	        and installment_money = #{installmentMoney,jdbcType=VARCHAR}
+	      </if>
+	      <if test="offerNum != null">
+	        and offer_num = #{offerNum,jdbcType=SMALLINT}
+	      </if>
+	      <if test="offerMoney != null">
+	        and offer_money = #{offerMoney,jdbcType=DECIMAL}
+	      </if>
+	      <if test="platfrom != null">
+	        and platfrom = #{platfrom,jdbcType=VARCHAR}
+	      </if>
+	      <if test="status != null">
+	        and status = #{status,jdbcType=BIT}
+	      </if>
+	      <if test="url != null">
+	        and url = #{url,jdbcType=VARCHAR}
+	      </if>	  
+		</where>
+	</sql>  
+ 
+  <insert id="merge" parameterType="com.hhly.cmscore.persistence.operate.po.OperateActivityConfigPO" 
+  useGeneratedKeys="true" keyProperty="id">
+    insert into operate_activity_config (id, activity_code, lottery_code,
+      single_order_money, single_user_red_money, single_user_money,
+      single_user_day_money, real_user_num, mobile_num,user_type, rebate_user_type,config_type,
+      is_follow_order, is_care_order, is_mobile, 
+      is_real_user, installment, installment_money, 
+      offer_num, offer_money, platfrom, 
+      status, create_by, create_time, 
+      url,min_recharge_money,activity_day_num,is_dlt_add,is_cancel,is_award,is_activity_page,
+      icon,mobile_icon_url,pc_icon_url)
+    values (#{id,jdbcType=INTEGER}, #{activityCode,jdbcType=VARCHAR}, #{lotteryCode,jdbcType=SMALLINT},
+      #{singleOrderMoney,jdbcType=DECIMAL}, #{singleUserRedMoney,jdbcType=DECIMAL}, #{singleUserMoney,jdbcType=DECIMAL},
+      #{singleUserDayMoney,jdbcType=DECIMAL}, #{realUserNum,jdbcType=SMALLINT},#{mobileNum,jdbcType=SMALLINT}, #{userType,jdbcType=TINYINT},
+      #{rebateUserType, jdbcType=TINYINT},#{configType, jdbcType=TINYINT},
+      #{isFollowOrder,jdbcType=BIT}, #{isCareOrder,jdbcType=BIT}, #{isMobile,jdbcType=BIT}, 
+      #{isRealUser,jdbcType=BIT}, #{installment,jdbcType=TINYINT}, #{installmentMoney,jdbcType=VARCHAR}, 
+      #{offerNum,jdbcType=SMALLINT}, #{offerMoney,jdbcType=DECIMAL}, #{platfrom,jdbcType=VARCHAR}, 
+      #{status,jdbcType=BIT}, #{createBy,jdbcType=VARCHAR}, now(), #{url,jdbcType=VARCHAR},#{minRechargeMoney,jdbcType=DECIMAL},#{activityDayNum,jdbcType=INTEGER},
+      #{isDltAdd,jdbcType=INTEGER},#{isCancel,jdbcType=INTEGER},#{isAward,jdbcType=INTEGER},#{isActivityPage,jdbcType=INTEGER},
+      #{icon,jdbcType=VARCHAR},#{mobileIconUrl,jdbcType=VARCHAR},#{pcIconUrl,jdbcType=VARCHAR})
+	  ON DUPLICATE KEY UPDATE 
+	  lottery_code = #{lotteryCode,jdbcType=SMALLINT},
+	  single_order_money = #{singleOrderMoney,jdbcType=DECIMAL},
+	  single_user_red_money = #{singleUserRedMoney,jdbcType=DECIMAL},
+	  single_user_money = #{singleUserMoney,jdbcType=DECIMAL},
+	  single_user_day_money = #{singleUserDayMoney,jdbcType=DECIMAL},
+	  real_user_num = #{realUserNum,jdbcType=SMALLINT},
+	  mobile_num = #{mobileNum,jdbcType=SMALLINT},
+	  user_type = #{userType,jdbcType=TINYINT},
+      config_type = #{configType,jdbcType=TINYINT},
+	  rebate_user_type = #{rebateUserType, jdbcType=TINYINT},
+	  is_follow_order = #{isFollowOrder,jdbcType=BIT},
+	  is_care_order = #{isCareOrder,jdbcType=BIT},
+	  is_mobile = #{isMobile,jdbcType=BIT},
+	  is_real_user = #{isRealUser,jdbcType=BIT},
+	  installment = #{installment,jdbcType=TINYINT},
+	  installment_money = #{installmentMoney,jdbcType=VARCHAR},
+	  offer_num = #{offerNum,jdbcType=SMALLINT},
+	  offer_money = #{offerMoney,jdbcType=DECIMAL},
+	  platfrom = #{platfrom,jdbcType=VARCHAR},
+	  status = #{status,jdbcType=BIT},
+	  url = #{url,jdbcType=VARCHAR},
+	  min_recharge_money = #{minRechargeMoney,jdbcType=DECIMAL},
+	  activity_day_num = #{activityDayNum,jdbcType=INTEGER},
+	  modify_by = #{modifyBy,jdbcType=VARCHAR},
+	  modify_time = now(),
+	  is_dlt_add = #{isDltAdd,jdbcType=INTEGER},
+	  is_cancel = #{isCancel,jdbcType=INTEGER},
+	  is_award = #{isAward,jdbcType=INTEGER},
+	  is_activity_page = #{isActivityPage,jdbcType=INTEGER},
+	  icon = #{icon,jdbcType=VARCHAR},
+	  mobile_icon_url = #{mobileIconUrl,jdbcType=VARCHAR},
+	  pc_icon_url = #{pcIconUrl,jdbcType=VARCHAR}
+  </insert>
+
+	<select id="findDetail"
+		parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityConfigVO" resultMap="BoResultMap">
+		select
+		oac.id, oac.activity_code, oac.lottery_code, oac.single_order_money,
+		oac.single_user_red_money, oac.single_user_money,
+		oac.single_user_day_money, oac.real_user_num, oac.user_type,
+		oac.rebate_user_type,
+		oac.is_follow_order, oac.is_care_order,
+		oac.is_mobile, oac.Is_real_user, oac.installment, oac.installment_money,
+		oac.offer_num, oac.offer_money,
+		oac.platfrom, oac.status, oac.create_by, oac.create_time, oac.modify_by,
+		oac.modify_time, oac.update_time, oac.url,oac.mobile_num,
+		oac.icon, oac.mobile_icon_url, oac.pc_icon_url,
+		oar.id rule_id, oar.activity_config_id, oar.lottery_child_code,oac.is_activity_page,
+		oar.lottery_pass_type, oar.rule_type, oar.rule_start,
+		oar.rule_end, oar.win_start_money, oar.win_end_money, oar.rebate_type,
+		oar.rebate_num, oar.is_multiple, oar.multiple_sub,oar.is_add,
+		oar.added_add, oar.user_action, oar.gift_type, oar.gift_money, oar.status rule_status,oar.content_type,oar.single_user_num
+		from operate_activity_config oac left join operate_activity_rule oar
+		on oac.id = oar.activity_config_id
+		<where>
+			<if test="id != null">
+				and oac.id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="activityCode != null">
+				and oac.activity_code = #{activityCode,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by oac.id
+	</select>
+ 	<select id="findActivityCoupon"
+		parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityConfigVO" resultMap="ActivityCouponResultMap">
+		select
+		oac.id, oac.activity_code, oac.lottery_code, oac.single_order_money,
+		oac.single_user_red_money, oac.single_user_money,
+        oac.single_user_day_money, oac.real_user_num, oac.user_type,oac.config_type,
+		oac.is_follow_order, oac.is_care_order,
+		oac.is_mobile, oac.Is_real_user, oac.installment, oac.installment_money,
+		oac.offer_num, oac.offer_money, oac.mobile_num,
+		oac.platfrom, oac.status, oac.create_by, oac.create_time, oac.modify_by,
+		oac.modify_time, oac.update_time, oac.url,oac.min_recharge_money,oac.activity_day_num,
+		oar.id rule_id, oar.config_id, oar.red_type, oar.red_status, oar.red_value,oar.red_name,
+		oar.min_spend_amount, oar.ectivity_day, oar.active_end_time,oar.channel_id, oar.limit_platform, oar.limit_lottery,
+		oar.limit_lottery_child, oar.limit_lottery_child_type, oar.limit_num,oar.red_label,oar.operate_lottery_id
+		from operate_activity_config oac left join operate_coupon_temp oar
+		on oac.id = oar.config_id and oar.config_type=1
+		<where>
+			<if test="id != null">
+				and oac.id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="activityCode != null">
+				and oac.activity_code = #{activityCode,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by oac.id
+	</select>
+	
+	<select id="findActivityAward"
+		parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityConfigVO" resultMap="ActivityAwardResultMap">
+		select
+		oac.id, oac.activity_code, oac.lottery_code, oac.single_order_money,
+		oac.single_user_red_money, oac.single_user_money,
+		oac.single_user_day_money, oac.real_user_num, oac.user_type,
+		oac.is_follow_order, oac.is_care_order,
+		oac.is_mobile, oac.Is_real_user, oac.installment, oac.installment_money,
+		oac.offer_num, oac.offer_money,
+		oac.platfrom, oac.status, oac.create_by, oac.create_time, oac.modify_by,
+		oac.modify_time, oac.update_time, oac.url,oac.min_recharge_money,oac.activity_day_num,
+		oar.id rule_id, oar.activity_config_id, oar.award_color, oar.award_img, oar.award_text, oar.probability, oar.order_id, oar.type, oar.type_code,
+    	oap.red_type,oap.red_value,oap.min_spend_amount,oap.ectivity_day,oap.channel_id,oap.operate_lottery_id
+		from operate_activity_config oac left join operate_activity_award oar
+		on oac.id = oar.activity_config_id
+		left join operate_coupon_temp oap on oar.type_code = oap.id and oar.type =1
+		<where>
+			<if test="id != null">
+				and oac.id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="activityCode != null">
+				and oac.activity_code = #{activityCode,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by oar.order_id
+	</select>
+	
+	<select id="findActivityAddCode"
+		parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityConfigVO" resultMap="ActivityAddCodeResultMap">
+		select
+		oac.id, oac.activity_code, oac.lottery_code, oac.single_order_money,
+		oac.single_user_red_money, oac.single_user_money,
+		oac.single_user_day_money, oac.real_user_num, oac.user_type,
+		oac.is_follow_order, oac.is_care_order,
+		oac.is_mobile, oac.Is_real_user, oac.installment, oac.installment_money,
+		oac.offer_num, oac.offer_money,
+		oac.platfrom, oac.status, oac.create_by, oac.create_time, oac.modify_by,
+		oac.modify_time, oac.update_time, oac.url,oac.min_recharge_money,oac.activity_day_num,
+		oac.is_dlt_add,oac.is_cancel,oac.is_award,
+		oar.id rule_id, oar.activity_config_id, oar.lottery_child_code, oar.rule_type, oar.operate_activity_coupon_id, 
+		oar.add_num, oar.give_num, oar.single_user_num, oar.rule_offer_num,
+		oap.red_type, oap.red_status, oap.red_value,oap.red_name,
+		oap.min_spend_amount, oap.ectivity_day, oap.active_end_time,oap.channel_id, oap.limit_platform, oap.limit_lottery,
+		oap.limit_lottery_child, oap.limit_lottery_child_type, oap.limit_num,oap.red_label,oap.operate_lottery_id				
+		from operate_activity_config oac left join operate_activity_added oar
+		on oac.id = oar.activity_config_id
+		left join operate_coupon_temp oap on oar.operate_activity_coupon_id = oap.id
+		<where>
+			<if test="id != null">
+				and oac.id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="activityCode != null">
+				and oac.activity_code = #{activityCode,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by oac.id
+	</select>
+
+	<select id="findActivityChp"
+			parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateActivityConfigVO" resultMap="ActivityChpResultMap">
+		select
+		oac.id, oac.activity_code,oac.real_user_num,
+		oac.is_mobile, oac.is_real_user,oac.create_by, oac.create_time, oac.modify_by,
+		oac.modify_time,
+		oacg.id rule_id,
+		activity_config_id,
+		sport_against_info_id,
+		team_group,
+		ifnull(reality_user,0) reality_user,
+		win_status,
+		ifnull(local_user,0) local_user,
+		ifnull(reality_jackpot,0) reality_jackpot,
+		ifnull(local_jackpot,0) local_jackpot,
+		home_name,
+		order_id,
+		match_status,
+		IFNULL(`real`,0) `real_score`,
+		IFNULL(`local`,0) 'local_score'
+		from operate_activity_config oac
+		left join operate_activity_chp_guess oacg on oac.id = oacg.activity_config_id
+		LEFT JOIN sport_against_info sai ON oacg.sport_against_info_id = sai.id
+		LEFT JOIN (select a.activity_rule_id, SUM(case WHEN b.user_type = 1 then b.team_score else 0 end) as 'real',
+		SUM(case WHEN b.user_type = 2 then b.team_score else 0 end) as 'local' 
+		from operate_activity_info a LEFT JOIN operate_activity_chp_info b  on a.id = b.activity_info_id where activity_code = #{activityCode,jdbcType=VARCHAR}
+		group by a.activity_rule_id) scoreCount on oacg.id = scoreCount.activity_rule_id
+		<where>
+			<if test="id != null">
+				and oac.id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="activityCode != null">
+				and oac.activity_code = #{activityCode,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by oacg.order_id
+	</select>
+</mapper>

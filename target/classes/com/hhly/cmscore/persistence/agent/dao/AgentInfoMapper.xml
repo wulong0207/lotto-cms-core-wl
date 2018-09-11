@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.agent.dao.AgentInfoMapper">
+  <resultMap id="SubMemberResultMap" type="com.hhly.skeleton.cms.agent.bo.AgentSubMemberBO">
+    <result column="agentAccount" jdbcType="VARCHAR" property="agentAccount" />
+    <result column="agentRealName" jdbcType="VARCHAR" property="agentRealName" />
+    <result column="agentMobile" jdbcType="VARCHAR" property="agentMobile" />
+    <result column="memberAccount" jdbcType="VARCHAR" property="memberAccount" />
+    <result column="memberRealName" jdbcType="VARCHAR" property="memberRealName" />
+    <result column="monthOrderAmount" jdbcType="DOUBLE" property="monthOrderAmount" />
+    <result column="accruedOrderAmount" jdbcType="DOUBLE" property="accruedOrderAmount" />
+    <result column="accruedOrderNum" jdbcType="INTEGER" property="accruedOrderNum" />
+    <result column="memberUserId" jdbcType="INTEGER" property="memberUserId" />
+    <result column="memberAgentCode" jdbcType="VARCHAR" property="memberAgentCode" />
+  </resultMap>
+
+  <sql id="Tabel">
+    agent_info
+  </sql>
+
+  <sql id="All_Member_Clause">
+    <where>
+      <if test="memberAccount != null and memberAccount!=''">
+        and account_name = #{memberAccount}
+      </if>
+      <choose>
+        <when test="agentAccount !=null and agentAccount!=''">
+          and agent_code = (select agent_code from agent_info where user_id=(select id from m_user_info where account_name=#{agentAccount}))
+        </when>
+        <otherwise>
+          and agent_code in (select agent_code from agent_info)
+        </otherwise>
+      </choose>
+    </where>
+  </sql>
+
+    <sql id="Only_Agent_Clause">
+        <where>
+            <choose>
+                <when test="agentAccount !=null and agentAccount!=''">
+                    and agent_code = (select agent_code from agent_info where user_id=(select id from m_user_info where account_name=#{agentAccount}))
+                </when>
+                <otherwise>
+                    and agent_code in (select agent_code from agent_info)
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="memberAccount != null and memberAccount!=''">
+                    and account_name = #{memberAccount}
+                </when>
+                <otherwise>
+                    and id in (select user_id from agent_info)
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+
+  <sql id="Page_Clause">
+    <if test="startRow != null and endRow !=null">
+      limit #{startRow},#{pageSize}
+    </if>
+  </sql>
+
+  <select id="countDirect" parameterType="com.hhly.skeleton.cms.agent.vo.AgentQueryVO" resultType="int">
+    SELECT count(id) from m_user_info <include refid="All_Member_Clause"/>
+  </select>
+
+  <select id="findDirect" parameterType="com.hhly.skeleton.cms.agent.vo.AgentQueryVO" resultMap="SubMemberResultMap">
+      SELECT * from
+      (SELECT account_name memberAccount,actual_name memberRealName,agent_code,id memberUserId from m_user_info <include refid="All_Member_Clause"/>) child
+      join
+      (
+      SELECT a.*,b.agent_code from (
+      SELECT id,account_name agentAccount,actual_name agentRealName,cus_mobile agentMobile from m_user_info
+        <where>
+          <if test="agentAccount !=null and agentAccount!=''">
+            and account_name = #{agentAccount}
+          </if>
+        </where>
+      ) a
+      join
+      agent_info b
+      on a.id=b.user_id
+    ) parent
+
+    on parent.agent_code = child.agent_code
+    <include refid="Page_Clause"/>
+  </select>
+
+  <select id="countSub" parameterType="com.hhly.skeleton.cms.agent.vo.AgentQueryVO" resultType="int">
+      SELECT count(id) from m_user_info <include refid="Only_Agent_Clause"/>
+  </select>
+
+  <select id="findSub" parameterType="com.hhly.skeleton.cms.agent.vo.AgentQueryVO" resultMap="SubMemberResultMap">
+      SELECT * from
+      (
+          SELECT c.*,d.agent_code memberAgentCode from (
+          SELECT account_name memberAccount,actual_name memberRealName,agent_code,id memberUserId from m_user_info <include refid="Only_Agent_Clause"/>
+          ) c
+          join agent_info d on c.memberUserId = d.user_id
+      ) child
+      join
+      (
+      SELECT a.*,b.agent_code from (
+      SELECT id,account_name agentAccount,actual_name agentRealName,cus_mobile agentMobile from m_user_info
+      <where>
+          <if test="agentAccount !=null and agentAccount!=''">
+              and account_name = #{agentAccount}
+          </if>
+      </where>
+      ) a
+      join
+      agent_info b
+      on a.id=b.user_id
+      ) parent
+      on parent.agent_code = child.agent_code
+      <include refid="Page_Clause"/>
+  </select>
+
+    <!--
+    <select id="countSub" parameterType="com.hhly.skeleton.cms.agent.vo.AgentQueryVO" resultType="int">
+      SELECT count(id) from m_user_info
+      <where>
+          agent_code in (
+          select agent_code from agent_info where parent_agent_id in (
+          select id from agent_info where user_id in (
+          SELECT id from m_user_info
+          <where>
+              <if test="agentAccount !=null and agentAccount!=''">
+                  and account_name = #{agentAccount}
+              </if>
+          </where>
+          )
+          )
+          )
+          <if test="subAccount != null and subAccount!=''">
+              and account_name = #{subAccount}
+          </if>
+      </where>
+  </select>
+
+  <select id="findSub" parameterType="com.hhly.skeleton.cms.agent.vo.AgentQueryVO" resultMap="SubMemberResultMap">
+      SELECT * from (
+      SELECT id,account_name agentAccount,actual_name agentRealName,cus_mobile agentMobile from m_user_info
+      <where>
+          <if test="agentAccount !=null and agentAccount!=''">
+              and account_name = #{agentAccount}
+          </if>
+      </where>
+      ) grandFather
+      join
+      (
+      SELECT c.*,d.user_id grandFatherUserId from (
+          select a.*,b.parent_agent_id from (
+          SELECT account_name memberAccount,actual_name memberRealName,agent_code,id subUserId from m_user_info
+          <where>
+              agent_code in (
+              select agent_code from agent_info where parent_agent_id in (
+              select id from agent_info where user_id in (
+              SELECT id from m_user_info
+              <where>
+                  <if test="agentAccount !=null and agentAccount!=''">
+                      and account_name = #{agentAccount}
+                  </if>
+              </where>
+              )
+              )
+              )
+              <if test="subAccount != null and subAccount!=''">
+                  and account_name = #{subAccount}
+              </if>
+          </where>
+          )a
+          join agent_info b
+          on a.agent_code = b.agent_code
+          ) c
+          join agent_info d
+          on c.parent_agent_id = d.id
+          ) grandSon
+      on grandFather.id = grandSon.grandFatherUserId
+      <include refid="Page_Clause"/>
+  </select>
+    -->
+</mapper>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.customer.dao.UserTypeDaoMapper">
+
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.customer.po.UserTypePO">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="CODE" jdbcType="VARCHAR" property="code"/>
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="DESCRIBE" jdbcType="VARCHAR" property="describe" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_BY" jdbcType="OTHER" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="OTHER" property="modifyBy" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  
+  <resultMap id="BoResultMap" type="com.hhly.skeleton.cms.customermgr.bo.UserTypeBO">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="CODE" jdbcType="VARCHAR" property="code"/>
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="DESCRIBE" jdbcType="VARCHAR" property="describe" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_BY" jdbcType="OTHER" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="OTHER" property="modifyBy" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap> 
+   
+   <resultMap id="ExcelResultMap" type="com.hhly.skeleton.cms.customermgr.bo.UserTypeExcelBO">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="USER_ID" jdbcType="INTEGER" property="userId"/>
+    <result column="TYPE_ID" jdbcType="INTEGER" property="typeId" />
+  </resultMap>
+   
+  <sql id="Base_Column_List">
+    ID, CODE, NAME, `DESCRIBE`, REMARK, CREATE_BY, MODIFY_BY, UPDATE_TIME, CREATE_TIME, MODIFY_TIME
+  </sql>
+  
+  <sql id="Base_Where_Clause">
+     1 = 1
+      <if test="id != null">
+        AND ID = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="code != null and code != ''">
+        AND CODE = #{code,jdbcType=VARCHAR},
+      </if>           
+      <if test="name != null and name != ''">
+        AND `NAME` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="describe != null and describe != ''">
+        AND `DESCRIBE` = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null and remark != ''">
+        AND REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null and createBy != ''">
+        AND CREATE_BY = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyBy != null and modifyBy != ''">
+        AND MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        AND UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null">
+        AND MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>  
+  </sql>
+  
+   <sql id="SQL_STATEMENT_ALL">
+	SELECT T.ID id, T.CODE code, T.`NAME` `name`, T.`DESCRIBE` `describe`, T.REMARK remark, 
+	T.CREATE_BY createBy, T.MODIFY_BY modifyBy, T.UPDATE_TIME updateTime,
+	T.CREATE_TIME createTime, T.MODIFY_TIME modifyTime
+	FROM M_TYPE T
+   </sql>
+	   
+  <sql id="SQL_CONDITION_ALL">
+  	where 1 = 1
+      <if test="id != null">
+        AND T.ID = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="code != null">
+        AND T.CODE = #{code,jdbcType=VARCHAR}
+      </if>
+      <if test="timeType != null">
+		<choose>  
+            <when test="timeType == 1">  
+                  <if test="beginTime != null">
+			        AND T.CREATE_TIME >= #{beginTime,jdbcType=TIMESTAMP} 
+			      </if>
+			      <if test="endTime != null">
+			        AND T.CREATE_TIME <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+      			 </if>
+            </when>  
+            <when test="timeType == 2">  
+                   <if test="beginTime != null">
+			        AND T.MODIFY_TIME >= #{beginTime,jdbcType=TIMESTAMP} 
+			      </if>
+			      <if test="endTime != null">
+			        AND T.MODIFY_TIME <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+      			 </if>
+            </when>  
+        </choose>         
+      </if>
+  </sql>  
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id"  parameterType="com.hhly.cmscore.persistence.customer.po.UserTypePO">
+    insert into M_TYPE (CODE, `NAME`, `DESCRIBE`, 
+      REMARK, CREATE_BY, MODIFY_BY, 
+      UPDATE_TIME, CREATE_TIME, MODIFY_TIME
+      )
+    values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{describe,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{modifyBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP}, now(), #{modifyTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  
+  <delete id="deleteByIds" parameterType="java.util.List">
+	delete from M_TYPE
+	where ID in
+	<foreach collection="list" item="item" open="(" close=")"
+		separator=",">
+		#{item}
+	</foreach>
+  </delete>
+  
+  <select id="find" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserTypeVO" resultMap="BoResultMap">
+  	<include refid="SQL_STATEMENT_ALL" /> 
+  	
+  	<include refid="SQL_CONDITION_ALL" /> 
+  	order by 
+     <choose>  
+         <when test="sortField !=null and sortField!=''">  
+             ${sortField} ${sortOrder}
+         </when>   
+         <otherwise>  
+              T.ID
+         </otherwise>  
+      </choose>    	
+  	 <if test="startRow != null and pageSize != null">
+   		 limit #{startRow} , #{pageSize} 
+ 	 </if>
+  </select>
+  
+  <select id="findTotal" parameterType="com.hhly.skeleton.cms.customermgr.vo.UserTypeVO" resultType="java.lang.Integer">
+    SELECT count(1) FROM M_TYPE T
+    <include refid="SQL_CONDITION_ALL" />
+  </select>
+
+  <select id="findBaseUserType" resultMap="BoResultMap">
+  	select T.ID id, T.`NAME` `name` from M_TYPE T ORDER BY ID 
+  </select>
+  
+  <select id="findExcelByTypeId" parameterType="java.lang.Integer" resultMap="ExcelResultMap">
+  	select U.ID id, U.USER_ID userId, U.TYPE_ID typeId from M_USER_TYPE U where U.TYPE_ID = #{typeId, jdbcType=VARCHAR} ORDER BY U.ID 
+  </select>
+  
+  <select id="valiUserTypeCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+  	select count(1) from M_TYPE where code = #{code,jdbcType=VARCHAR}
+  </select>
+    
+  <update id="updateById" parameterType="com.hhly.cmscore.persistence.customer.po.UserTypePO">
+	 update M_TYPE
+	    <set>
+	        UPDATE_TIME = now(),
+	        MODIFY_TIME = now(),
+	      <if test="code != null">
+	        CODE = #{code,jdbcType=VARCHAR},
+	      </if>	    
+	      <if test="name != null">
+	        `NAME` = #{name,jdbcType=VARCHAR},
+	      </if>
+	      <if test="describe != null">
+	        `DESCRIBE` = #{describe,jdbcType=VARCHAR},
+	      </if>
+	      <if test="remark != null">
+	        REMARK = #{remark,jdbcType=VARCHAR},
+	      </if>
+	      <if test="createBy != null">
+	        CREATE_BY = #{createBy,jdbcType=VARCHAR},
+	      </if>
+	      <if test="modifyBy != null">
+	        MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+	      </if>
+	    </set>
+	    where ID = #{id,jdbcType=INTEGER}  	
+  </update> 
+  
+	<parameterMap id="paramMap" type="map" >
+		<parameter property="typeCode" jdbcType="VARCHAR" mode="IN" />
+	</parameterMap>
+	<insert id="addTypeToUser" parameterMap="paramMap" statementType="CALLABLE">
+		{call pr_user_type(?)}
+	</insert>    
+</mapper>

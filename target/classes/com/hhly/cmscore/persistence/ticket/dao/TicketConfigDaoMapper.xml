@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.cmscore.persistence.ticket.dao.TicketConfigDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.cmscore.persistence.ticket.po.TicketConfigPO">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="TICKET_CONFIG_ID" jdbcType="VARCHAR" property="ticketChannelId" />
+    <result column="LOTTERY_CODE" jdbcType="DECIMAL" property="lotteryCode" />
+    <result column="SEND_STATUS" jdbcType="DECIMAL" property="sendStatus" />
+    <result column="PRE_BATCH" jdbcType="VARCHAR" property="preBatch" />
+    <result column="PRE_TICKET" jdbcType="VARCHAR" property="preTicket" />
+    <result column="SEND_WEIGHT" jdbcType="DECIMAL" property="sendWeight" />
+    <result column="SEND_EACH_BATCH" jdbcType="DECIMAL" property="sendEachBatch" />
+    <result column="THREAD_COUNT" jdbcType="DECIMAL" property="threadCount" />
+    <result column="SEARCH_AUTO" jdbcType="DECIMAL" property="searchAuto" />
+    <result column="SEARCH_IDENT" jdbcType="VARCHAR" property="searchIdent" />
+    <result column="SEARCH_MAX_TICKET" jdbcType="DECIMAL" property="searchMaxTicket" />
+    <result column="END_SEND_SPACE" jdbcType="VARCHAR" property="endSendSpace" />
+    <result column="ALLOW_SEND_TIME" jdbcType="VARCHAR" property="allowSendTime" />
+    <result column="STOP_LOTTERY" jdbcType="VARCHAR" property="stopLottery" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="CREATE_BY" jdbcType="OTHER" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="OTHER" property="modifyBy" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+    <sql id="Base_Column_List">
+    ID, TICKET_CHANNEL_ID, LOTTERY_CODE,SEND_STATUS, PRE_BATCH, PRE_TICKET, SEND_WEIGHT, 
+    SEND_EACH_BATCH, THREAD_COUNT, SEARCH_AUTO, SEARCH_IDENT, SEARCH_MAX_TICKET, END_SEND_SPACE, 
+    ALLOW_SEND_TIME, STOP_LOTTERY, REMARK, CREATE_BY, MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+    CREATE_TIME
+  </sql>
+
+	<sql id="Column_List">
+		TC.ID,
+		TC.TICKET_CHANNEL_ID TICKETCHANNELID,
+		TC.LOTTERY_CODE LOTTERYCODE,
+		TC.SEND_STATUS SENDSTATUS,
+		TC.PRE_BATCH PREBATCH,
+		TC.PRE_TICKET PRETICKET,
+		TC.SEND_WEIGHT SENDWEIGHT,
+		TC.SEND_EACH_BATCH SENDEACHBATCH,
+		TC.THREAD_COUNT THREADCOUNT,
+		TC.SEARCH_AUTO SEARCHAUTO,
+		TC.SEARCH_IDENT SEARCHIDENT,
+		TC.SEARCH_MAX_TICKET SEARCHMAXTICKET,
+		TC.END_SEND_SPACE ENDSENDSPACE,
+		TC.ALLOW_SEND_TIME ALLOWSENDTIME,
+		TC.STOP_LOTTERY STOPLOTTERY,
+		TC.REMARK,
+		TC.CREATE_BY CREATEBY,
+		TC.MODIFY_BY MODIFYBY,
+		TC.MODIFY_TIME MODIFYTIME,
+		TC.UPDATE_TIME UPDATETIME,
+		TC.CREATE_TIME CREATETIME,
+		TC.DEALER_END_TIME DEALERENDTIME,
+		TC.start_money startmoney,
+		tc.end_moeny endmoeny
+	</sql>
+   
+	<sql id="sql_condition_TicketConfigVO">
+		<where>
+			<if test="lotteryCategory !=null ">
+				and lt.lottery_category = #{lotteryCategory}
+			</if>
+			<if test="lotteryCode !=null">
+				and tc.lottery_code = #{lotteryCode}
+			</if>
+			<if test="ticketChannelId !=null and ticketChannelId != ''">
+				and tc.ticket_Channel_Id = #{ticketChannelId}
+			</if>
+			<if test="sendStatus !=null ">
+				and tc.send_status = #{sendStatus}
+			</if>
+		</where>
+	</sql>
+	<select id="listPage" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketConfigVO"
+		resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketConfigBO">
+		 /*master*/
+		select
+		<include refid="Column_List" />
+		from TICKET_CONFIG TC
+		<if test="lotteryCategory !=null ">
+			left join lottery_type lt on lt.lottery_code = tc.lottery_code
+		</if>
+		<include refid="sql_condition_TicketConfigVO" />
+		order by
+		<choose>
+			<when test="sortField !=null and sortField!=''">
+				${sortField} ${sortOrder}
+			</when>
+			<otherwise>
+				TC.id
+			</otherwise>
+		</choose>
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow}, #{pageSize}
+		</if>
+	</select>
+	<select id="countPage" parameterType="com.hhly.skeleton.cms.ticketmgr.vo.TicketConfigVO" resultType="int">
+	    select count(1)
+	    from TICKET_CONFIG tc
+	    <if test="lotteryCategory !=null ">
+			left join lottery_type lt on lt.lottery_code = tc.lottery_code
+		</if>
+		<include refid="sql_condition_TicketConfigVO" />
+	</select>
+
+	<update id="update" parameterType="com.hhly.cmscore.persistence.ticket.po.TicketConfigPO">
+	update TICKET_CONFIG
+    set 
+      LOTTERY_CODE = #{lotteryCode,jdbcType=DECIMAL},
+      SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
+      PRE_BATCH = #{preBatch,jdbcType=VARCHAR},
+      PRE_TICKET = #{preTicket,jdbcType=VARCHAR},
+      SEND_WEIGHT = #{sendWeight,jdbcType=DECIMAL},
+      SEND_EACH_BATCH = #{sendEachBatch,jdbcType=DECIMAL},
+      THREAD_COUNT = #{threadCount,jdbcType=DECIMAL},
+      SEARCH_AUTO = #{searchAuto,jdbcType=DECIMAL},
+      SEARCH_IDENT = #{searchIdent,jdbcType=VARCHAR},
+      SEARCH_MAX_TICKET = #{searchMaxTicket,jdbcType=DECIMAL},
+      END_SEND_SPACE = #{endSendSpace,jdbcType=VARCHAR},
+      ALLOW_SEND_TIME = #{allowSendTime,jdbcType=VARCHAR},
+      STOP_LOTTERY = #{stopLottery,jdbcType=VARCHAR},
+      DEALER_END_TIME = #{dealerEndTime,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      MODIFY_BY = #{modifyBy,jdbcType=OTHER},
+      MODIFY_TIME = now(),
+      UPDATE_TIME = now(),
+      start_money = #{startMoney,jdbcType=DECIMAL},
+      end_moeny = #{endMoeny,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=DECIMAL}
+	</update>
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.hhly.cmscore.persistence.ticket.po.TicketConfigPO">
+		insert into TICKET_CONFIG (TICKET_CHANNEL_ID, LOTTERY_CODE, 
+      SEND_STATUS, PRE_BATCH, PRE_TICKET, 
+      SEND_WEIGHT, SEND_EACH_BATCH, THREAD_COUNT, 
+      SEARCH_AUTO, SEARCH_IDENT, SEARCH_MAX_TICKET, 
+      END_SEND_SPACE, ALLOW_SEND_TIME, STOP_LOTTERY, 
+      REMARK, CREATE_BY, MODIFY_BY, 
+      MODIFY_TIME, UPDATE_TIME, CREATE_TIME,DEALER_END_TIME,start_money,end_moeny
+      )
+    values (#{ticketChannelId,jdbcType=VARCHAR}, #{lotteryCode,jdbcType=DECIMAL}, 
+      #{sendStatus,jdbcType=DECIMAL}, #{preBatch,jdbcType=VARCHAR}, #{preTicket,jdbcType=VARCHAR}, 
+      #{sendWeight,jdbcType=DECIMAL}, #{sendEachBatch,jdbcType=DECIMAL}, #{threadCount,jdbcType=DECIMAL}, 
+      #{searchAuto,jdbcType=DECIMAL}, #{searchIdent,jdbcType=VARCHAR}, #{searchMaxTicket,jdbcType=DECIMAL}, 
+      #{endSendSpace,jdbcType=VARCHAR}, #{allowSendTime,jdbcType=VARCHAR}, #{stopLottery,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=OTHER}, #{modifyBy,jdbcType=OTHER}, 
+      now(),now(),now(),#{dealerEndTime,jdbcType=DECIMAL},#{startMoney,jdbcType=DECIMAL},#{endMoeny,jdbcType=DECIMAL}
+      )
+	</insert>
+	<select id="getTicketConfig" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketConfigBO">
+	  select 
+		SUM(TC.SEND_WEIGHT) SENDWEIGHT,
+	    tl.drawer_name DRAWERNAME
+  	  from TICKET_CONFIG tc
+      join TICKET_CHANNEL tl on tc.ticket_channel_id = tl.ticket_channel_id
+	  where tc.lottery_Code = #{lotteryCode}
+	  and tc.ticket_Channel_Id = #{channelId}
+	</select>
+</mapper>

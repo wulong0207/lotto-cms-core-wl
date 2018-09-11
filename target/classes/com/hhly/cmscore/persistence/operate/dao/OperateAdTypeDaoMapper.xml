@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.hhly.cmscore.persistence.operate.dao.OperateAdTypeDaoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.operatemgr.bo.OperateAdTypeBO">
+    <result column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="M_TYPE_ID" jdbcType="DECIMAL" property="mTypeId" />
+    <result column="ADV_ID" jdbcType="DECIMAL" property="advId" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CHANNEL_ID" jdbcType="VARCHAR" property="channelId" />
+  </resultMap>
+	<sql id="Base_Column_List">
+		ID, M_TYPE_ID, ADV_ID, UPDATE_TIME, CHANNEL_ID
+	</sql>
+	<sql id="Table">
+		OPERATE_ADV_TYPE
+	</sql>
+	
+	<insert id="batchAdd" parameterType="java.util.List">
+		insert into  <include refid="Table"/> (
+			 M_TYPE_ID, ADV_ID, UPDATE_TIME, CHANNEL_ID
+			)
+			values
+		<foreach collection="list" item="item" index="index" separator=",">			
+			 (
+			#{item.mTypeId,jdbcType=DECIMAL},
+			#{item.advId,jdbcType=DECIMAL}, 
+			now(),
+			#{item.channelId,jdbcType=DECIMAL}
+			)
+		</foreach>
+	</insert>
+
+	<delete id="delete" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateAdTypeVO">
+		delete from <include refid="Table"/> where ADV_ID = #{advId}
+	</delete>
+	
+	<select id="list" parameterType="com.hhly.skeleton.cms.operatemgr.vo.OperateAdTypeVO" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/> 
+			from <include refid="Table"/>
+			where ADV_ID = #{advId}
+	</select>
+</mapper>
